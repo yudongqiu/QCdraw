@@ -1,0 +1,545 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D9843341BB4DE3B00FAEC44 /* StreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */; settings = {ASSET_TAGS = (); }; };
+		F503060A1BBE25D900C489D1 /* diffuse-marble.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306091BBE25D900C489D1 /* diffuse-marble.jpg */; settings = {ASSET_TAGS = (); }; };
+		F503060C1BBE25DD00C489D1 /* normal-marble.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F503060B1BBE25DD00C489D1 /* normal-marble.jpg */; settings = {ASSET_TAGS = (); }; };
+		F503061C1BBE2B9400C489D1 /* diffuse-wood.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306191BBE2B9400C489D1 /* diffuse-wood.jpg */; settings = {ASSET_TAGS = (); }; };
+		F503061D1BBE2B9400C489D1 /* normal-wood.png in Resources */ = {isa = PBXBuildFile; fileRef = F503061A1BBE2B9400C489D1 /* normal-wood.png */; settings = {ASSET_TAGS = (); }; };
+		F50306281BBE48B400C489D1 /* normal-metal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306271BBE48B400C489D1 /* normal-metal.jpg */; settings = {ASSET_TAGS = (); }; };
+		F503062A1BBE48B800C489D1 /* diffuse-metal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306291BBE48B800C489D1 /* diffuse-metal.jpg */; settings = {ASSET_TAGS = (); }; };
+		F50791191BBDA916004E848B /* save3d.png in Resources */ = {isa = PBXBuildFile; fileRef = F50791181BBDA916004E848B /* save3d.png */; settings = {ASSET_TAGS = (); }; };
+		F54208F51BBC966B0018AEFE /* redo.png in Resources */ = {isa = PBXBuildFile; fileRef = F54208F31BBC966B0018AEFE /* redo.png */; settings = {ASSET_TAGS = (); }; };
+		F54208F61BBC966B0018AEFE /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = F54208F41BBC966B0018AEFE /* undo.png */; settings = {ASSET_TAGS = (); }; };
+		F54F8D001B5038D2001665CF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F8CFF1B5038D2001665CF /* AppDelegate.swift */; };
+		F54F8D021B5038D2001665CF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F8D011B5038D2001665CF /* ViewController.swift */; };
+		F54F8D041B5038D2001665CF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54F8D031B5038D2001665CF /* Images.xcassets */; };
+		F54F8D071B5038D2001665CF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F54F8D051B5038D2001665CF /* Main.storyboard */; };
+		F54F8D131B5038D2001665CF /* QChelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F8D121B5038D2001665CF /* QChelperTests.swift */; };
+		F54F8D221B505C21001665CF /* SceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F54F8D211B505C21001665CF /* SceneKit.framework */; };
+		F54F8D551B5066B0001665CF /* MySceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F8D541B5066B0001665CF /* MySceneView.swift */; };
+		F54F9BF11BB7CD9A00537E24 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BF01BB7CD9A00537E24 /* add.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9BF71BB7CDF300537E24 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BF21BB7CDF300537E24 /* camera.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9BF81BB7CDF300537E24 /* delete.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BF31BB7CDF300537E24 /* delete.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9BF91BB7CDF300537E24 /* open.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BF41BB7CDF300537E24 /* open.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9BFA1BB7CDF300537E24 /* rotate.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BF51BB7CDF300537E24 /* rotate.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9BFB1BB7CDF300537E24 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BF61BB7CDF300537E24 /* save.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9BFD1BB86BD400537E24 /* rotating.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BFC1BB86BD400537E24 /* rotating.png */; settings = {ASSET_TAGS = (); }; };
+		F54F9C011BB8749500537E24 /* CustomWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F9C001BB8749500537E24 /* CustomWindowController.swift */; settings = {ASSET_TAGS = (); }; };
+		F54FF2D31BB1F34F009CC98C /* Elements.plist in Resources */ = {isa = PBXBuildFile; fileRef = F54FF2D21BB1F34F009CC98C /* Elements.plist */; settings = {ASSET_TAGS = (); }; };
+		F54FF2D51BB2307C009CC98C /* Atoms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54FF2D41BB2307C009CC98C /* Atoms.swift */; settings = {ASSET_TAGS = (); }; };
+		F54FF2DB1BB24798009CC98C /* FileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54FF2DA1BB24798009CC98C /* FileParser.swift */; settings = {ASSET_TAGS = (); }; };
+		F58810561BCC38630026AA42 /* CartesianEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F58810551BCC38630026AA42 /* CartesianEditorViewController.swift */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F54F8D0D1B5038D2001665CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F54F8CF21B5038D2001665CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F54F8CF91B5038D2001665CF;
+			remoteInfo = QChelper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamReader.swift; sourceTree = "<group>"; };
+		F50306091BBE25D900C489D1 /* diffuse-marble.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "diffuse-marble.jpg"; sourceTree = "<group>"; };
+		F503060B1BBE25DD00C489D1 /* normal-marble.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "normal-marble.jpg"; sourceTree = "<group>"; };
+		F50306191BBE2B9400C489D1 /* diffuse-wood.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "diffuse-wood.jpg"; sourceTree = "<group>"; };
+		F503061A1BBE2B9400C489D1 /* normal-wood.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "normal-wood.png"; sourceTree = "<group>"; };
+		F50306271BBE48B400C489D1 /* normal-metal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "normal-metal.jpg"; sourceTree = "<group>"; };
+		F50306291BBE48B800C489D1 /* diffuse-metal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "diffuse-metal.jpg"; sourceTree = "<group>"; };
+		F50791181BBDA916004E848B /* save3d.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save3d.png; sourceTree = "<group>"; };
+		F54208F31BBC966B0018AEFE /* redo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = redo.png; sourceTree = "<group>"; };
+		F54208F41BBC966B0018AEFE /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = undo.png; sourceTree = "<group>"; };
+		F54F8CFA1B5038D2001665CF /* QCdraw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QCdraw.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F54F8CFE1B5038D2001665CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F54F8CFF1B5038D2001665CF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F54F8D011B5038D2001665CF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		F54F8D031B5038D2001665CF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		F54F8D061B5038D2001665CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F54F8D0C1B5038D2001665CF /* QCdraw.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QCdraw.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F54F8D111B5038D2001665CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F54F8D121B5038D2001665CF /* QChelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QChelperTests.swift; sourceTree = "<group>"; };
+		F54F8D211B505C21001665CF /* SceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SceneKit.framework; path = System/Library/Frameworks/SceneKit.framework; sourceTree = SDKROOT; };
+		F54F8D541B5066B0001665CF /* MySceneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySceneView.swift; sourceTree = "<group>"; };
+		F54F9BF01BB7CD9A00537E24 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = add.png; sourceTree = "<group>"; };
+		F54F9BF21BB7CDF300537E24 /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
+		F54F9BF31BB7CDF300537E24 /* delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delete.png; sourceTree = "<group>"; };
+		F54F9BF41BB7CDF300537E24 /* open.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = open.png; sourceTree = "<group>"; };
+		F54F9BF51BB7CDF300537E24 /* rotate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rotate.png; sourceTree = "<group>"; };
+		F54F9BF61BB7CDF300537E24 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
+		F54F9BFC1BB86BD400537E24 /* rotating.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rotating.png; sourceTree = "<group>"; };
+		F54F9C001BB8749500537E24 /* CustomWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomWindowController.swift; sourceTree = "<group>"; };
+		F54FF2D21BB1F34F009CC98C /* Elements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Elements.plist; sourceTree = "<group>"; };
+		F54FF2D41BB2307C009CC98C /* Atoms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atoms.swift; sourceTree = "<group>"; };
+		F54FF2DA1BB24798009CC98C /* FileParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileParser.swift; sourceTree = "<group>"; };
+		F58810551BCC38630026AA42 /* CartesianEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartesianEditorViewController.swift; sourceTree = "<group>"; };
+		F5ADE8C91BB9E1BE00394B48 /* QCdraw.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = QCdraw.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F54F8CF71B5038D2001665CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F54F8D221B505C21001665CF /* SceneKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F54F8D091B5038D2001665CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F54F8CF11B5038D2001665CF = {
+			isa = PBXGroup;
+			children = (
+				F5ADE8C91BB9E1BE00394B48 /* QCdraw.entitlements */,
+				F54F8D211B505C21001665CF /* SceneKit.framework */,
+				F54F8CFC1B5038D2001665CF /* QChelper */,
+				F54F8D0F1B5038D2001665CF /* QChelperTests */,
+				F54F8CFB1B5038D2001665CF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F54F8CFB1B5038D2001665CF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F54F8CFA1B5038D2001665CF /* QCdraw.app */,
+				F54F8D0C1B5038D2001665CF /* QCdraw.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F54F8CFC1B5038D2001665CF /* QChelper */ = {
+			isa = PBXGroup;
+			children = (
+				F54F8CFF1B5038D2001665CF /* AppDelegate.swift */,
+				F54F8D011B5038D2001665CF /* ViewController.swift */,
+				F58810551BCC38630026AA42 /* CartesianEditorViewController.swift */,
+				F54F8D031B5038D2001665CF /* Images.xcassets */,
+				F54F9C001BB8749500537E24 /* CustomWindowController.swift */,
+				F54F8D051B5038D2001665CF /* Main.storyboard */,
+				F54F8D541B5066B0001665CF /* MySceneView.swift */,
+				F54FF2D41BB2307C009CC98C /* Atoms.swift */,
+				F54FF2DA1BB24798009CC98C /* FileParser.swift */,
+				1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */,
+				F54F8CFD1B5038D2001665CF /* Supporting Files */,
+			);
+			path = QChelper;
+			sourceTree = "<group>";
+		};
+		F54F8CFD1B5038D2001665CF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F5FBC7BF1BBDFB9D00D60B6B /* textures */,
+				F5646B8E1BC1A21500342BB6 /* icons */,
+				F54F8CFE1B5038D2001665CF /* Info.plist */,
+				F54FF2D21BB1F34F009CC98C /* Elements.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F54F8D0F1B5038D2001665CF /* QChelperTests */ = {
+			isa = PBXGroup;
+			children = (
+				F54F8D121B5038D2001665CF /* QChelperTests.swift */,
+				F54F8D101B5038D2001665CF /* Supporting Files */,
+			);
+			path = QChelperTests;
+			sourceTree = "<group>";
+		};
+		F54F8D101B5038D2001665CF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F54F8D111B5038D2001665CF /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F5646B8E1BC1A21500342BB6 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				F50791181BBDA916004E848B /* save3d.png */,
+				F54208F31BBC966B0018AEFE /* redo.png */,
+				F54208F41BBC966B0018AEFE /* undo.png */,
+				F54F9BF01BB7CD9A00537E24 /* add.png */,
+				F54F9BFC1BB86BD400537E24 /* rotating.png */,
+				F54F9BF21BB7CDF300537E24 /* camera.png */,
+				F54F9BF31BB7CDF300537E24 /* delete.png */,
+				F54F9BF41BB7CDF300537E24 /* open.png */,
+				F54F9BF51BB7CDF300537E24 /* rotate.png */,
+				F54F9BF61BB7CDF300537E24 /* save.png */,
+			);
+			name = icons;
+			sourceTree = "<group>";
+		};
+		F5FBC7BF1BBDFB9D00D60B6B /* textures */ = {
+			isa = PBXGroup;
+			children = (
+				F50306271BBE48B400C489D1 /* normal-metal.jpg */,
+				F50306291BBE48B800C489D1 /* diffuse-metal.jpg */,
+				F50306091BBE25D900C489D1 /* diffuse-marble.jpg */,
+				F503060B1BBE25DD00C489D1 /* normal-marble.jpg */,
+				F50306191BBE2B9400C489D1 /* diffuse-wood.jpg */,
+				F503061A1BBE2B9400C489D1 /* normal-wood.png */,
+			);
+			name = textures;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F54F8CF91B5038D2001665CF /* QCdraw */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F54F8D161B5038D2001665CF /* Build configuration list for PBXNativeTarget "QCdraw" */;
+			buildPhases = (
+				F54F8CF61B5038D2001665CF /* Sources */,
+				F54F8CF71B5038D2001665CF /* Frameworks */,
+				F54F8CF81B5038D2001665CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QCdraw;
+			productName = QChelper;
+			productReference = F54F8CFA1B5038D2001665CF /* QCdraw.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F54F8D0B1B5038D2001665CF /* QCdrawTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F54F8D191B5038D2001665CF /* Build configuration list for PBXNativeTarget "QCdrawTests" */;
+			buildPhases = (
+				F54F8D081B5038D2001665CF /* Sources */,
+				F54F8D091B5038D2001665CF /* Frameworks */,
+				F54F8D0A1B5038D2001665CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F54F8D0E1B5038D2001665CF /* PBXTargetDependency */,
+			);
+			name = QCdrawTests;
+			productName = QChelperTests;
+			productReference = F54F8D0C1B5038D2001665CF /* QCdraw.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F54F8CF21B5038D2001665CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = QYD;
+				TargetAttributes = {
+					F54F8CF91B5038D2001665CF = {
+						CreatedOnToolsVersion = 6.4;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
+					F54F8D0B1B5038D2001665CF = {
+						CreatedOnToolsVersion = 6.4;
+						TestTargetID = F54F8CF91B5038D2001665CF;
+					};
+				};
+			};
+			buildConfigurationList = F54F8CF51B5038D2001665CF /* Build configuration list for PBXProject "QCdraw" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F54F8CF11B5038D2001665CF;
+			productRefGroup = F54F8CFB1B5038D2001665CF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F54F8CF91B5038D2001665CF /* QCdraw */,
+				F54F8D0B1B5038D2001665CF /* QCdrawTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F54F8CF81B5038D2001665CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F54F9BF81BB7CDF300537E24 /* delete.png in Resources */,
+				F50791191BBDA916004E848B /* save3d.png in Resources */,
+				F54F8D041B5038D2001665CF /* Images.xcassets in Resources */,
+				F54F9BFB1BB7CDF300537E24 /* save.png in Resources */,
+				F503060C1BBE25DD00C489D1 /* normal-marble.jpg in Resources */,
+				F503062A1BBE48B800C489D1 /* diffuse-metal.jpg in Resources */,
+				F54F9BFD1BB86BD400537E24 /* rotating.png in Resources */,
+				F503060A1BBE25D900C489D1 /* diffuse-marble.jpg in Resources */,
+				F54FF2D31BB1F34F009CC98C /* Elements.plist in Resources */,
+				F503061D1BBE2B9400C489D1 /* normal-wood.png in Resources */,
+				F54208F51BBC966B0018AEFE /* redo.png in Resources */,
+				F50306281BBE48B400C489D1 /* normal-metal.jpg in Resources */,
+				F54F8D071B5038D2001665CF /* Main.storyboard in Resources */,
+				F54F9BFA1BB7CDF300537E24 /* rotate.png in Resources */,
+				F54F9BF11BB7CD9A00537E24 /* add.png in Resources */,
+				F503061C1BBE2B9400C489D1 /* diffuse-wood.jpg in Resources */,
+				F54208F61BBC966B0018AEFE /* undo.png in Resources */,
+				F54F9BF71BB7CDF300537E24 /* camera.png in Resources */,
+				F54F9BF91BB7CDF300537E24 /* open.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F54F8D0A1B5038D2001665CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F54F8CF61B5038D2001665CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D9843341BB4DE3B00FAEC44 /* StreamReader.swift in Sources */,
+				F54F8D021B5038D2001665CF /* ViewController.swift in Sources */,
+				F54FF2DB1BB24798009CC98C /* FileParser.swift in Sources */,
+				F54F8D551B5066B0001665CF /* MySceneView.swift in Sources */,
+				F54FF2D51BB2307C009CC98C /* Atoms.swift in Sources */,
+				F54F9C011BB8749500537E24 /* CustomWindowController.swift in Sources */,
+				F58810561BCC38630026AA42 /* CartesianEditorViewController.swift in Sources */,
+				F54F8D001B5038D2001665CF /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F54F8D081B5038D2001665CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F54F8D131B5038D2001665CF /* QChelperTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F54F8D0E1B5038D2001665CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F54F8CF91B5038D2001665CF /* QCdraw */;
+			targetProxy = F54F8D0D1B5038D2001665CF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		F54F8D051B5038D2001665CF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F54F8D061B5038D2001665CF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F54F8D141B5038D2001665CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F54F8D151B5038D2001665CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F54F8D171B5038D2001665CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = QCdraw.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = QChelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
+				PRODUCT_NAME = QCdraw;
+			};
+			name = Debug;
+		};
+		F54F8D181B5038D2001665CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = QCdraw.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = QChelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
+				PRODUCT_NAME = QCdraw;
+			};
+			name = Release;
+		};
+		F54F8D1A1B5038D2001665CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = QChelperTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Bruce.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = QCdraw;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QCdraw.app/Contents/MacOS/QCdraw";
+			};
+			name = Debug;
+		};
+		F54F8D1B1B5038D2001665CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = QChelperTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "Bruce.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = QCdraw;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QCdraw.app/Contents/MacOS/QCdraw";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F54F8CF51B5038D2001665CF /* Build configuration list for PBXProject "QCdraw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F54F8D141B5038D2001665CF /* Debug */,
+				F54F8D151B5038D2001665CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F54F8D161B5038D2001665CF /* Build configuration list for PBXNativeTarget "QCdraw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F54F8D171B5038D2001665CF /* Debug */,
+				F54F8D181B5038D2001665CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F54F8D191B5038D2001665CF /* Build configuration list for PBXNativeTarget "QCdrawTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F54F8D1A1B5038D2001665CF /* Debug */,
+				F54F8D1B1B5038D2001665CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F54F8CF21B5038D2001665CF /* Project object */;
+}
