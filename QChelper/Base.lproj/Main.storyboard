@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
-        <plugIn identifier="com.apple.SceneKitIBPlugin" version="9531"/>
+        <deployment version="101300" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.SceneKitIBPlugin" version="14460.31"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -54,17 +56,23 @@
                                     <items>
                                         <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                             <connections>
-                                                <action selector="open_file:" target="Ady-hI-5gd" id="o5m-SV-E9P"/>
+                                                <action selector="open_fileWithSender:" target="Ady-hI-5gd" id="dcX-yL-DSf"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
                                             <connections>
-                                                <action selector="save_snapshot:" target="Ady-hI-5gd" id="aon-mg-m9H"/>
+                                                <action selector="save_snapshotWithSender:" target="Ady-hI-5gd" id="xJc-bE-v4L"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Save 3D" keyEquivalent="3" id="O3I-QX-txq">
                                             <connections>
-                                                <action selector="export_dae:" target="Ady-hI-5gd" id="YaY-7X-awQ"/>
+                                                <action selector="export_daeWithSender:" target="Ady-hI-5gd" id="b8X-2O-3QK"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export tungsten json" id="RgB-Mr-Ccu">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="export_jsonWithSender:" target="Ady-hI-5gd" id="JRD-KZ-XoS"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
@@ -109,7 +117,7 @@
                                         <menuItem isSeparatorItem="YES" id="0kZ-yQ-vyw"/>
                                         <menuItem title="Add Bond" keyEquivalent="b" id="uRl-iY-unG">
                                             <connections>
-                                                <action selector="add_bond:" target="Ady-hI-5gd" id="7Am-qI-KGG"/>
+                                                <action selector="add_bondWithSender:" target="Ady-hI-5gd" id="Mw7-2X-t1R"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Delete" id="x3v-GG-iWU">
@@ -118,18 +126,18 @@ CA
 </string>
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="remove_selected_node:" target="Ady-hI-5gd" id="4bU-YJ-AwD"/>
+                                                <action selector="remove_selected_nodeWithSender:" target="Ady-hI-5gd" id="MMa-Gp-mfX"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Rotate" keyEquivalent="r" id="pa3-QI-u2k">
                                             <connections>
-                                                <action selector="rotate_molecule:" target="Ady-hI-5gd" id="d36-5f-ckK"/>
+                                                <action selector="rotate_moleculeWithSender:" target="Ady-hI-5gd" id="DcK-7A-BDm"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Transparentize" id="JYh-zZ-EzZ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="transparentize:" target="Ady-hI-5gd" id="EYs-wP-IfF"/>
+                                                <action selector="transparentizeWithSender:" target="Ady-hI-5gd" id="kH5-Yh-eo1"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Select All" keyEquivalent="a" id="Ruw-6m-B2m">
@@ -150,10 +158,28 @@ CA
                                                 <segue destination="BRf-wn-tXi" kind="show" id="uei-y4-W6g"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Recenter" id="58X-Le-JjP">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="view_recenterWithSender:" target="Ady-hI-5gd" id="tfb-OO-zLY"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="VdW Representation" id="ePW-6g-ekt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="switch_VdW_representationWithSender:" target="Ady-hI-5gd" id="Wvd-cN-7M9"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Increase Resolution" id="g3Y-RO-r6M">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="menu_high_reso_switch:" target="Voe-Tx-rLC" id="I7e-IE-OOO"/>
+                                                <action selector="menu_high_reso_switchWithSender:" target="Voe-Tx-rLC" id="pcH-qG-13m"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Cast Shadows" id="y7j-2A-EYG">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="cast_shadowsWithSender:" target="Ady-hI-5gd" id="xYX-QH-ynl"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Texture" id="IGp-7r-3Q1">
@@ -163,25 +189,25 @@ CA
                                                     <menuItem title="Default" id="6mW-ce-tjq">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_none:" target="Ady-hI-5gd" id="Zqn-Jn-B6W"/>
+                                                            <action selector="change_texture_noneWithSender:" target="Ady-hI-5gd" id="wfl-WO-pgq"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Metal" id="eVO-vv-xOR">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_metal:" target="Ady-hI-5gd" id="3sG-ce-3UH"/>
+                                                            <action selector="change_texture_metalWithSender:" target="Ady-hI-5gd" id="KMf-Q1-aYO"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Marble" id="Ksj-7q-Bvi">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_marble:" target="Ady-hI-5gd" id="XpH-Iu-KUv"/>
+                                                            <action selector="change_texture_marbleWithSender:" target="Ady-hI-5gd" id="BhJ-Um-klq"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Wood" id="WxP-fS-O6n">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_wood:" target="Ady-hI-5gd" id="IgA-61-vUn"/>
+                                                            <action selector="change_texture_woodWithSender:" target="Ady-hI-5gd" id="9JV-uT-WLd"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -236,8 +262,10 @@ CA
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="QCdraw" customModuleProvider="target">
                     <connections>
+                        <outlet property="menu_cast_shadow" destination="y7j-2A-EYG" id="0U1-7W-8cZ"/>
                         <outlet property="menu_high_reso" destination="g3Y-RO-r6M" id="Wlm-fb-3Lt"/>
                         <outlet property="menu_rotate" destination="pa3-QI-u2k" id="Iym-Xf-RB4"/>
+                        <outlet property="menu_vdw_representation" destination="ePW-6g-ekt" id="GZg-JX-K3h"/>
                     </connections>
                 </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -248,11 +276,14 @@ CA
         <scene sceneID="7k3-0Y-k1b">
             <objects>
                 <windowController showSeguePresentationStyle="single" id="BRf-wn-tXi" sceneMemberID="viewController">
-                    <window key="window" title="Cartesian Editor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="hnA-QG-Z67">
+                    <window key="window" title="Cartesian Editor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="hnA-QG-Z67">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="478" y="360" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+                        <connections>
+                            <outlet property="delegate" destination="BRf-wn-tXi" id="y39-bk-rxj"/>
+                        </connections>
                     </window>
                     <connections>
                         <segue destination="hMX-Ea-sHl" kind="relationship" relationship="window.shadowedContentViewController" id="aFg-Zx-kTc"/>
@@ -267,39 +298,39 @@ CA
             <objects>
                 <viewController id="hMX-Ea-sHl" customClass="CartesianEditorViewController" customModule="QCdraw" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="lYK-Hz-YMM">
-                        <rect key="frame" x="0.0" y="0.0" width="420" height="311"/>
+                        <rect key="frame" x="0.0" y="0.0" width="432" height="311"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZqL-n9-QpZ">
-                                <rect key="frame" x="-1" y="38" width="422" height="234"/>
-                                <clipView key="contentView" ambiguous="YES" id="1by-L2-zgE">
-                                    <rect key="frame" x="1" y="1" width="420" height="232"/>
+                                <rect key="frame" x="-1" y="38" width="434" height="234"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <clipView key="contentView" ambiguous="YES" drawsBackground="NO" id="1by-L2-zgE">
+                                    <rect key="frame" x="1" y="1" width="417" height="232"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView ambiguous="YES" importsGraphics="NO" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="GrP-qd-WOP">
-                                            <rect key="frame" x="0.0" y="0.0" width="420" height="232"/>
+                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="GrP-qd-WOP">
+                                            <rect key="frame" x="0.0" y="0.0" width="417" height="232"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <size key="minSize" width="420" height="232"/>
+                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="417" height="232"/>
                                             <size key="maxSize" width="479" height="10000000"/>
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="420" height="232"/>
-                                            <size key="maxSize" width="479" height="10000000"/>
                                         </textView>
                                     </subviews>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="eV7-g5-7XB">
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="eV7-g5-7XB">
                                     <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="yt8-en-5Hv">
-                                    <rect key="frame" x="405" y="1" width="16" height="232"/>
+                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="yt8-en-5Hv">
+                                    <rect key="frame" x="418" y="1" width="15" height="232"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CnW-Wn-GBl">
-                                <rect key="frame" x="-2" y="280" width="424" height="18"/>
+                                <rect key="frame" x="4" y="280" width="424" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=" Atom                  x                              y                               z" id="WcX-OF-Qmv">
                                     <font key="font" metaFont="system" size="14"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -307,7 +338,8 @@ CA
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Iwj-0T-XgY">
-                                <rect key="frame" x="323" y="2" width="89" height="32"/>
+                                <rect key="frame" x="329" y="2" width="89" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0FI-1v-BGc">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -316,11 +348,12 @@ DQ
 </string>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="ok:" target="hMX-Ea-sHl" id="o1C-3o-J4e"/>
+                                    <action selector="okWithSender:" target="hMX-Ea-sHl" id="fmO-9V-47Z"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Blc-Tg-q35">
-                                <rect key="frame" x="228" y="2" width="89" height="32"/>
+                                <rect key="frame" x="234" y="2" width="89" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="LjH-Ua-7DO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -329,11 +362,12 @@ Gw
 </string>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="cancel:" target="hMX-Ea-sHl" id="a7H-Rd-dSf"/>
+                                    <action selector="cancelWithSender:" target="hMX-Ea-sHl" id="ZtJ-hF-1KN"/>
                                 </connections>
                             </button>
                             <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SC6-4O-woS">
-                                <rect key="frame" x="18" y="6" width="96" height="26"/>
+                                <rect key="frame" x="24" y="6" width="96" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Angstrom" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="pBR-w8-CpY" id="ol9-tO-ri1">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -349,7 +383,7 @@ Gw
                     </view>
                     <connections>
                         <outlet property="textfield" destination="GrP-qd-WOP" id="66L-W3-9o4"/>
-                        <outlet property="unit_selection" destination="SC6-4O-woS" id="NLQ-4j-J4x"/>
+                        <outlet property="unit_selection" destination="SC6-4O-woS" id="3gY-nb-70V"/>
                     </connections>
                 </viewController>
                 <customObject id="KTN-f8-vG3" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -360,7 +394,7 @@ Gw
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" customClass="CustomWindowController" customModule="QCdraw" customModuleProvider="target" sceneMemberID="viewController">
-                    <window key="window" title="QCdraw" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="QCdraw" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <rect key="contentRect" x="360" y="50" width="1024" height="768"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
@@ -370,27 +404,27 @@ Gw
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="EPQ-uy-JYQ"/>
                                 <toolbarItem implicitItemIdentifier="046FBBE4-A533-4131-8A2A-66A70C29C0BD" label="Open" paletteLabel="Open" tag="-1" image="open" id="yiZ-hX-kk6">
                                     <connections>
-                                        <action selector="open_file:" target="Oky-zY-oP4" id="J5u-X8-QvD"/>
+                                        <action selector="open_fileWithSender:" target="Oky-zY-oP4" id="TYD-4Q-9Yk"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="49CCA4D9-A78D-47DC-BB74-A60FF950496F" label="Save" paletteLabel="Save" tag="-1" image="save" id="tLF-I3-A7g">
                                     <connections>
-                                        <action selector="save_snapshot:" target="Oky-zY-oP4" id="wFw-Gi-zqZ"/>
+                                        <action selector="save_snapshotWithSender:" target="Oky-zY-oP4" id="T4u-xv-iyI"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="43006C3E-23D1-4E10-BC2D-909B26CBE2B8" label="+Bond" paletteLabel="+Bond" tag="-1" image="add" id="35P-QO-eMj">
                                     <connections>
-                                        <action selector="add_bond:" target="Oky-zY-oP4" id="H5X-pa-q3r"/>
+                                        <action selector="add_bondWithSender:" target="Oky-zY-oP4" id="f09-KP-xeS"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="2876AA38-6011-4B9F-86F2-9A7731F6030F" label="Delete" paletteLabel="Delete" tag="-1" image="delete" id="UK5-lM-Dhi">
                                     <connections>
-                                        <action selector="remove_selected_node:" target="Oky-zY-oP4" id="ouB-zc-gci"/>
+                                        <action selector="remove_selected_nodeWithSender:" target="Oky-zY-oP4" id="abe-gI-Rux"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="8865A43B-E2B6-4F1B-9817-C28A404780BC" label="Rotate" paletteLabel="Rotate" tag="-1" image="rotate" id="Ijq-In-Lcp">
                                     <connections>
-                                        <action selector="rotate_molecule:" target="Oky-zY-oP4" id="VaN-Sh-4Te"/>
+                                        <action selector="rotate_moleculeWithSender:" target="Oky-zY-oP4" id="MQn-nG-PhD"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="FC69791E-0DEF-406D-AFB8-6858D02000AF" label="Undo" paletteLabel="Undo" tag="-1" image="undo" autovalidates="NO" id="EXF-Vs-fhl">
@@ -405,7 +439,7 @@ Gw
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="8F08EAA0-9309-436B-99B0-38904B02F3EF" label="Save 3D" paletteLabel="Save 3D" tag="-1" image="save3d" id="k6E-Pl-JIR">
                                     <connections>
-                                        <action selector="export_dae:" target="Oky-zY-oP4" id="t0q-IT-Okp"/>
+                                        <action selector="export_daeWithSender:" target="Oky-zY-oP4" id="tJE-np-UUt"/>
                                     </connections>
                                 </toolbarItem>
                             </allowedToolbarItems>
@@ -423,9 +457,12 @@ Gw
                                 <toolbarItem reference="Ijq-In-Lcp"/>
                             </defaultToolbarItems>
                         </toolbar>
+                        <connections>
+                            <outlet property="delegate" destination="B8D-0N-5wS" id="aG2-eL-Fpc"/>
+                        </connections>
                     </window>
                     <connections>
-                        <outlet property="toolbar_rotate" destination="Ijq-In-Lcp" id="w0c-1o-cRH"/>
+                        <outlet property="toolbar_rotate" destination="Ijq-In-Lcp" id="l4d-Q1-N7g"/>
                         <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
                     </connections>
                 </windowController>
@@ -449,7 +486,7 @@ Gw
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <sceneView sceneName="" loops="YES" jitteringEnabled="YES" autoenablesDefaultLighting="YES" allowsCameraControl="YES" preferredRenderingAPI="0" translatesAutoresizingMaskIntoConstraints="NO" id="0Gw-Ns-Apl" customClass="MySceneView" customModule="QCdraw" customModuleProvider="target">
+                            <sceneView sceneName="" jitteringEnabled="YES" allowsCameraControl="YES" preferredRenderingAPI="1" translatesAutoresizingMaskIntoConstraints="NO" id="0Gw-Ns-Apl" customClass="MySceneView" customModule="QCdraw">
                                 <rect key="frame" x="0.0" y="0.0" width="815" height="544"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </sceneView>
@@ -471,7 +508,7 @@ Gw
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="162.5" y="1287"/>
+            <point key="canvasLocation" x="210.5" y="1597"/>
         </scene>
     </scenes>
     <resources>

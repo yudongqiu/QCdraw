@@ -8,25 +8,32 @@
 
 import Foundation
 
+
+
 class file_parser {    
     var AtomList : [atom] = []
     let bohr_to_angstrom = 0.529177208
+    // Read Elements.plist for Elements Data
+    var myDict: NSDictionary?
     init (path: String) {
+        if let dpath = Bundle.main.path(forResource: "Elements", ofType: "plist") {
+            myDict = NSDictionary(contentsOfFile: dpath)
+        }
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
             }
             var data_source = "unknown"
             for line in aStreamReader {
-                if line.containsString("PSI4:") {
+                if line.contains("PSI4:") {
                     data_source = "psi4"
                     break
                 }
-                else if line.containsString("MOLPRO") {
+                else if line.contains("MOLPRO") {
                     data_source = "molpro"
                     break
                 }
-                else if line.containsString("CFOUR") {
+                else if line.contains("CFOUR") {
                     data_source = "cfour"
                     break
                 }
@@ -37,24 +44,22 @@ class file_parser {
                 var geoline = 0
                 var linecount = 0
                 for line in aStreamReader {
-                    if line.containsString("Cartesian Geometry") {
+                    if line.contains("Cartesian Geometry") {
                         geoline = linecount
                     }
-                    linecount++
+                    linecount += 1
                 }
                 // go to the last geometry section
                 aStreamReader.rewind()
                 if geoline == 0 { // if optimization not found
                     for line in aStreamReader {
-                        if line.containsString("Geometry") {
+                        if line.contains("Geometry") {
                             break
                         }
                     }
                 }
                 else { // go to the last optimization point
-                    for _ in 0..<geoline {
-                        aStreamReader.nextLine()
-                    }
+                    aStreamReader.skiplines(lineNumber: geoline)
                 }
                 var geofound = false // Did we find the geometry?
                 for line in aStreamReader {
@@ -63,12 +68,12 @@ class file_parser {
                     if inline.count == 4 {
                         if let posx = inline[1].doubleValue {
                             if let posy = inline[2].doubleValue {
-                                if let posz = inline[3].doubleValue{
+                                if let posz = inline[3].doubleValue {
                                     var new_atom = atom()
-                                    new_atom.name = inline[0]
+                                    new_atom.name = inline[0] as NSString
                                     new_atom.pos = [CGFloat(posx),CGFloat(posy),CGFloat(posz)]
-                                    new_atom.radius = dict_atom_radius(new_atom.name)
-                                    new_atom.color = dict_atom_color(new_atom.name)
+                                    new_atom.radius = dict_atom_radius(name: new_atom.name)
+                                    new_atom.color = dict_atom_color(name: new_atom.name)
                                     AtomList.append(new_atom)
                                     geofound = true
                                     continue
@@ -85,16 +90,16 @@ class file_parser {
                 var geoline = 0
                 var linecount = 0
                 for line in aStreamReader {
-                    if line.containsString("Current geometry") {
+                    if line.contains("Current geometry") {
                         geoline = linecount
                     }
-                    linecount++
+                    linecount += 1
                 }
                 aStreamReader.rewind()
                 // if not found, goto first Atomic Coordinates (in Bohr)
                 if geoline == 0 {
                     for line in aStreamReader {
-                        if line.containsString("ATOMIC COORDINATES") {
+                        if line.contains("ATOMIC COORDINATES") {
                             break
                         }
                     }
@@ -107,10 +112,10 @@ class file_parser {
                                 if let posy = inline[4].doubleValue {
                                     if let posz = inline[5].doubleValue{
                                         var new_atom = atom()
-                                        new_atom.name = inline[1]
+                                        new_atom.name = inline[1] as NSString
                                         new_atom.pos = [CGFloat(posx * bohr_to_angstrom),CGFloat(posy * bohr_to_angstrom),CGFloat(posz * bohr_to_angstrom)]
-                                        new_atom.radius = dict_atom_radius(new_atom.name)
-                                        new_atom.color = dict_atom_color(new_atom.name)
+                                        new_atom.radius = dict_atom_radius(name: new_atom.name)
+                                        new_atom.color = dict_atom_color(name: new_atom.name)
                                         AtomList.append(new_atom)
                                         geofound = true
                                         continue
@@ -124,9 +129,7 @@ class file_parser {
                 }
                 else { // if found Current geometry in opt jobs
                     // go to the last geometry section
-                    for _ in 0...geoline {
-                        aStreamReader.nextLine()
-                    }
+                    aStreamReader.skiplines(lineNumber: geoline+1)
                     var geofound = false // Did we find the geometry?
                     for line in aStreamReader {
                         let inline = line.split()
@@ -136,10 +139,10 @@ class file_parser {
                                 if let posy = inline[2].doubleValue {
                                     if let posz = inline[3].doubleValue{
                                         var new_atom = atom()
-                                        new_atom.name = inline[0]
+                                        new_atom.name = inline[0] as NSString
                                         new_atom.pos = [CGFloat(posx),CGFloat(posy),CGFloat(posz)]
-                                        new_atom.radius = dict_atom_radius(new_atom.name)
-                                        new_atom.color = dict_atom_color(new_atom.name)
+                                        new_atom.radius = dict_atom_radius(name: new_atom.name)
+                                        new_atom.color = dict_atom_color(name: new_atom.name)
                                         AtomList.append(new_atom)
                                         geofound = true
                                         continue
@@ -157,16 +160,14 @@ class file_parser {
                 var geoline = 0
                 var linecount = 0
                 for line in aStreamReader {
-                    if line.containsString("Coordinates") {
+                    if line.contains("Coordinates") {
                         geoline = linecount
                     }
-                    linecount++
+                    linecount += 1
                 }
                 // go to the last geometry section
                 aStreamReader.rewind()
-                for _ in 0...geoline+2 {
-                    aStreamReader.nextLine()
-                }
+                aStreamReader.skiplines(lineNumber: geoline+3)
                 
                 for line in aStreamReader {
                     let inline = line.split()
@@ -179,10 +180,10 @@ class file_parser {
                             if let posy = inline[3].doubleValue {
                                 if let posz = inline[4].doubleValue{
                                     var new_atom = atom()
-                                    new_atom.name = inline[0]
+                                    new_atom.name = inline[0] as NSString
                                     new_atom.pos = [CGFloat(posx * bohr_to_angstrom),CGFloat(posy * bohr_to_angstrom),CGFloat(posz * bohr_to_angstrom)]
-                                    new_atom.radius = dict_atom_radius(new_atom.name)
-                                    new_atom.color = dict_atom_color(new_atom.name)
+                                    new_atom.radius = dict_atom_radius(name: new_atom.name)
+                                    new_atom.color = dict_atom_color(name: new_atom.name)
                                     AtomList.append(new_atom)
                                     continue
                                 }
@@ -203,10 +204,10 @@ class file_parser {
                             if let posy = inline[2].doubleValue {
                                 if let posz = inline[3].doubleValue{
                                     var new_atom = atom()
-                                    new_atom.name = inline[0]
+                                    new_atom.name = inline[0] as NSString
                                     new_atom.pos = [CGFloat(posx),CGFloat(posy),CGFloat(posz)]
-                                    new_atom.radius = dict_atom_radius(new_atom.name)
-                                    new_atom.color = dict_atom_color(new_atom.name)
+                                    new_atom.radius = dict_atom_radius(name: new_atom.name)
+                                    new_atom.color = dict_atom_color(name: new_atom.name)
                                     AtomList.append(new_atom)
                                     geofound = true
                                     continue
@@ -223,17 +224,29 @@ class file_parser {
     
     init() {}
     
+    func recenter () {
+        var sumx=0.0 as CGFloat, sumy=0.0 as CGFloat, sumz=0.0 as CGFloat
+        for atom in self.AtomList {
+            sumx += atom.pos[0]
+            sumy += atom.pos[1]
+            sumz += atom.pos[2]
+        }
+        let natoms = CGFloat(self.AtomList.count)
+        let ave_x = sumx / natoms
+        let ave_y = sumy / natoms
+        let ave_z = sumz / natoms
+        for i in 0..<Int(natoms) {
+            self.AtomList[i].pos[0] -= ave_x
+            self.AtomList[i].pos[1] -= ave_y
+            self.AtomList[i].pos[2] -= ave_z
+        }
+    }
+    
     func dict_atom_radius(name: NSString) -> CGFloat {
         var result : CGFloat = 0.5
-        // Read Elements.plist for Elements Data
-        var myDict: NSDictionary?
-        if let path = NSBundle.mainBundle().pathForResource("Elements", ofType: "plist") {
-            myDict = NSDictionary(contentsOfFile: path)
-        }
         if let dict = myDict {
-            let element_radius = dict.objectForKey("Element Radius")?.objectForKey(name)
-            if let radius = element_radius?.floatValue {
-                result = CGFloat(radius)
+            if let element_radius = (dict.object(forKey: "Element Radius") as! NSDictionary).object(forKey: name) as? NSNumber {
+                result = CGFloat(element_radius.floatValue)
             }
         }
         return result
@@ -241,12 +254,8 @@ class file_parser {
     
     func dict_atom_color(name: NSString) -> [CGFloat] {
         var result : [CGFloat] = [0.8, 0.8, 0.8]
-        var myDict: NSDictionary?
-        if let path = NSBundle.mainBundle().pathForResource("Elements", ofType: "plist") {
-            myDict = NSDictionary(contentsOfFile: path)
-        }
         if let dict = myDict {
-            let element_color = dict.objectForKey("Element Colors")?.objectForKey(name)
+            let element_color = (dict.object(forKey: "Element Colors") as! NSDictionary).object(forKey: name) as? [NSNumber]
             if let color = element_color {
                 if color.count == 3{
                     result[0] = CGFloat(color[0].floatValue/255)
@@ -257,12 +266,11 @@ class file_parser {
         }
         return result
     }
-
 }
 
 extension String {
     func split(delimiter: String = " ") -> [String] {
-        let line_split_raw = self.componentsSeparatedByString(delimiter)
+        let line_split_raw = self.components(separatedBy: delimiter)
         var line_split : [String] = []
         for item in line_split_raw {
             if item != "" && item != "\t" && item != " " {
@@ -271,18 +279,22 @@ extension String {
         }
         return(line_split)
     }
-    struct NumberFormatter {
-        static let instance = NSNumberFormatter()
-    }
     var doubleValue:Double? {
-        return NumberFormatter.instance.numberFromString(self)?.doubleValue
+        return NumberFormatter().number(from: self)?.doubleValue
     }
     var floatValue:Float? {
-        return NumberFormatter.instance.numberFromString(self)?.floatValue
+        return NumberFormatter().number(from: self)?.floatValue
     }
     var integerValue:Int? {
-        return NumberFormatter.instance.numberFromString(self)?.integerValue
+        return NumberFormatter().number(from: self)?.intValue
     }
+    func contains(_ find: String) -> Bool{
+        return self.range(of: find) != nil
+    }
+    func containsIgnoringCase(_ find: String) -> Bool{
+        return self.range(of: find, options: .caseInsensitive) != nil
+    }
+    
 }
 
 

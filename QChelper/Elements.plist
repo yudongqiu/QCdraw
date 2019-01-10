@@ -112,6 +112,8 @@
 			<real>2.04</real>
 			<key>I</key>
 			<real>2.3</real>
+			<key>Si</key>
+			<real>2.4</real>
 		</dict>
 		<key>F</key>
 		<dict>
@@ -143,6 +145,15 @@
 		<dict>
 			<key>I</key>
 			<real>2.9</real>
+		</dict>
+		<key>Fe</key>
+		<dict>
+			<key>C</key>
+			<integer>2</integer>
+			<key>O</key>
+			<integer>2</integer>
+			<key>N</key>
+			<integer>2</integer>
 		</dict>
 	</dict>
 	<key>Element Colors</key>
@@ -331,7 +342,7 @@
 	<key>Element Radius</key>
 	<dict>
 		<key>H</key>
-		<real>0.18</real>
+		<real>0.2</real>
 		<key>He</key>
 		<real>0.25</real>
 		<key>Li</key>
