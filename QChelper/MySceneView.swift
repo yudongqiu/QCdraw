@@ -96,7 +96,7 @@ class MySceneView: SCNView {
         
         // reset the rotate button
         appdelegate.menu_rotate.state = .off
-        windowController.toolbar_rotate.image = NSImage(named: NSImage.Name("rotate.png"))
+        windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
     }
     
     func add_atom(thisatom: atom) -> Void {
@@ -780,7 +780,7 @@ class MySceneView: SCNView {
             }
             // reset the rotate button
             appdelegate.menu_rotate.state = .off
-            windowController.toolbar_rotate.image = NSImage(named: NSImage.Name("rotate.png"))
+            windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
             return true
         }
         catch {
@@ -799,20 +799,20 @@ class MySceneView: SCNView {
                     material.reflective.contents = nil
                 }
                 if texture == "metal" {
-                    material.diffuse.contents = NSImage(named: NSImage.Name("diffuse-metal.jpg"))
-                    material.normal.contents = NSImage(named: NSImage.Name("normal-metal.jpg"))
+                    material.diffuse.contents = NSImage(named: "diffuse-metal.jpg")
+                    material.normal.contents = NSImage(named: "normal-metal.jpg")
                     material.specular.contents = nil
                     material.reflective.contents = nil
                 }
                 if texture == "marble" {
-                    material.diffuse.contents = NSImage(named: NSImage.Name("diffuse-marble.jpg"))
-                    material.normal.contents = NSImage(named: NSImage.Name("normal-marble.jpg"))
+                    material.diffuse.contents = NSImage(named: "diffuse-marble.jpg")
+                    material.normal.contents = NSImage(named: "normal-marble.jpg")
                     material.specular.contents = nil
                     material.reflective.contents = nil
                 }
                 if texture == "wood" {
-                    material.diffuse.contents = NSImage(named: NSImage.Name("diffuse-wood.jpg"))
-                    material.normal.contents = NSImage(named: NSImage.Name("normal-wood.png"))
+                    material.diffuse.contents = NSImage(named: "diffuse-wood.jpg")
+                    material.normal.contents = NSImage(named: "normal-wood.png")
                     material.specular.contents = nil
                     material.reflective.contents = nil
                 }
@@ -827,7 +827,7 @@ class MySceneView: SCNView {
     }
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        if let board = sender.draggingPasteboard().propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray {
+        if let board = sender.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray {
             if let path = board[0] as? String {
                 var success = false
                 if (path as NSString).pathExtension == "dae" {

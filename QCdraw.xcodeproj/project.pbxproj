@@ -64,7 +64,7 @@
 		F54F8D011B5038D2001665CF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		F54F8D031B5038D2001665CF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		F54F8D061B5038D2001665CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		F54F8D0C1B5038D2001665CF /* QCdraw.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QCdraw.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F54F8D0C1B5038D2001665CF /* QCdrawTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QCdrawTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F54F8D111B5038D2001665CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F54F8D121B5038D2001665CF /* QChelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QChelperTests.swift; sourceTree = "<group>"; };
 		F54F8D541B5066B0001665CF /* MySceneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySceneView.swift; sourceTree = "<group>"; };
@@ -113,7 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				F54F8CFA1B5038D2001665CF /* QCdraw.app */,
-				F54F8D0C1B5038D2001665CF /* QCdraw.xctest */,
+				F54F8D0C1B5038D2001665CF /* QCdrawTest.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -229,7 +229,7 @@
 			);
 			name = QCdrawTests;
 			productName = QChelperTests;
-			productReference = F54F8D0C1B5038D2001665CF /* QCdraw.xctest */;
+			productReference = F54F8D0C1B5038D2001665CF /* QCdrawTest.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -246,6 +246,7 @@
 					F54F8CF91B5038D2001665CF = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = XT8BC8793B;
+						LastSwiftMigration = 1010;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -255,6 +256,7 @@
 					F54F8D0B1B5038D2001665CF = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = XT8BC8793B;
+						LastSwiftMigration = 1010;
 						TestTargetID = F54F8CF91B5038D2001665CF;
 					};
 				};
@@ -476,6 +478,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
 				PRODUCT_NAME = QCdraw;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -489,6 +492,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
 				PRODUCT_NAME = QCdraw;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -508,7 +512,8 @@
 				INFOPLIST_FILE = QChelperTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Bruce.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = QCdraw;
+				PRODUCT_NAME = QCdrawTest;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QCdraw.app/Contents/MacOS/QCdraw";
 			};
 			name = Debug;
@@ -525,7 +530,8 @@
 				INFOPLIST_FILE = QChelperTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Bruce.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = QCdraw;
+				PRODUCT_NAME = QCdrawTest;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QCdraw.app/Contents/MacOS/QCdraw";
 			};
 			name = Release;

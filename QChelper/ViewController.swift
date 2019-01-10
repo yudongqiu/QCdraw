@@ -102,12 +102,12 @@ class ViewController: NSViewController {
             animation.repeatCount = .infinity //repeat forever
             mySceneView.moleculeNode.addAnimation(animation, forKey: "rot")
             appdelegate.menu_rotate.state = .on
-            windowController.toolbar_rotate.image = NSImage(named: NSImage.Name("rotating.png"))
+            windowController.toolbar_rotate.image = NSImage(named: "rotating.png")
         }
         else {
             mySceneView.moleculeNode.removeAnimation(forKey: "rot", blendOutDuration: 0.5)
             appdelegate.menu_rotate.state = .off
-            windowController.toolbar_rotate.image = NSImage(named: NSImage.Name("rotate.png"))
+            windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
         }
     }
     
