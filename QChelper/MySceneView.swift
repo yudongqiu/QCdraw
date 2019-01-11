@@ -918,6 +918,20 @@ class MySceneView: SCNView {
         self.adjust_focus()
     }
     
+    func toggleRotateAnimation() {
+        if self.moleculeNode.action(forKey: "rot") != nil {
+            self.moleculeNode.removeAction(forKey: "rot")
+        } else {
+            if let pov = self.pointOfView {
+                let p_up = pov.convertVector(SCNVector3(0,1,0), to: nil)
+                let axisAngle = SCNVector4(x: p_up.x, y: p_up.y, z: p_up.z, w: .pi*2)
+                let rotateAction = SCNAction.rotate(by: .pi*2, around: p_up, duration: 10)
+                let repeatAction = SCNAction.repeatForever(rotateAction)
+                self.moleculeNode.runAction(repeatAction, forKey: "rot")
+            }
+        }
+    }
+    
     
 } // end of class
 

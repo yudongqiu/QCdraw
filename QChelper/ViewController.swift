@@ -94,21 +94,14 @@ class ViewController: NSViewController {
     @IBAction func rotate_molecule(sender: NSButton) {
         let windowController = NSApplication.shared.windows[0].windowController as! CustomWindowController
         if appdelegate.menu_rotate.state == .off {
-            let animation = CABasicAnimation(keyPath: "rotation")
-            let p_up = mySceneView.pointOfView!.convertVector(SCNVector3(0,1,0), to: nil)
-            animation.fromValue = NSValue(scnVector4: SCNVector4(x: p_up.x, y: p_up.y, z: p_up.z, w: 0))
-            animation.toValue = NSValue(scnVector4: SCNVector4(x: p_up.x, y: p_up.y, z: p_up.z, w: .pi*2))
-            animation.duration = 10
-            animation.repeatCount = .infinity //repeat forever
-            mySceneView.moleculeNode.addAnimation(animation, forKey: "rot")
             appdelegate.menu_rotate.state = .on
             windowController.toolbar_rotate.image = NSImage(named: "rotating.png")
         }
         else {
-            mySceneView.moleculeNode.removeAnimation(forKey: "rot", blendOutDuration: 2.0)
             appdelegate.menu_rotate.state = .off
             windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
         }
+        mySceneView.toggleRotateAnimation()
     }
     
     @IBAction func add_bond(sender: NSButton) {
