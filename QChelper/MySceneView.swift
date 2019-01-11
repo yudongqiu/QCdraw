@@ -59,6 +59,7 @@ class MySceneView: SCNView {
 //        // create and add a light to the scene  
         self.lightNode.light = SCNLight()
         self.lightNode.light!.type = SCNLight.LightType.directional
+        self.lightNode.light!.castsShadow = (appdelegate.menu_cast_shadow.state == .on)
         self.lightNode.rotation = SCNVector4Make(1, 1, 0, -0.7)
         self.cameraNode.addChildNode(self.lightNode)
         
@@ -102,7 +103,6 @@ class MySceneView: SCNView {
     func add_atom(thisatom: atom) -> Void {
         // draw a sphere
         let sphereGeometry = SCNSphere(radius: thisatom.radius)
-        print(thisatom.name, thisatom.color)
         sphereGeometry.isGeodesic = true
         sphereGeometry.segmentCount = 50
         let color = NSColor(red: thisatom.color[0], green: thisatom.color[1], blue: thisatom.color[2], alpha: 1)
@@ -878,9 +878,7 @@ class MySceneView: SCNView {
             for eachnode in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
                 sumx += eachnode.position.x
                 sumy += eachnode.position.y
-                if maxz < eachnode.position.z {
-                    maxz = eachnode.position.z
-                }
+                maxz = max(maxz, eachnode.position.z)
             }
             let ave_x = sumx / CGFloat(total_number_of_atoms)
             let ave_y = sumy / CGFloat(total_number_of_atoms)
@@ -911,16 +909,12 @@ class MySceneView: SCNView {
         var shift = SCNVector3Zero
         for eachatom in self.normalatomnode.childNodes{
             shift += eachatom.position
-            print(eachatom.position)
         }
-        print(shift)
         let n = self.normalatomnode.childNodes.count + self.selectedatomnode.childNodes.count
-        print(n)
         shift /= CGFloat(n)
         for eachnode in self.normalatomnode.childNodes + self.normalbondnode.childNodes {
             eachnode.position -= shift
         }
-        print(shift)
         self.adjust_focus()
     }
     

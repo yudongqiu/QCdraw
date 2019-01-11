@@ -105,7 +105,7 @@ class ViewController: NSViewController {
             windowController.toolbar_rotate.image = NSImage(named: "rotating.png")
         }
         else {
-            mySceneView.moleculeNode.removeAnimation(forKey: "rot", blendOutDuration: 0.5)
+            mySceneView.moleculeNode.removeAnimation(forKey: "rot", blendOutDuration: 2.0)
             appdelegate.menu_rotate.state = .off
             windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
         }
