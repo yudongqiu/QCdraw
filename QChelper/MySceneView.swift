@@ -27,6 +27,7 @@ class MySceneView: SCNView {
     
     var click_location = NSPoint()
     var p_pov = SCNVector3Zero
+    var renderSegmentCount = 50 // for determine quality of rendering
     
     func init_scene() {
         //clean old nodes
@@ -63,7 +64,6 @@ class MySceneView: SCNView {
         self.lightNode.rotation = SCNVector4Make(1, 1, 0, -0.7)
         self.cameraNode.addChildNode(self.lightNode)
         
-        
         // add an ambient light to the scene
         let ambientLightNode = SCNNode()
         ambientLightNode.name = "ambientlght"
@@ -71,7 +71,6 @@ class MySceneView: SCNView {
         ambientLightNode.light!.type = SCNLight.LightType.ambient
         ambientLightNode.light!.color = NSColor(deviceWhite: 0.2, alpha: 1)
         scene.rootNode.addChildNode(ambientLightNode)
-        
         
         // setup nodes hierarchy
         scene.rootNode.addChildNode(self.moleculeNode)
@@ -81,17 +80,6 @@ class MySceneView: SCNView {
         self.atomnodes.addChildNode(self.selectedatomnode)
         self.bondnodes.addChildNode(self.normalbondnode)
         self.bondnodes.addChildNode(self.selectedbondnode)
-        
-        // try selected animation
-//        let selected_animation = CABasicAnimation(keyPath: "transform")
-//        let fromtrans = CATransform3DMakeScale(1.1, 1.1, 1.1)
-//        let totrans = CATransform3DMakeScale(0.9, 0.9, 0.9)
-//        selected_animation.fromValue = NSValue(CATransform3D: fromtrans)
-//        selected_animation.toValue = NSValue(CATransform3D: totrans)
-//        selected_animation.duration = 0.5
-//        selected_animation.autoreverses = true
-//        selected_animation.repeatCount = MAXFLOAT
-//        selectednode.addAnimation(selected_animation, forKey: "select")
         
         self.scene = scene
         
@@ -104,7 +92,7 @@ class MySceneView: SCNView {
         // draw a sphere
         let sphereGeometry = SCNSphere(radius: thisatom.radius)
         sphereGeometry.isGeodesic = true
-        sphereGeometry.segmentCount = 50
+        sphereGeometry.segmentCount = self.renderSegmentCount
         let color = NSColor(red: thisatom.color[0], green: thisatom.color[1], blue: thisatom.color[2], alpha: 1)
         sphereGeometry.firstMaterial?.multiply.contents = color
         let sphereNode = SCNNode(geometry: sphereGeometry)
@@ -129,6 +117,7 @@ class MySceneView: SCNView {
                 let d = point_a - point_b
                 let length = d.length()
                 let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
+                bondGeometry.radialSegmentCount = self.renderSegmentCount
                 bondGeometry.firstMaterial?.multiply.contents = bond_color
                 let bondNode = SCNNode(geometry: bondGeometry)
                 // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
@@ -762,6 +751,7 @@ class MySceneView: SCNView {
                 let input = file_parser(path: path)
                 if input.AtomList.count > 0 {
                     self.init_scene()
+                    self.renderSegmentCount = max(20, Int(50-input.AtomList.count/30))
                     for eachatom in input.AtomList{
                         self.add_atom(thisatom: eachatom)
                     }
