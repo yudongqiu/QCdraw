@@ -425,22 +425,23 @@ class MySceneView: SCNView {
         if hitResults.count > 0 {
             // retrieved the first clicked object
             let hitnode = hitResults[0].node
-            if self.normalatomnode.childNodes.contains(hitnode) {
+            let parentNode = hitnode.parent!
+            if parentNode == self.normalatomnode {
                 hitnode.removeFromParentNode()
                 self.addBlinkAnimation(node: hitnode)
                 self.selectedatomnode.addChildNode(hitnode)
             }
-            else if self.selectedatomnode.childNodes.contains(hitnode) {
+            else if parentNode == self.selectedatomnode {
                 hitnode.removeFromParentNode()
                 self.removeBlinkAnimation(node: hitnode)
-                self.selectedatomnode.addChildNode(hitnode)
+                self.normalatomnode.addChildNode(hitnode)
             }
-            else if self.normalbondnode.childNodes.contains(hitnode) {
+            else if parentNode == self.normalbondnode {
                 hitnode.removeFromParentNode()
                 self.addBlinkAnimation(node: hitnode)
                 self.selectedbondnode.addChildNode(hitnode)
             }
-            else if self.selectedbondnode.childNodes.contains(hitnode) {
+            else if parentNode == self.selectedbondnode {
                 hitnode.removeFromParentNode()
                 self.removeBlinkAnimation(node: hitnode)
                 self.normalbondnode.addChildNode(hitnode)
