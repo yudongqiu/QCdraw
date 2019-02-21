@@ -905,6 +905,7 @@ class MySceneView: SCNView {
             // adjust camara position
             self.pointOfView!.position = SCNVector3(x: ave_x, y: ave_y, z: maxz+11)
             self.pointOfView!.eulerAngles = SCNVector3(0, 0, 0)
+            self.cameraNode.transform = self.pointOfView!.transform
         }
     }
     
@@ -925,16 +926,16 @@ class MySceneView: SCNView {
     }
     
     func recenter() {
-        self.reset_selection()
-        var shift = SCNVector3Zero
-        for eachatom in self.normalatomnode.childNodes{
-            shift += eachatom.position
-        }
-        let n = self.normalatomnode.childNodes.count + self.selectedatomnode.childNodes.count
-        shift /= CGFloat(n)
-        for eachnode in self.normalatomnode.childNodes + self.normalbondnode.childNodes {
-            eachnode.position -= shift
-        }
+//        self.reset_selection()
+//        var shift = SCNVector3Zero
+//        for eachatom in self.normalatomnode.childNodes{
+//            shift += eachatom.position
+//        }
+//        let n = self.normalatomnode.childNodes.count + self.selectedatomnode.childNodes.count
+//        shift /= CGFloat(n)
+//        for eachnode in self.normalatomnode.childNodes + self.normalbondnode.childNodes {
+//            eachnode.position -= shift
+//        }
         self.adjust_focus()
     }
     
@@ -943,6 +944,22 @@ class MySceneView: SCNView {
             self.moleculeNode.removeAction(forKey: "rot")
         } else {
             if let pov = self.pointOfView {
+                // shift the pivot of moleculeNode to the center of all atoms
+                var sumx=0.0 as CGFloat, sumy=0.0 as CGFloat, sumz=0.0 as CGFloat
+                var total_number_of_atoms = 0.0 as CGFloat
+                for eachnode in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
+                    sumx += eachnode.position.x
+                    sumy += eachnode.position.y
+                    sumz += eachnode.position.z
+                    total_number_of_atoms += 1
+                }
+                let ave_x = sumx / total_number_of_atoms
+                let ave_y = sumy / total_number_of_atoms
+                let ave_z = sumz / total_number_of_atoms
+                let pivot = SCNMatrix4MakeTranslation(ave_x, ave_y, ave_z)
+                self.moleculeNode.pivot = pivot
+                self.moleculeNode.position = SCNVector3(ave_x, ave_y, ave_z)
+                // create rotation around the pivot pointing to "up"
                 let p_up = pov.convertVector(SCNVector3(0,1,0), to: nil)
                 let rotateAction = SCNAction.rotate(by: .pi*2, around: p_up, duration: 10)
                 let repeatAction = SCNAction.repeatForever(rotateAction)
