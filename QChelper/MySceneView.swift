@@ -666,10 +666,10 @@ class MySceneView: SCNView {
         let bond_color : NSColor = dict_bond_color(myDict: myDict!)
         // check every pair of atoms to determine if a bond need to be added
         for i in 0 ..< self.normalatomnode.childNodes.count {
+            let atom_a = self.normalatomnode.childNodes[i]
+            let point_a = atom_a.position
             for j in i+1 ..< self.normalatomnode.childNodes.count {
-                let atom_a = self.normalatomnode.childNodes[i]
                 let atom_b = self.normalatomnode.childNodes[j]
-                let point_a = atom_a.position
                 let point_b = atom_b.position
                 let dx = abs(point_a.x - point_b.x)
                 if dx > 3.0 { continue }
@@ -687,6 +687,7 @@ class MySceneView: SCNView {
                 if lengthSq < max_bond_length * max_bond_length {
                     let length = sqrt(lengthSq)
                     let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
+                    bondGeometry.radialSegmentCount = self.renderSegmentCount
                     bondGeometry.firstMaterial?.multiply.contents = bond_color
                     let bondNode = SCNNode(geometry: bondGeometry)
                     let d = point_b - point_a
