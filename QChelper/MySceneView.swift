@@ -53,7 +53,7 @@ class MySceneView: SCNView {
 //        self.cameraNode.camera?.focalSize = 20.0
 //        self.cameraNode.camera?.focalBlurRadius = 5.0
 //        self.cameraNode.camera?.focalDistance = 1.0
-        self.cameraNode.position = SCNVector3(x: 0, y: 0, z: 5)
+        self.cameraNode.position = SCNVector3(x: 0, y: 0, z: 0)
         scene.rootNode.addChildNode(self.cameraNode)
         
         // create and add a light to the scene
@@ -157,7 +157,7 @@ class MySceneView: SCNView {
         else if (self.normalbondnode.childNodes + self.selectedbondnode.childNodes).contains(thisnode) {
             undoManager?.registerUndo(withTarget: self, selector: #selector(MySceneView.add_bond_node), object: thisnode)
         }
-        thisnode.geometry?.firstMaterial?.diffuse.intensity = 1
+        self.removeBlinkAnimation(node: thisnode)
         thisnode.removeFromParentNode()
         // reset info bar
         view_controller.info_bar.stringValue = ""
@@ -477,12 +477,12 @@ class MySceneView: SCNView {
         // print atom name (only one)
         if self.selectedatomnode.childNodes.count == 1 && self.selectedbondnode.childNodes.count == 0 {
             let node = self.selectedatomnode.childNodes[0]
-            view_controller.info_bar.stringValue = "Atom : " + node.name! + " " + node.position.stringValue
+            view_controller.info_bar.stringValue = String(format: "Atom : %@ %@", node.name!, node.position.stringValue)
         }
         // print bond length (only one)
         else if self.selectedbondnode.childNodes.count == 1 && self.selectedatomnode.childNodes.count == 0 {
             let geometry = self.selectedbondnode.childNodes[0].geometry as! SCNCylinder
-            view_controller.info_bar.stringValue = "R = " + geometry.height.description + " \u{212B}"
+            view_controller.info_bar.stringValue = String(format: "R = %.5f \u{212B}", geometry.height)
         }
         // print bond angles (if two connected bonds are selected)
         else if self.selectedbondnode.childNodes.count == 2 {
@@ -993,7 +993,7 @@ extension SCNVector3
         vector = vector / scalar
     }
     static func ~= (left: SCNVector3, right: SCNVector3) -> Bool {
-        let tolerance : CGFloat = 0.000001
+        let tolerance : CGFloat = 0.0001
         if abs(left.x - right.x) < tolerance && abs(left.y - right.y) < tolerance && abs(left.z - right.z) < tolerance {
             return true
         }
