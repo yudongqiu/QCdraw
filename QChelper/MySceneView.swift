@@ -482,7 +482,7 @@ class MySceneView: SCNView {
         // print bond length (only one)
         else if self.selectedbondnode.childNodes.count == 1 && self.selectedatomnode.childNodes.count == 0 {
             let geometry = self.selectedbondnode.childNodes[0].geometry as! SCNCylinder
-            view_controller.info_bar.stringValue = String(format: "R = %.5f \u{212B}", geometry.height)
+            view_controller.info_bar.stringValue = String(format: "R = %.5f Å", geometry.height)
         }
         // print bond angles (if two connected bonds are selected)
         else if self.selectedbondnode.childNodes.count == 2 {
@@ -497,10 +497,10 @@ class MySceneView: SCNView {
             let b_length = (bond_b.geometry as! SCNCylinder).height
             let theta = acos(dot(a_vector,b_vector)/Float(a_length * b_length)) / .pi * 180.0
             if a_start ~= b_start || a_end ~= b_end {
-                view_controller.info_bar.stringValue = "\u{03F4} = " + theta.description + "\u{00B0}"
+                view_controller.info_bar.stringValue = String(format: "θ = %.4f°", theta)
             }
             else if a_start ~= b_end || a_end ~= b_start {
-                view_controller.info_bar.stringValue = "\u{03F4} = " + (180.0-theta).description + "\u{00B0}"
+                view_controller.info_bar.stringValue = String(format: "θ = %.4f°", 180-theta)
             }
             else {
                 view_controller.info_bar.stringValue = "Right click to deselect all"
@@ -567,7 +567,7 @@ class MySceneView: SCNView {
                 let Uab = cross(a_vector, b_vector)
                 let Ubc = cross(b_vector, c_vector)
                 let gamma = acos(dot(Uab,Ubc)/(length(Uab)*length(Ubc))) / .pi * 180.0
-                view_controller.info_bar.stringValue = "\u{0393} = " + gamma.description + "\u{00B0}"
+                view_controller.info_bar.stringValue = String(format: "Γ = %.4f°", gamma)
             } // end of print dihedral
             else {
                 view_controller.info_bar.stringValue = "Right click to deselect all"
