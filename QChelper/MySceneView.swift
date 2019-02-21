@@ -665,40 +665,114 @@ class MySceneView: SCNView {
         let bond_thickness = dict_bond_thickness(myDict: myDict!)
         let bond_color : NSColor = dict_bond_color(myDict: myDict!)
         // check every pair of atoms to determine if a bond need to be added
-        for i in 0 ..< self.normalatomnode.childNodes.count {
+        for (i, j) in self.compute_bonds(nodes: Array(self.normalatomnode.childNodes)) {
             let atom_a = self.normalatomnode.childNodes[i]
             let point_a = atom_a.position
-            for j in i+1 ..< self.normalatomnode.childNodes.count {
-                let atom_b = self.normalatomnode.childNodes[j]
-                let point_b = atom_b.position
-                let dx = abs(point_a.x - point_b.x)
-                if dx > 3.0 { continue }
-                let dy = abs(point_a.y - point_b.y)
-                if dy > 3.0 { continue }
-                let dz = abs(point_a.z - point_b.z)
-                if dz > 3.0 { continue }
-                let lengthSq = dx*dx + dy*dy + dz*dz
-                // get atom names
-                let name_a = atom_a.name! as NSString
-                let name_b = atom_b.name! as NSString
-                // get max bond length between the atoms
-                let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_a, name_b: name_b)
-//                let lengthSq = (point_a - point_b).lengthSq()
-                if lengthSq < max_bond_length * max_bond_length {
-                    let length = sqrt(lengthSq)
-                    let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
-                    bondGeometry.radialSegmentCount = self.renderSegmentCount
-                    bondGeometry.firstMaterial?.multiply.contents = bond_color
-                    let bondNode = SCNNode(geometry: bondGeometry)
-                    let d = point_b - point_a
-                    // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
-                    // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
-                    bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
-                    bondNode.position = (point_a + point_b) * 0.5
-                    self.normalbondnode.addChildNode(bondNode)
+            let atom_b = self.normalatomnode.childNodes[j]
+            let point_b = atom_b.position
+            let d = point_b - point_a
+            let length = d.length()
+            // build cylinder nodes for bonds
+            let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
+            bondGeometry.radialSegmentCount = self.renderSegmentCount
+            bondGeometry.firstMaterial?.multiply.contents = bond_color
+            let bondNode = SCNNode(geometry: bondGeometry)
+            // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
+            // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
+            bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
+            bondNode.position = (point_a + point_b) * 0.5
+            self.normalbondnode.addChildNode(bondNode)
+        }
+    }
+    
+    func compute_bonds(nodes: [SCNNode]) -> [(Int, Int)]{
+        let path = Bundle.main.path(forResource: "Elements", ofType: "plist")
+        let myDict = NSDictionary(contentsOfFile: path!)
+        let maxDist = 5.0 as CGFloat
+        // collect the min and max of all coords
+        var minX = CGFloat.greatestFiniteMagnitude, minY = CGFloat.greatestFiniteMagnitude, minZ = CGFloat.greatestFiniteMagnitude
+        var maxX = -CGFloat.greatestFiniteMagnitude, maxY = -CGFloat.greatestFiniteMagnitude, maxZ = -CGFloat.greatestFiniteMagnitude
+        for i in 0 ..< nodes.count {
+            let pos = nodes[i].position
+            minX = min(minX, pos.x)
+            minY = min(minY, pos.y)
+            minZ = min(minZ, pos.z)
+            maxX = max(maxX, pos.x)
+            maxY = max(maxY, pos.y)
+            maxZ = max(maxZ, pos.z)
+        }
+        // create a 3D grid box
+        let dimX = Int((maxX - minX) / maxDist) + 1
+        let dimY = Int((maxY - minY) / maxDist) + 1
+        let dimZ = Int((maxZ - minZ) / maxDist) + 1
+        var box3D = Array(repeating: Array(repeating: Array(repeating: [Int](), count: dimZ), count: dimY), count: dimX)
+        // put atom node's index into box
+        for i in 0 ..< nodes.count {
+            let pos = nodes[i].position
+            let idX = Int((pos.x - minX) / maxDist)
+            let idY = Int((pos.y - minY) / maxDist)
+            let idZ = Int((pos.z - minZ) / maxDist)
+            box3D[idX][idY][idZ].append(i)
+        }
+        // loop over box and add bonds for atoms in same and neighboring boxes
+        var bonds = [(Int, Int)]()
+        for bx in 0 ..< dimX {
+            for by in 0 ..< dimY {
+                for bz in 0 ..< dimZ {
+                    let nodeIdxs = box3D[bx][by][bz]
+                    // build bonds inside box
+                    for i in 0 ..< nodeIdxs.count {
+                        let idx_I = nodeIdxs[i]
+                        let atom_I = nodes[idx_I]
+                        let name_I = atom_I.name! as NSString
+                        let pos_I = atom_I.position
+                        for j in i+1 ..< nodeIdxs.count {
+                            let idx_J = nodeIdxs[j]
+                            let atom_J = nodes[idx_J]
+                            let name_J = atom_J.name! as NSString
+                            let pos_J = atom_J.position
+                            let lenSq = (pos_I - pos_J).lengthSq()
+                            let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_I, name_b: name_J)
+                            if lenSq < max_bond_length * max_bond_length {
+                                bonds.append((idx_I, idx_J))
+                            }
+                        }
+                    }
+                    // build bonds between box
+                    var neighbors = [(Int, Int, Int)]()
+                    for dx in 0 ..< min(2, dimX-bx) {
+                        for dy in 0 ..< min(2, dimY-by) {
+                            for dz in 0 ..< min(2, dimZ-bz) {
+                                if dx+dy+dz > 0 {
+                                    neighbors.append((bx+dx, by+dy, bz+dz))
+                                }
+                            }
+                        }
+                    }
+                    for i in 0 ..< nodeIdxs.count {
+                        let idx_I = nodeIdxs[i]
+                        let atom_I = nodes[idx_I]
+                        let name_I = atom_I.name! as NSString
+                        let pos_I = atom_I.position
+                        for (nx, ny, nz) in neighbors{
+                            let neiborNodeIdxs = box3D[nx][ny][nz]
+                            for j in 0 ..< neiborNodeIdxs.count {
+                                let idx_J = neiborNodeIdxs[j]
+                                let atom_J = nodes[idx_J]
+                                let name_J = atom_J.name! as NSString
+                                let pos_J = atom_J.position
+                                let lenSq = (pos_I - pos_J).lengthSq()
+                                let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_I, name_b: name_J)
+                                if lenSq < max_bond_length * max_bond_length {
+                                    bonds.append((idx_I, idx_J))
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+        return bonds
     }
     
     func dict_atom_max_bond_length(myDict: NSDictionary, name_a: NSString, name_b: NSString) -> CGFloat {
@@ -883,8 +957,8 @@ class MySceneView: SCNView {
     func adjust_focus() {
         let total_number_of_atoms = self.normalatomnode.childNodes.count + self.selectedatomnode.childNodes.count
         if total_number_of_atoms > 0{
-            var sumx=0.0 as CGFloat, sumy=0.0 as CGFloat
-            var maxz=0.0 as CGFloat
+            var sumx = 0.0 as CGFloat, sumy = 0.0 as CGFloat
+            var maxz = -CGFloat.greatestFiniteMagnitude
             // get average and standard deviation of all atoms' position
             for eachnode in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
                 sumx += eachnode.position.x
