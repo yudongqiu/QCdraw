@@ -425,25 +425,24 @@ class MySceneView: SCNView {
         if hitResults.count > 0 {
             // retrieved the first clicked object
             let hitnode = hitResults[0].node
-            let material = hitnode.geometry!.firstMaterial!
             if self.normalatomnode.childNodes.contains(hitnode) {
                 hitnode.removeFromParentNode()
-                material.diffuse.intensity = 0.5
+                self.addBlinkAnimation(node: hitnode)
                 self.selectedatomnode.addChildNode(hitnode)
             }
             else if self.selectedatomnode.childNodes.contains(hitnode) {
                 hitnode.removeFromParentNode()
-                material.diffuse.intensity = 1
-                self.normalatomnode.addChildNode(hitnode)
+                self.removeBlinkAnimation(node: hitnode)
+                self.selectedatomnode.addChildNode(hitnode)
             }
             else if self.normalbondnode.childNodes.contains(hitnode) {
                 hitnode.removeFromParentNode()
-                material.diffuse.intensity = 0.5
+                self.addBlinkAnimation(node: hitnode)
                 self.selectedbondnode.addChildNode(hitnode)
             }
             else if self.selectedbondnode.childNodes.contains(hitnode) {
                 hitnode.removeFromParentNode()
-                material.diffuse.intensity = 1
+                self.removeBlinkAnimation(node: hitnode)
                 self.normalbondnode.addChildNode(hitnode)
             }
         }
@@ -624,17 +623,16 @@ class MySceneView: SCNView {
         self.pointOfView!.position = p_pov - shift
         super.rightMouseDragged(with: theEvent)
     }
-
     
     func reset_selection() {
         for eachnode in self.selectedatomnode.childNodes {
             eachnode.removeFromParentNode()
-            eachnode.geometry!.firstMaterial!.diffuse.intensity = 1
+            self.removeBlinkAnimation(node: eachnode)
             self.normalatomnode.addChildNode(eachnode)
         }
         for eachnode in self.selectedbondnode.childNodes {
             eachnode.removeFromParentNode()
-            eachnode.geometry!.firstMaterial!.diffuse.intensity = 1
+            self.removeBlinkAnimation(node: eachnode)
             self.normalbondnode.addChildNode(eachnode)
         }
         view_controller.info_bar.stringValue = ""
@@ -643,14 +641,30 @@ class MySceneView: SCNView {
     func select_all() {
         for eachnode in self.normalatomnode.childNodes {
             eachnode.removeFromParentNode()
-            eachnode.geometry!.firstMaterial!.diffuse.intensity = 0.5
+            self.addBlinkAnimation(node: eachnode)
             self.selectedatomnode.addChildNode(eachnode)
         }
         for eachnode in self.normalbondnode.childNodes {
             eachnode.removeFromParentNode()
-            eachnode.geometry!.firstMaterial!.diffuse.intensity = 0.5
+            self.addBlinkAnimation(node: eachnode)
             self.selectedbondnode.addChildNode(eachnode)
         }
+    }
+    
+    func addBlinkAnimation(node: SCNNode) {
+        let material = node.geometry!.firstMaterial!
+        let animation = CABasicAnimation(keyPath: "intensity")
+        animation.fromValue = 0.0
+        animation.toValue = 1.0
+        animation.duration = 1.0
+        animation.autoreverses = true
+        animation.repeatCount = .infinity
+        material.diffuse.addAnimation(animation, forKey: "blink")
+    }
+    
+    func removeBlinkAnimation(node: SCNNode) {
+        let material = node.geometry!.firstMaterial!
+        material.removeAnimation(forKey: "blink")
     }
     
     func auto_add_bond() {
