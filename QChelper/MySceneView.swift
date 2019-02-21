@@ -56,7 +56,7 @@ class MySceneView: SCNView {
         self.cameraNode.position = SCNVector3(x: 0, y: 0, z: 5)
         scene.rootNode.addChildNode(self.cameraNode)
         
-//        // create and add a light to the scene  
+        // create and add a light to the scene
         self.lightNode.light = SCNLight()
         self.lightNode.light!.type = SCNLight.LightType.directional
         self.lightNode.light!.castsShadow = (appdelegate.menu_cast_shadow.state == .on)
@@ -172,8 +172,6 @@ class MySceneView: SCNView {
         undoManager?.registerUndo(withTarget: self, selector: #selector(MySceneView.remove_node), object: thisnode)
         self.normalbondnode.addChildNode(thisnode)
     }
-    
-    
     
     func save_file(url: URL) -> Bool {
         var success = false
@@ -739,6 +737,33 @@ class MySceneView: SCNView {
         return result
     }
     
+    func open_file(url: URL?) {
+        if let path = url?.path {
+            var success = false
+            if (path as NSString).pathExtension == "dae" {
+                success = self.init_with_dae(url: url)
+            }
+            else {
+                let input = file_parser(path: path)
+                if input.AtomList.count > 0 {
+                    self.init_scene()
+                    for eachatom in input.AtomList{
+                        self.add_atom(thisatom: eachatom)
+                    }
+                    self.auto_add_bond()
+                    self.adjust_focus()
+                    success = true
+                }
+            }
+            if success {
+                view_controller.info_bar.stringValue = "Left click to select atoms and click +Bond to add bond"
+            }
+            else {
+                view_controller.info_bar.stringValue = "File not recognized"
+            }
+        }
+    }
+    
     func init_with_dae(url: URL?) -> Bool {
         do {
             let load_scene = try SCNScene(url: url!, options: nil)
@@ -827,35 +852,15 @@ class MySceneView: SCNView {
     }
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        var success = false
         if let board = sender.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray {
             if let path = board[0] as? String {
-                var success = false
-                if (path as NSString).pathExtension == "dae" {
-                    let fileUrl = URL(fileURLWithPath: path)
-                    success = self.init_with_dae(url: fileUrl)
-                }
-                else {
-                    let input = file_parser(path: path)
-                    if input.AtomList.count > 0 {
-                        self.init_scene()
-                        for eachatom in input.AtomList{
-                            self.add_atom(thisatom: eachatom)
-                        }
-                        self.auto_add_bond()
-                        success = true
-                    }
-                }
-                if success {
-                    view_controller.info_bar.stringValue = "Left click to select atoms and click +Bond to add bond"
-                    // reset the VDW representation to CPK
-                    appdelegate.menu_vdw_representation.state = .off
-                }
-                else {
-                    view_controller.info_bar.stringValue = "File not recognized"
-                }
+                let url = URL(string: path)
+                self.open_file(url: url)
+                success = true
             }
         }
-        return false
+        return success
     }
     
     
@@ -924,7 +929,6 @@ class MySceneView: SCNView {
         } else {
             if let pov = self.pointOfView {
                 let p_up = pov.convertVector(SCNVector3(0,1,0), to: nil)
-                let axisAngle = SCNVector4(x: p_up.x, y: p_up.y, z: p_up.z, w: .pi*2)
                 let rotateAction = SCNAction.rotate(by: .pi*2, around: p_up, duration: 10)
                 let repeatAction = SCNAction.repeatForever(rotateAction)
                 self.moleculeNode.runAction(repeatAction, forKey: "rot")

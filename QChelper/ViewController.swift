@@ -61,30 +61,7 @@ class ViewController: NSViewController {
         openpanel.title = "Open File"
         openpanel.begin {(result) -> Void in
             if result == NSApplication.ModalResponse.OK {
-                if let path = openpanel.url?.path {
-                    var success = false
-                    if (path as NSString).pathExtension == "dae" {
-                        success = self.mySceneView.init_with_dae(url: openpanel.url)
-                    }
-                    else {
-                        let input = file_parser(path: path)
-                        if input.AtomList.count > 0 {
-                            self.mySceneView.init_scene()
-                            for eachatom in input.AtomList{
-                                self.mySceneView.add_atom(thisatom: eachatom)
-                            }
-                            self.mySceneView.auto_add_bond()
-                            self.mySceneView.adjust_focus()
-                            success = true
-                        }
-                    }
-                    if success {
-                        self.info_bar.stringValue = "Left click to select atoms and click +Bond to add bond"
-                    }
-                    else {
-                        self.info_bar.stringValue = "File not recognized"
-                    }
-                }
+                self.mySceneView.open_file(url: openpanel.url)
             }
         }
         // reset the VDW representation to CPK
@@ -215,7 +192,6 @@ class ViewController: NSViewController {
             }
         }
     }
-
-
+    
 }
 
