@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1D9843341BB4DE3B00FAEC44 /* StreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */; };
+		1FFE40A4222C4A180079864A /* atomShadowOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFE40A2222C4A170079864A /* atomShadowOn.png */; };
+		1FFE40A5222C4A180079864A /* atomShadowOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFE40A3222C4A180079864A /* atomShadowOff.png */; };
 		F503060A1BBE25D900C489D1 /* diffuse-marble.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306091BBE25D900C489D1 /* diffuse-marble.jpg */; };
 		F503060C1BBE25DD00C489D1 /* normal-marble.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F503060B1BBE25DD00C489D1 /* normal-marble.jpg */; };
 		F503061C1BBE2B9400C489D1 /* diffuse-wood.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306191BBE2B9400C489D1 /* diffuse-wood.jpg */; };
@@ -49,6 +51,9 @@
 
 /* Begin PBXFileReference section */
 		1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamReader.swift; sourceTree = "<group>"; };
+		1FFE40A2222C4A170079864A /* atomShadowOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = atomShadowOn.png; path = makeIcons/atomShadowOn.png; sourceTree = SOURCE_ROOT; };
+		1FFE40A3222C4A180079864A /* atomShadowOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = atomShadowOff.png; path = makeIcons/atomShadowOff.png; sourceTree = SOURCE_ROOT; };
+		1FFE40A6222C51B50079864A /* QCdraw.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QCdraw.entitlements; sourceTree = "<group>"; };
 		F50306091BBE25D900C489D1 /* diffuse-marble.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "diffuse-marble.jpg"; sourceTree = "<group>"; };
 		F503060B1BBE25DD00C489D1 /* normal-marble.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "normal-marble.jpg"; sourceTree = "<group>"; };
 		F50306191BBE2B9400C489D1 /* diffuse-wood.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "diffuse-wood.jpg"; sourceTree = "<group>"; };
@@ -103,6 +108,7 @@
 		F54F8CF11B5038D2001665CF = {
 			isa = PBXGroup;
 			children = (
+				1FFE40A6222C51B50079864A /* QCdraw.entitlements */,
 				F54F8CFC1B5038D2001665CF /* QChelper */,
 				F54F8D0F1B5038D2001665CF /* QChelperTests */,
 				F54F8CFB1B5038D2001665CF /* Products */,
@@ -171,6 +177,8 @@
 				F54208F31BBC966B0018AEFE /* redo.png */,
 				F54208F41BBC966B0018AEFE /* undo.png */,
 				F54F9BF01BB7CD9A00537E24 /* add.png */,
+				1FFE40A3222C4A180079864A /* atomShadowOff.png */,
+				1FFE40A2222C4A170079864A /* atomShadowOn.png */,
 				F54F9BFC1BB86BD400537E24 /* rotating.png */,
 				F54F9BF21BB7CDF300537E24 /* camera.png */,
 				F54F9BF31BB7CDF300537E24 /* delete.png */,
@@ -247,9 +255,10 @@
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = XT8BC8793B;
 						LastSwiftMigration = 1010;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
@@ -295,6 +304,8 @@
 				F54FF2D31BB1F34F009CC98C /* Elements.plist in Resources */,
 				F503061D1BBE2B9400C489D1 /* normal-wood.png in Resources */,
 				F54208F51BBC966B0018AEFE /* redo.png in Resources */,
+				1FFE40A4222C4A180079864A /* atomShadowOn.png in Resources */,
+				1FFE40A5222C4A180079864A /* atomShadowOff.png in Resources */,
 				F50306281BBE48B400C489D1 /* normal-metal.jpg in Resources */,
 				F54F8D071B5038D2001665CF /* Main.storyboard in Resources */,
 				F54F9BFA1BB7CDF300537E24 /* rotate.png in Resources */,
@@ -472,12 +483,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = QCdraw.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = XT8BC8793B;
 				INFOPLIST_FILE = QChelper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
 				PRODUCT_NAME = QCdraw;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
@@ -486,12 +502,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = QCdraw.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = XT8BC8793B;
 				INFOPLIST_FILE = QChelper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
 				PRODUCT_NAME = QCdraw;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 			};
 			name = Release;

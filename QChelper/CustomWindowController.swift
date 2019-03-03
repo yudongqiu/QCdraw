@@ -18,5 +18,6 @@ class CustomWindowController: NSWindowController {
     
     @IBOutlet weak var toolbar_rotate: NSToolbarItem!
     
-
+    @IBOutlet weak var toolbar_shadow: NSToolbarItem!
+    
 }

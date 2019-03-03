@@ -181,13 +181,18 @@ class ViewController: NSViewController {
     
     
     @IBAction func cast_shadows(sender: AnyObject?) {
-        if let light = self.mySceneView.lightNode.light {
-            if self.appdelegate.menu_cast_shadow.state == .off {
+        let windowController = NSApplication.shared.windows[0].windowController as! CustomWindowController
+        if self.appdelegate.menu_cast_shadow.state == .off {
+            self.appdelegate.menu_cast_shadow.state = .on
+            windowController.toolbar_shadow.image = NSImage(named: "atomShadowOn.png")
+            if let light = self.mySceneView.lightNode.light {
                 light.castsShadow = true
-                self.appdelegate.menu_cast_shadow.state = .on
             }
-            else {
-                self.appdelegate.menu_cast_shadow.state = .off
+        }
+        else {
+            self.appdelegate.menu_cast_shadow.state = .off
+            windowController.toolbar_shadow.image = NSImage(named: "atomShadowOff.png")
+            if let light = self.mySceneView.lightNode.light {
                 light.castsShadow = false
             }
         }

@@ -443,6 +443,13 @@ Gw
                                         <action selector="export_daeWithSender:" target="Oky-zY-oP4" id="tJE-np-UUt"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="CAA151A5-D5F9-4297-AE36-DA3D9C955F0D" label="Shadow" paletteLabel="Shadow" tag="-1" image="atomShadowOff" id="Agt-v8-ab9">
+                                    <size key="minSize" width="819" height="819"/>
+                                    <size key="maxSize" width="819" height="819"/>
+                                    <connections>
+                                        <action selector="cast_shadowsWithSender:" target="Oky-zY-oP4" id="LWW-Wl-650"/>
+                                    </connections>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="yiZ-hX-kk6"/>
@@ -455,6 +462,7 @@ Gw
                                 <toolbarItem reference="35P-QO-eMj"/>
                                 <toolbarItem reference="UK5-lM-Dhi"/>
                                 <toolbarItem reference="EPQ-uy-JYQ"/>
+                                <toolbarItem reference="Agt-v8-ab9"/>
                                 <toolbarItem reference="Ijq-In-Lcp"/>
                             </defaultToolbarItems>
                         </toolbar>
@@ -464,6 +472,7 @@ Gw
                     </window>
                     <connections>
                         <outlet property="toolbar_rotate" destination="Ijq-In-Lcp" id="l4d-Q1-N7g"/>
+                        <outlet property="toolbar_shadow" destination="Agt-v8-ab9" id="G7X-QA-d5y"/>
                         <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
                     </connections>
                 </windowController>
@@ -514,6 +523,7 @@ Gw
     </scenes>
     <resources>
         <image name="add" width="256" height="256"/>
+        <image name="atomShadowOff" width="819" height="819"/>
         <image name="delete" width="256" height="256"/>
         <image name="open" width="256" height="256"/>
         <image name="redo" width="128" height="128"/>
