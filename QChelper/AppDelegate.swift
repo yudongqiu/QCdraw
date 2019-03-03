@@ -11,6 +11,12 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    func application(_ sender: NSApplication, openFile filename: String) -> Bool {
+        if let window = NSApp.mainWindow, let viewController = window.contentViewController as? ViewController {
+            viewController.mySceneView.open_file(url: URL(fileURLWithPath: filename))
+        }
+        return true
+    }
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         // Insert code here to initialize your application
