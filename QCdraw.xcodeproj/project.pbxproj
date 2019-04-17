@@ -254,7 +254,7 @@
 					F54F8CF91B5038D2001665CF = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = XT8BC8793B;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1020;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 1;
@@ -264,7 +264,7 @@
 					F54F8D0B1B5038D2001665CF = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = XT8BC8793B;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1020;
 						TestTargetID = F54F8CF91B5038D2001665CF;
 					};
 				};
@@ -490,7 +490,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
 				PRODUCT_NAME = QCdraw;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -505,7 +505,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = QCdraw;
 				PRODUCT_NAME = QCdraw;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -526,7 +526,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Bruce.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = QCdrawTest;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QCdraw.app/Contents/MacOS/QCdraw";
 			};
 			name = Debug;
@@ -544,7 +544,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Bruce.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = QCdrawTest;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/QCdraw.app/Contents/MacOS/QCdraw";
 			};
 			name = Release;

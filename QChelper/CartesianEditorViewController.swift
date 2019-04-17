@@ -96,7 +96,7 @@ class CartesianEditorViewController: NSViewController {
         if AtomList.count > 0 {
             self.view_controller.mySceneView.init_scene()
             for (idx, eachatom) in AtomList.enumerated() {
-                self.view_controller.mySceneView.add_atom(thisatom: eachatom)
+                self.view_controller.mySceneView.add_atom(thisatom: eachatom, index: idx)
             }
             self.view_controller.mySceneView.auto_add_bond()
             self.view_controller.mySceneView.adjust_focus()
