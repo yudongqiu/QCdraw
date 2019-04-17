@@ -88,7 +88,7 @@ class MySceneView: SCNView {
         windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
     }
     
-    func add_atom(thisatom: atom) -> Void {
+    func add_atom(thisatom: atom, index: Int = -1) -> Void {
         // draw a sphere
         let sphereGeometry = SCNSphere(radius: thisatom.radius)
         sphereGeometry.isGeodesic = true
@@ -98,6 +98,7 @@ class MySceneView: SCNView {
         let sphereNode = SCNNode(geometry: sphereGeometry)
         sphereNode.name = thisatom.name as String
         sphereNode.position = SCNVector3(x: thisatom.pos[0], y: thisatom.pos[1], z: thisatom.pos[2])
+        sphereNode.setValue(index, forUndefinedKey: "atom_index")
         self.normalatomnode.addChildNode(sphereNode)
     }
     
@@ -467,7 +468,9 @@ class MySceneView: SCNView {
         // print atom name (only one)
         if self.selectedatomnode.childNodes.count == 1 && self.selectedbondnode.childNodes.count == 0 {
             let node = self.selectedatomnode.childNodes[0]
-            view_controller.info_bar.stringValue = String(format: "Atom : %@ %@", node.name!, node.position.stringValue)
+            let index = node.value(forUndefinedKey: "atom_index") as! Int
+            let indexStr = index >= 0 ? String(index) : ""
+            view_controller.info_bar.stringValue = String(format: "Atom %@: %@ %@", indexStr, node.name!, node.position.stringValue)
         }
         // print bond length (only one)
         else if self.selectedbondnode.childNodes.count == 1 && self.selectedatomnode.childNodes.count == 0 {
@@ -827,8 +830,8 @@ class MySceneView: SCNView {
                 if input.AtomList.count > 0 {
                     self.init_scene()
                     self.renderSegmentCount = max(20, Int(50-input.AtomList.count/30))
-                    for eachatom in input.AtomList{
-                        self.add_atom(thisatom: eachatom)
+                    for (idx, eachatom) in input.AtomList.enumerated() {
+                        self.add_atom(thisatom: eachatom, index: idx)
                     }
                     self.auto_add_bond()
                     self.adjust_focus()
