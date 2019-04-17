@@ -110,12 +110,22 @@ class CartesianEditorViewController: NSViewController {
         super.viewDidLoad()
         // Do view setup here.
         textfield.font = NSFont(name: "Menlo", size: 12)
+        struct AtomStr {
+            var index: Int
+            var content: String
+        }
+        var atomlist: [AtomStr] = []
         for eachatom in self.view_controller.mySceneView.normalatomnode.childNodes + self.view_controller.mySceneView.selectedatomnode.childNodes {
             let name = String(format: "%2s", (eachatom.name! as NSString).utf8String!)
             let posx = String(format: "%17.6f", eachatom.position.x)
             let posy = String(format: "%17.6f", eachatom.position.y)
             let posz = String(format: "%17.6f", eachatom.position.z)
-            textfield.string += name + posx + posy + posz + "\n"
+            let index = eachatom.value(forUndefinedKey: "atom_index") as! Int
+            atomlist.append(AtomStr(index: index, content: name + posx + posy + posz))
+        }
+        atomlist.sort { $0.index < $1.index }
+        for a in atomlist {
+            textfield.string += a.content + "\n"
         }
     }
 }

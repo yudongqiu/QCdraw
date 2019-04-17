@@ -271,11 +271,11 @@
 			};
 			buildConfigurationList = F54F8CF51B5038D2001665CF /* Build configuration list for PBXProject "QCdraw" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				Base,
+				en,
 			);
 			mainGroup = F54F8CF11B5038D2001665CF;
 			productRefGroup = F54F8CFB1B5038D2001665CF /* Products */;
