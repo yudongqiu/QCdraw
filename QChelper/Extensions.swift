@@ -94,10 +94,10 @@ extension String {
     var integerValue:Int? {
         return NumberFormatter().number(from: self)?.intValue
     }
-    func contains(_ find: String) -> Bool{
+    func contains(_ find: String) -> Bool {
         return self.range(of: find) != nil
     }
-    func containsIgnoringCase(_ find: String) -> Bool{
+    func containsIgnoringCase(_ find: String) -> Bool {
         return self.range(of: find, options: .caseInsensitive) != nil
     }
     var pathExtension:String { get {
@@ -106,4 +106,7 @@ extension String {
     var lastPathComponent:String { get {
         return (self as NSString).lastPathComponent
     }}
+    func strip() -> String {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }

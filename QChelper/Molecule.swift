@@ -88,16 +88,18 @@ class Molecule {
         return res
     }
     
-    func add_new_atom(name: String, posx: Double, posy: Double, posz: Double) {
+    func add_new_atom(name: String, posx: Double, posy: Double, posz: Double, trajectory: [SCNVector3] = []) {
         var new_atom = Atom()
         new_atom.name = name.capitalized as NSString
         new_atom.pos = SCNVector3(posx, posy, posz)
         new_atom.radius = dict_atom_radius(name: new_atom.name)
         new_atom.color = dict_atom_color(name: new_atom.name)
+        new_atom.trajectory = trajectory
         self.atomlist.append(new_atom)
     }
     
     func read_text(text: String, unit: String? = "angstrom") {
+        self.atomlist = []
         let text_lines = text.split(delimiter: "\n")
         // convertion factor based on unit
         let conv = (unit == "bohr") ? bohr_to_angstrom : 1.0
@@ -155,32 +157,71 @@ class Molecule {
     }
     
     func read_xyz(path: String) {
+        self.atomlist = []
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
             }
-            var geofound = false // Did we find the geometry?
-            for line in aStreamReader {
-                let inline = line.split()
-                // if the line satisfy all conditions, continue
-                if inline.count == 4 {
-                    if let posx = inline[1].doubleValue {
-                        if let posy = inline[2].doubleValue {
-                            if let posz = inline[3].doubleValue{
-                                self.add_new_atom(name: inline[0], posx: posx, posy: posy, posz: posz)
-                                geofound = true
-                                continue
+            var block_elem_list: [[String]] = []
+            var block_geo_list: [[[Double]]] = []
+            while true {
+                if var line = aStreamReader.nextLine() {
+                    line = line.strip()
+                    let ls = line.split()
+                    if ls.count == 1 {
+                        if let noa = ls[0].integerValue {
+                            // start a new geo block
+                            var elems: [String] = []
+                            var geo: [[Double]] = []
+                            aStreamReader.skiplines(lineNumber: 1)
+                            for _ in 0 ..< noa {
+                                if let geoline = aStreamReader.nextLine() {
+                                    let inline = geoline.split()
+                                    if inline.count == 4 {
+                                        if let posx = inline[1].doubleValue {
+                                            if let posy = inline[2].doubleValue {
+                                                if let posz = inline[3].doubleValue{
+                                                    let xyz = [posx, posy, posz]
+                                                    elems.append(inline[0])
+                                                    geo.append(xyz)
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    break
+                                }
                             }
+                            block_elem_list.append(elems)
+                            block_geo_list.append(geo)
                         }
                     }
+                } else {
+                    break
                 }
-                // else break
-                if geofound { break }
+            }
+            if block_elem_list.count >= 1 {
+                let elems = block_elem_list[0]
+                let init_geo = block_geo_list[0]
+                for i in 0 ..< elems.count {
+                    let name = elems[i]
+                    let pos = init_geo[i]
+                    var traj : [SCNVector3] = []
+                    // only create trajectory if there are > 1 frames
+                    if block_elem_list.count > 1 {
+                        for geo in block_geo_list {
+                            let atom_xyz = geo[i]
+                            traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
+                        }
+                    }
+                    self.add_new_atom(name: name, posx: pos[0], posy: pos[1], posz: pos[2], trajectory: traj)
+                }
             }
         }
     }
     
     func read_psi4(path: String) {
+        self.atomlist = []
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
@@ -228,6 +269,7 @@ class Molecule {
     }
     
     func read_molpro(path: String) {
+        self.atomlist = []
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
@@ -298,6 +340,7 @@ class Molecule {
     }
     
     func read_cfour(path: String) {
+        self.atomlist = []
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
