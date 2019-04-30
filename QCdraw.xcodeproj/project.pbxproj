@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1D9843341BB4DE3B00FAEC44 /* StreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */; };
+		1F44D05B2278BFE20039BD44 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F44D05A2278BFE20039BD44 /* Extensions.swift */; };
 		1FFE40A4222C4A180079864A /* atomShadowOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFE40A2222C4A170079864A /* atomShadowOn.png */; };
 		1FFE40A5222C4A180079864A /* atomShadowOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FFE40A3222C4A180079864A /* atomShadowOff.png */; };
 		F503060A1BBE25D900C489D1 /* diffuse-marble.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F50306091BBE25D900C489D1 /* diffuse-marble.jpg */; };
@@ -34,8 +35,8 @@
 		F54F9BFD1BB86BD400537E24 /* rotating.png in Resources */ = {isa = PBXBuildFile; fileRef = F54F9BFC1BB86BD400537E24 /* rotating.png */; };
 		F54F9C011BB8749500537E24 /* CustomWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F9C001BB8749500537E24 /* CustomWindowController.swift */; };
 		F54FF2D31BB1F34F009CC98C /* Elements.plist in Resources */ = {isa = PBXBuildFile; fileRef = F54FF2D21BB1F34F009CC98C /* Elements.plist */; };
-		F54FF2D51BB2307C009CC98C /* Atoms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54FF2D41BB2307C009CC98C /* Atoms.swift */; };
-		F54FF2DB1BB24798009CC98C /* FileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54FF2DA1BB24798009CC98C /* FileParser.swift */; };
+		F54FF2D51BB2307C009CC98C /* Atom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54FF2D41BB2307C009CC98C /* Atom.swift */; };
+		F54FF2DB1BB24798009CC98C /* Molecule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54FF2DA1BB24798009CC98C /* Molecule.swift */; };
 		F58810561BCC38630026AA42 /* CartesianEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F58810551BCC38630026AA42 /* CartesianEditorViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamReader.swift; sourceTree = "<group>"; };
+		1F44D05A2278BFE20039BD44 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		1FFE40A2222C4A170079864A /* atomShadowOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = atomShadowOn.png; path = makeIcons/atomShadowOn.png; sourceTree = SOURCE_ROOT; };
 		1FFE40A3222C4A180079864A /* atomShadowOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = atomShadowOff.png; path = makeIcons/atomShadowOff.png; sourceTree = SOURCE_ROOT; };
 		1FFE40A6222C51B50079864A /* QCdraw.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QCdraw.entitlements; sourceTree = "<group>"; };
@@ -82,8 +84,8 @@
 		F54F9BFC1BB86BD400537E24 /* rotating.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rotating.png; sourceTree = "<group>"; };
 		F54F9C001BB8749500537E24 /* CustomWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomWindowController.swift; sourceTree = "<group>"; };
 		F54FF2D21BB1F34F009CC98C /* Elements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Elements.plist; sourceTree = "<group>"; };
-		F54FF2D41BB2307C009CC98C /* Atoms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atoms.swift; sourceTree = "<group>"; };
-		F54FF2DA1BB24798009CC98C /* FileParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileParser.swift; sourceTree = "<group>"; };
+		F54FF2D41BB2307C009CC98C /* Atom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atom.swift; sourceTree = "<group>"; };
+		F54FF2DA1BB24798009CC98C /* Molecule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Molecule.swift; sourceTree = "<group>"; };
 		F58810551BCC38630026AA42 /* CartesianEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartesianEditorViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -134,8 +136,9 @@
 				F54F9C001BB8749500537E24 /* CustomWindowController.swift */,
 				F54F8D051B5038D2001665CF /* Main.storyboard */,
 				F54F8D541B5066B0001665CF /* MySceneView.swift */,
-				F54FF2D41BB2307C009CC98C /* Atoms.swift */,
-				F54FF2DA1BB24798009CC98C /* FileParser.swift */,
+				1F44D05A2278BFE20039BD44 /* Extensions.swift */,
+				F54FF2D41BB2307C009CC98C /* Atom.swift */,
+				F54FF2DA1BB24798009CC98C /* Molecule.swift */,
 				1D9843331BB4DE3B00FAEC44 /* StreamReader.swift */,
 				F54F8CFD1B5038D2001665CF /* Supporting Files */,
 			);
@@ -333,11 +336,12 @@
 			files = (
 				1D9843341BB4DE3B00FAEC44 /* StreamReader.swift in Sources */,
 				F54F8D021B5038D2001665CF /* ViewController.swift in Sources */,
-				F54FF2DB1BB24798009CC98C /* FileParser.swift in Sources */,
+				F54FF2DB1BB24798009CC98C /* Molecule.swift in Sources */,
 				F54F8D551B5066B0001665CF /* MySceneView.swift in Sources */,
-				F54FF2D51BB2307C009CC98C /* Atoms.swift in Sources */,
+				F54FF2D51BB2307C009CC98C /* Atom.swift in Sources */,
 				F54F9C011BB8749500537E24 /* CustomWindowController.swift in Sources */,
 				F58810561BCC38630026AA42 /* CartesianEditorViewController.swift in Sources */,
+				1F44D05B2278BFE20039BD44 /* Extensions.swift in Sources */,
 				F54F8D001B5038D2001665CF /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

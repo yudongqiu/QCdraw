@@ -88,7 +88,7 @@ class MySceneView: SCNView {
         windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
     }
     
-    func add_atom(thisatom: atom, index: Int = -1) -> Void {
+    func add_atom(thisatom: Atom, index: Int = -1) -> Void {
         // draw a sphere
         let sphereGeometry = SCNSphere(radius: thisatom.radius)
         sphereGeometry.isGeodesic = true
@@ -97,7 +97,7 @@ class MySceneView: SCNView {
         sphereGeometry.firstMaterial?.multiply.contents = color
         let sphereNode = SCNNode(geometry: sphereGeometry)
         sphereNode.name = thisatom.name as String
-        sphereNode.position = SCNVector3(x: thisatom.pos[0], y: thisatom.pos[1], z: thisatom.pos[2])
+        sphereNode.position = thisatom.pos
         sphereNode.setValue(index, forUndefinedKey: "atom_index")
         self.normalatomnode.addChildNode(sphereNode)
     }
@@ -166,14 +166,14 @@ class MySceneView: SCNView {
     func save_file(url: URL) -> Bool {
         var success = false
         do {
-            if (url as NSURL).pathExtension == "pdf" {
+            if url.pathExtension == "pdf" {
                 let myView = NSImageView(frame: self.bounds)
                 myView.image = self.snapshot()
                 let pdfdata = myView.dataWithPDF(inside: self.bounds)
                 try pdfdata.write(to: url, options: .atomic)
 
             }
-            else if (url as NSURL).pathExtension == "png" {
+            else if url.pathExtension == "png" {
                 let pngdata = NSBitmapImageRep(data: self.snapshot().tiffRepresentation!)!.representation(using: .png, properties: [:])!
                 try pngdata.write(to: url, options: .atomic)
             }
@@ -689,6 +689,9 @@ class MySceneView: SCNView {
     }
     
     func compute_bonds(nodes: [SCNNode]) -> [(Int, Int)]{
+        if nodes.count < 2 {
+            return []
+        }
         let path = Bundle.main.path(forResource: "Elements", ofType: "plist")
         let myDict = NSDictionary(contentsOfFile: path!)
         let maxDist = 5.0 as CGFloat
@@ -822,27 +825,31 @@ class MySceneView: SCNView {
     func open_file(url: URL?) {
         if let path = url?.path {
             var success = false
-            if (path as NSString).pathExtension == "dae" {
+            if path.pathExtension == "dae" {
                 success = self.init_with_dae(url: url)
             }
             else {
-                let input = file_parser(path: path)
-                if input.AtomList.count > 0 {
-                    self.init_scene()
-                    self.renderSegmentCount = max(20, Int(50-input.AtomList.count/30))
-                    for (idx, eachatom) in input.AtomList.enumerated() {
-                        self.add_atom(thisatom: eachatom, index: idx)
+                do {
+                    let input = try Molecule(path: path)
+                    if input.atomlist.count > 0 {
+                        self.init_scene()
+                        self.renderSegmentCount = max(20, Int(50-input.atomlist.count/30))
+                        for (idx, eachatom) in input.atomlist.enumerated() {
+                            self.add_atom(thisatom: eachatom, index: idx)
+                        }
+                        self.auto_add_bond()
+                        self.adjust_focus()
+                        success = true
                     }
-                    self.auto_add_bond()
-                    self.adjust_focus()
-                    success = true
+                } catch {
+                    success = false
                 }
             }
             if success {
-                view_controller.info_bar.stringValue = "Left click to select atoms and click +Bond to add bond"
+                view_controller.info_bar.stringValue = path.lastPathComponent
             }
             else {
-                view_controller.info_bar.stringValue = "File not recognized"
+                view_controller.info_bar.stringValue = "File " + path + " not recognized"
             }
         }
     }
@@ -1040,63 +1047,4 @@ class MySceneView: SCNView {
 } // end of class
 
 
-extension SCNVector3
-{
-    static func + (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-        return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
-    }
-    static func += (left: inout SCNVector3, right: SCNVector3) {
-        left = left + right
-    }
-    static func - (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-        return SCNVector3Make(left.x - right.x, left.y - right.y, left.z - right.z)
-    }
-    static func -= (left: inout SCNVector3, right: SCNVector3) {
-        left = left - right
-    }
-    static func * (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-        return SCNVector3Make(left.x * right.x, left.y * right.y, left.z * right.z)
-    }
-    static func *= (left: inout SCNVector3, right: SCNVector3) {
-        left = left * right
-    }
-    static func * (vector: SCNVector3, scalar: CGFloat) -> SCNVector3 {
-        return SCNVector3Make(vector.x * scalar, vector.y * scalar, vector.z * scalar)
-    }
-    static func *= (vector: inout SCNVector3, scalar: CGFloat) {
-        vector = vector * scalar
-    }
-    static func / (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
-        return SCNVector3Make(left.x / right.x, left.y / right.y, left.z / right.z)
-    }
-    static func /= (left: inout SCNVector3, right: SCNVector3) {
-        left = left / right
-    }
-    static func / (vector: SCNVector3, scalar: CGFloat) -> SCNVector3 {
-        return SCNVector3Make(vector.x / scalar, vector.y / scalar, vector.z / scalar)
-    }
-    static func /= (vector: inout SCNVector3, scalar: CGFloat) {
-        vector = vector / scalar
-    }
-    static func ~= (left: SCNVector3, right: SCNVector3) -> Bool {
-        let tolerance : CGFloat = 0.0001
-        if abs(left.x - right.x) < tolerance && abs(left.y - right.y) < tolerance && abs(left.z - right.z) < tolerance {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-    func lengthSq() -> CGFloat {
-        return x*x + y*y + z*z
-    }
-    func length() -> CGFloat {
-        return sqrt(x*x + y*y + z*z)
-    }
-    func distance(vector: SCNVector3) -> CGFloat {
-        return (self - vector).length()
-    }
-    public var stringValue: String {
-        return String(format: "(%.3f %.3f %.3f)", x, y, z)
-    }
-}
+
