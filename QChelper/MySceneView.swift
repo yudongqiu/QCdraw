@@ -29,6 +29,8 @@ class MySceneView: SCNView {
     var p_pov = SCNVector3Zero
     var renderSegmentCount = 50 // for determine quality of rendering
     
+    var traj_length = 0 // length of trajectory
+    
     func init_scene() {
         //clean old nodes
         self.moleculeNode = SCNNode()
@@ -83,9 +85,15 @@ class MySceneView: SCNView {
         
         self.scene = scene
         
+        // length of the trajectory
+        self.traj_length = 0
+        
         // reset the rotate button
         appdelegate.menu_rotate.state = .off
         windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
+        
+        // reset view_controller elements
+        view_controller.reset()
     }
     
     func add_atom(thisatom: Atom, index: Int = -1) -> Void {
@@ -99,6 +107,7 @@ class MySceneView: SCNView {
         sphereNode.name = thisatom.name as String
         sphereNode.position = thisatom.pos
         sphereNode.setValue(index, forUndefinedKey: "atom_index")
+        sphereNode.setValue(thisatom.trajectory, forUndefinedKey: "trajectory")
         self.normalatomnode.addChildNode(sphereNode)
     }
     
@@ -740,17 +749,27 @@ class MySceneView: SCNView {
                             let lenSq = (pos_I - pos_J).lengthSq()
                             let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_I, name_b: name_J)
                             if lenSq < max_bond_length * max_bond_length {
-                                bonds.append((idx_I, idx_J))
+                                let bond = (idx_I <= idx_J) ? (idx_I, idx_J) : (idx_J, idx_I)
+                                bonds.append(bond)
                             }
                         }
                     }
                     // build bonds between box
                     var neighbors = [(Int, Int, Int)]()
-                    for dx in 0 ..< min(2, dimX-bx) {
-                        for dy in 0 ..< min(2, dimY-by) {
-                            for dz in 0 ..< min(2, dimZ-bz) {
-                                if dx+dy+dz > 0 {
-                                    neighbors.append((bx+dx, by+dy, bz+dz))
+                    for dx in 0 ... 1 {
+                        let nx = bx + dx
+                        if nx >= 0 && nx < dimX {
+                            for dy in -dx ... 1 {
+                                let ny = by + dy
+                                if ny >= 0 && ny < dimY {
+                                    for dz in -max(dx,dy) ... 1 {
+                                        let nz = bz + dz
+                                        if nz >= 0 && nz < dimZ {
+                                            if dx != 0 || dx != 0 || dz != 0 {
+                                                neighbors.append((nx, ny, nz))
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -770,7 +789,8 @@ class MySceneView: SCNView {
                                 let lenSq = (pos_I - pos_J).lengthSq()
                                 let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_I, name_b: name_J)
                                 if lenSq < max_bond_length * max_bond_length {
-                                    bonds.append((idx_I, idx_J))
+                                    let bond = (idx_I <= idx_J) ? (idx_I, idx_J) : (idx_J, idx_I)
+                                    bonds.append(bond)
                                 }
                             }
                         }
@@ -826,7 +846,7 @@ class MySceneView: SCNView {
         if let path = url?.path {
             var success = false
             if path.pathExtension == "dae" {
-                success = self.init_with_dae(url: url)
+                success = self.init_with_dae(url: url!)
             }
             else {
                 do {
@@ -837,6 +857,8 @@ class MySceneView: SCNView {
                         for (idx, eachatom) in input.atomlist.enumerated() {
                             self.add_atom(thisatom: eachatom, index: idx)
                         }
+                        // set the trajectory length
+                        self.update_traj_length(length: input.traj_length)
                         self.auto_add_bond()
                         self.adjust_focus()
                         success = true
@@ -854,9 +876,10 @@ class MySceneView: SCNView {
         }
     }
     
-    func init_with_dae(url: URL?) -> Bool {
+    func init_with_dae(url: URL) -> Bool {
+        print(url)
         do {
-            let load_scene = try SCNScene(url: url!, options: nil)
+            let load_scene = try SCNScene(url: url, options: nil)
             self.scene = load_scene
             // restore the node hierarchy
             self.cameraNode = load_scene.rootNode.childNodes[0]
@@ -896,10 +919,11 @@ class MySceneView: SCNView {
             // reset the rotate button
             appdelegate.menu_rotate.state = .off
             windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
+            // reset view_controller
+            view_controller.reset()
             return true
         }
         catch {
-            NSLog("Can't open file")
             return false
         }
     }
@@ -945,7 +969,7 @@ class MySceneView: SCNView {
         var success = false
         if let board = sender.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")) as? NSArray {
             if let path = board[0] as? String {
-                let url = URL(string: path)
+                let url = URL(fileURLWithPath: path)
                 self.open_file(url: url)
                 success = true
             }
@@ -1043,6 +1067,34 @@ class MySceneView: SCNView {
         }
     }
     
+    func update_traj_length(length: Int) {
+        self.traj_length = length
+        if length > 1 {
+            self.view_controller.toolbox.isHidden = false
+            self.view_controller.slider.maxValue = Double(length-1)
+        } else {
+            self.view_controller.toolbox.isHidden = true
+        }
+    }
+    
+    func choose_frame(frame: Int) {
+        let valid_frame = min(max(frame, 0), self.traj_length-1)
+        if self.traj_length > 0 {
+            for atomnode in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
+                let traj : [SCNVector3] = atomnode.value(forUndefinedKey: "trajectory") as! [SCNVector3]
+                atomnode.position = traj[valid_frame]
+            }
+            // update UI components
+            self.view_controller.slider.integerValue = valid_frame
+            self.view_controller.slider_text.integerValue = valid_frame
+        }
+    }
+    
+    func next_frame() {
+        let current_frame = self.view_controller.slider.integerValue
+        let next_frame = (current_frame + 1) % self.traj_length
+        self.choose_frame(frame: next_frame)
+    }
     
 } // end of class
 

@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "QChelper/CartesianEditorViewController.swift"
-            timestampString = "578356252.526341"
+            filePath = "QChelper/ViewController.swift"
+            timestampString = "578390117.9492559"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
-            landmarkName = "ok(sender:)"
+            startingLineNumber = "218"
+            endingLineNumber = "218"
+            landmarkName = "toggle_play_traj(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

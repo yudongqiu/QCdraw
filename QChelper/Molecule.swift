@@ -18,6 +18,14 @@ class Molecule {
     let bohr_to_angstrom = 0.529177208
     var myDict: NSDictionary?
     
+    var traj_length: Int { get {
+        var res = 0
+        if self.atomlist.count > 0 {
+            res = self.atomlist[0].trajectory.count
+        }
+        return res
+    }}
+    
     init() {
         // Read Elements.plist for Elements Data
         if let dpath = Bundle.main.path(forResource: "Elements", ofType: "plist") {

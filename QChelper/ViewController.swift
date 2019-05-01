@@ -13,7 +13,14 @@ class ViewController: NSViewController {
 
     @IBOutlet weak var mySceneView: MySceneView!
     @IBOutlet weak var info_bar: NSTextField!
+    @IBOutlet weak var slider: NSSliderCell!
+    @IBOutlet weak var toolbox: NSBox!
+    @IBOutlet weak var slider_text: NSTextField!
+    @IBOutlet weak var play_button: NSButton!
+    @IBOutlet weak var speed_slider: NSSlider!
+    
     let appdelegate = NSApplication.shared.delegate as! AppDelegate
+    var timer = Timer() // for play traj
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -196,6 +203,47 @@ class ViewController: NSViewController {
                 light.castsShadow = false
             }
         }
+    }
+    
+    @IBAction func move_slider(_ sender: NSSlider) {
+        self.mySceneView.choose_frame(frame: sender.integerValue)
+    }
+    
+    @IBAction func set_slider(_ sender: NSTextField) {
+        self.mySceneView.choose_frame(frame: sender.integerValue)
+    }
+    
+    @IBAction func toggle_play_traj(_ sender: NSButton) {
+        self.timer.invalidate()
+        if sender.state == .on {
+            if self.mySceneView.traj_length > 1 {
+                // limit the max speed to one loop per second
+                let frame_per_second = min(pow(2.0, speed_slider.doubleValue), Double(self.mySceneView.traj_length))
+                let time_interval = 1.0 / frame_per_second
+                self.timer = Timer.scheduledTimer(timeInterval: time_interval, target: self, selector: #selector(fire_timer), userInfo: nil, repeats: true)
+            }
+        }
+    }
+    
+    @objc func fire_timer() {
+        self.mySceneView.next_frame()
+    }
+    
+    @IBAction func set_speed_slider(_ sender: NSSlider) {
+        if play_button.state == .on {
+            if self.mySceneView.traj_length > 1 {
+                self.timer.invalidate()
+                let frame_per_second = min(pow(2.0, speed_slider.doubleValue), Double(self.mySceneView.traj_length))
+                let time_interval = 1.0 / frame_per_second
+                self.timer = Timer.scheduledTimer(timeInterval: time_interval, target: self, selector: #selector(fire_timer), userInfo: nil, repeats: true)
+            }
+        }
+    }
+    
+    func reset() {
+        self.timer.invalidate()
+        self.play_button.state = .off
+        self.slider.integerValue = 0
     }
     
 }

@@ -21,9 +21,11 @@ class CartesianEditorViewController: NSViewController {
         let unit = unit_selection.selectedItem!.title.lowercased()
         let molecule = Molecule(text: textfield.string, unit: unit)
         self.view_controller.mySceneView.init_scene()
+        self.view_controller.reset()
         for (idx, eachatom) in molecule.atomlist.enumerated() {
             self.view_controller.mySceneView.add_atom(thisatom: eachatom, index: idx)
         }
+        self.view_controller.mySceneView.update_traj_length(length: 0)
         self.view_controller.mySceneView.auto_add_bond()
         self.view_controller.mySceneView.adjust_focus()
         self.view.window?.close()
