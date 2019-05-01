@@ -30,6 +30,7 @@ class MySceneView: SCNView {
     var renderSegmentCount = 50 // for determine quality of rendering
     
     var traj_length = 0 // length of trajectory
+    var current_frame = 0
     
     func init_scene() {
         //clean old nodes
@@ -87,6 +88,7 @@ class MySceneView: SCNView {
         
         // length of the trajectory
         self.traj_length = 0
+        self.current_frame = 0
         
         // reset the rotate button
         appdelegate.menu_rotate.state = .off
@@ -94,6 +96,60 @@ class MySceneView: SCNView {
         
         // reset view_controller elements
         view_controller.reset()
+    }
+    
+    func init_with_dae(url: URL) -> Bool {
+        do {
+            let load_scene = try SCNScene(url: url, options: nil)
+            self.scene = load_scene
+            // restore the node hierarchy
+            self.cameraNode = load_scene.rootNode.childNodes[0]
+            // add a new lightNode as childnode of cameraNode
+            self.lightNode = SCNNode()
+            self.lightNode.light = SCNLight()
+            self.lightNode.light!.type = SCNLight.LightType.directional
+            self.lightNode.rotation = SCNVector4Make(1, 1, 0, -0.7)
+            self.cameraNode.addChildNode(self.lightNode)
+            self.moleculeNode = load_scene.rootNode.childNodes[2]
+            self.atomnodes = self.moleculeNode.childNodes[0]
+            self.bondnodes = self.moleculeNode.childNodes[1]
+            self.normalatomnode = self.atomnodes.childNodes[0]
+            self.selectedatomnode = self.atomnodes.childNodes[1] // this should be empty
+            self.normalbondnode = self.bondnodes.childNodes[0]
+            self.selectedbondnode = self.bondnodes.childNodes[1] // this should be empty
+            // reset all the atomnodes to prevent cast error from SCNgeometry to SCNSphere
+            for eachatom in self.normalatomnode.childNodes {
+                var radius : CGFloat = 0.0
+                var center = SCNVector3()
+                eachatom.__getBoundingSphereCenter(&center, radius: &radius)
+                // draw a new sphere
+                let sphereGeometry = SCNSphere(radius: radius)
+                sphereGeometry.isGeodesic = true
+                sphereGeometry.segmentCount = 200
+                sphereGeometry.firstMaterial?.multiply.contents = eachatom.geometry!.firstMaterial?.multiply.contents
+                eachatom.geometry = sphereGeometry
+            }
+            // reset all the bondnodes to prevent cast error from SCNgeometry to SCNcylinder
+            for eachbond in (self.normalbondnode.childNodes + self.selectedbondnode.childNodes) {
+                let v1 = eachbond.boundingBox.min
+                let v2 = eachbond.boundingBox.max
+                let new_geometry = SCNCylinder(radius: abs(v2.x-v1.x)/2, height: abs(v2.y-v1.y))
+                new_geometry.firstMaterial?.multiply.contents = eachbond.geometry!.firstMaterial?.multiply.contents
+                eachbond.geometry = new_geometry
+            }
+            // length of the trajectory
+            self.traj_length = 0
+            self.current_frame = 0
+            // reset the rotate button
+            appdelegate.menu_rotate.state = .off
+            windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
+            // reset view_controller
+            view_controller.reset()
+            return true
+        }
+        catch {
+            return false
+        }
     }
     
     func add_atom(thisatom: Atom, index: Int = -1) -> Void {
@@ -450,19 +506,6 @@ class MySceneView: SCNView {
     }
     
     
-    
-    // mouse drag to rotate the molecule
-//    override func mouseDragged(theEvent: NSEvent) {
-//        let point = theEvent.locationInWindow
-//        let dx = point.x - click_location.x
-//        let dy = point.y - click_location.y
-//        
-//        let rotX = CATransform3DMakeRotation(dy * 0.003, -1, 0, 0);
-//        let rotY = CATransform3DMakeRotation(dx * 0.003, 0, 1, 0);
-//        let rotation = CATransform3DConcat(rotY, rotX);
-//        moleculeNode.transform = CATransform3DConcat(initialTransform, rotation)
-//    }
-
     override func mouseDragged(with theEvent: NSEvent) {
         // set lightnode as childnode of cameranode, and set cameranode to follow the pointofview
         if let current_transform = self.pointOfView?.transform {
@@ -474,38 +517,48 @@ class MySceneView: SCNView {
     
     override func mouseUp(with theEvent: NSEvent) {
         // print info bar
+        self.update_info_bar()
+        super.mouseUp(with: theEvent)
+    }
+    
+    func update_info_bar() {
+        var info_str : String = ""
         // print atom name (only one)
         if self.selectedatomnode.childNodes.count == 1 && self.selectedbondnode.childNodes.count == 0 {
             let node = self.selectedatomnode.childNodes[0]
             let index = node.value(forUndefinedKey: "atom_index") as! Int
             let indexStr = index >= 0 ? String(index) : ""
-            view_controller.info_bar.stringValue = String(format: "Atom %@: %@ %@", indexStr, node.name!, node.position.stringValue)
+            info_str = String(format: "Atom %@: %@ %@", indexStr, node.name!, node.position.stringValue)
         }
         // print bond length (only one)
         else if self.selectedbondnode.childNodes.count == 1 && self.selectedatomnode.childNodes.count == 0 {
             let geometry = self.selectedbondnode.childNodes[0].geometry as! SCNCylinder
-            view_controller.info_bar.stringValue = String(format: "R = %.5f Å", geometry.height)
+            info_str = String(format: "R = %.5f Å", geometry.height)
         }
         // print bond angles (if two connected bonds are selected)
         else if self.selectedbondnode.childNodes.count == 2 {
             let bond_a = self.selectedbondnode.childNodes[0]
             let bond_b = self.selectedbondnode.childNodes[1]
             // compute the starting and ending point of the bonds
-            let (a_start, a_end) = compute_bond_ends(bondnode: bond_a)
+            let a_start = (bond_a.value(forUndefinedKey: "atom_a") as! SCNNode).position
+            let a_end = (bond_a.value(forUndefinedKey: "atom_b") as! SCNNode).position
+            let b_start = (bond_b.value(forUndefinedKey: "atom_a") as! SCNNode).position
+            let b_end = (bond_b.value(forUndefinedKey: "atom_b") as! SCNNode).position
+//            let (a_start, a_end) = compute_bond_ends(bondnode: bond_a)
             let a_vector : float3 = float3(a_start - a_end)
-            let (b_start, b_end) = compute_bond_ends(bondnode: bond_b)
+//            let (b_start, b_end) = compute_bond_ends(bondnode: bond_b)
             let b_vector : float3 = float3(b_start - b_end)
             let a_length = (bond_a.geometry as! SCNCylinder).height
             let b_length = (bond_b.geometry as! SCNCylinder).height
             let theta = acos(dot(a_vector,b_vector)/Float(a_length * b_length)) / .pi * 180.0
             if a_start ~= b_start || a_end ~= b_end {
-                view_controller.info_bar.stringValue = String(format: "θ = %.4f°", theta)
+                info_str = String(format: "θ = %.4f°", theta)
             }
             else if a_start ~= b_end || a_end ~= b_start {
-                view_controller.info_bar.stringValue = String(format: "θ = %.4f°", 180-theta)
+                info_str = String(format: "θ = %.4f°", 180-theta)
             }
             else {
-                view_controller.info_bar.stringValue = "Right click to deselect all"
+                info_str = "Right click to deselect all"
             }
         }
         // print dihedral angle ( if three connected bonds are selected)
@@ -513,7 +566,10 @@ class MySceneView: SCNView {
             // put the nodes ends into an array
             var bond_ends : [(SCNVector3, SCNVector3)] = []
             for thisbond in self.selectedbondnode.childNodes {
-                bond_ends.append(compute_bond_ends(bondnode: thisbond))
+                let start = (thisbond.value(forUndefinedKey: "atom_a") as! SCNNode).position
+                let end = (thisbond.value(forUndefinedKey: "atom_b") as! SCNNode).position
+                bond_ends.append((start, end))
+//                bond_ends.append(compute_bond_ends(bondnode: thisbond))
             }
             // find out the connection between bonds
             var mid = -1
@@ -569,19 +625,18 @@ class MySceneView: SCNView {
                 let Uab = cross(a_vector, b_vector)
                 let Ubc = cross(b_vector, c_vector)
                 let gamma = acos(dot(Uab,Ubc)/(length(Uab)*length(Ubc))) / .pi * 180.0
-                view_controller.info_bar.stringValue = String(format: "Γ = %.4f°", gamma)
+                info_str = String(format: "Γ = %.4f°", gamma)
             } // end of print dihedral
             else {
-                view_controller.info_bar.stringValue = "Right click to deselect all"
+                info_str = "Right click to deselect all"
             }
         }
         else if self.selectedatomnode.childNodes.count + self.selectedbondnode.childNodes.count > 1 {
-            view_controller.info_bar.stringValue = "Right click to deselect all"
+            info_str = "Right click to deselect all"
         }
-        else {
-            view_controller.info_bar.stringValue = ""
+        if info_str != "" {
+            self.view_controller.info_bar.stringValue = info_str
         }
-        super.mouseUp(with: theEvent)
     }
     
     func compute_bond_ends(bondnode : SCNNode) -> (start: SCNVector3, end:SCNVector3) {
@@ -679,21 +734,42 @@ class MySceneView: SCNView {
         // check every pair of atoms to determine if a bond need to be added
         for (i, j) in self.compute_bonds(nodes: Array(self.normalatomnode.childNodes)) {
             let atom_a = self.normalatomnode.childNodes[i]
-            let point_a = atom_a.position
+//            let point_a = atom_a.position
             let atom_b = self.normalatomnode.childNodes[j]
-            let point_b = atom_b.position
-            let d = point_b - point_a
-            let length = d.length()
+//            let point_b = atom_b.position
+//            let d = point_b - point_a
+//            let length = d.length()
             // build cylinder nodes for bonds
-            let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
+//            let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
+            let bondGeometry = SCNCylinder(radius: bond_thickness, height: 1.0)
             bondGeometry.radialSegmentCount = self.renderSegmentCount
             bondGeometry.firstMaterial?.multiply.contents = bond_color
             let bondNode = SCNNode(geometry: bondGeometry)
             // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
             // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
-            bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
-            bondNode.position = (point_a + point_b) * 0.5
+//            bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
+//            bondNode.position = (point_a + point_b) * 0.5
+            bondNode.setValue(atom_a, forUndefinedKey: "atom_a")
+            bondNode.setValue(atom_b, forUndefinedKey: "atom_b")
             self.normalbondnode.addChildNode(bondNode)
+        }
+        self.update_bond_nodes()
+    }
+    
+    func update_bond_nodes() {
+        for node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
+            if let atom_a = node.value(forUndefinedKey: "atom_a") as? SCNNode {
+                if let atom_b = node.value(forUndefinedKey: "atom_b") as? SCNNode {
+                    let point_a = atom_a.position
+                    let point_b = atom_b.position
+                    let d = point_b - point_a
+                    let length = d.length()
+                    let geometry = node.geometry as! SCNCylinder
+                    geometry.height = length
+                    node.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
+                    node.position = (point_a + point_b) * 0.5
+                }
+            }
         }
     }
     
@@ -876,57 +952,7 @@ class MySceneView: SCNView {
         }
     }
     
-    func init_with_dae(url: URL) -> Bool {
-        print(url)
-        do {
-            let load_scene = try SCNScene(url: url, options: nil)
-            self.scene = load_scene
-            // restore the node hierarchy
-            self.cameraNode = load_scene.rootNode.childNodes[0]
-            // add a new lightNode as childnode of cameraNode
-            self.lightNode = SCNNode()
-            self.lightNode.light = SCNLight()
-            self.lightNode.light!.type = SCNLight.LightType.directional
-            self.lightNode.rotation = SCNVector4Make(1, 1, 0, -0.7)
-            self.cameraNode.addChildNode(self.lightNode)
-            self.moleculeNode = load_scene.rootNode.childNodes[2]
-            self.atomnodes = self.moleculeNode.childNodes[0]
-            self.bondnodes = self.moleculeNode.childNodes[1]
-            self.normalatomnode = self.atomnodes.childNodes[0]
-            self.selectedatomnode = self.atomnodes.childNodes[1] // this should be empty
-            self.normalbondnode = self.bondnodes.childNodes[0]
-            self.selectedbondnode = self.bondnodes.childNodes[1] // this should be empty
-            // reset all the atomnodes to prevent cast error from SCNgeometry to SCNSphere
-            for eachatom in self.normalatomnode.childNodes {
-                var radius : CGFloat = 0.0
-                var center = SCNVector3()
-                eachatom.__getBoundingSphereCenter(&center, radius: &radius)
-                // draw a new sphere
-                let sphereGeometry = SCNSphere(radius: radius)
-                sphereGeometry.isGeodesic = true
-                sphereGeometry.segmentCount = 200
-                sphereGeometry.firstMaterial?.multiply.contents = eachatom.geometry!.firstMaterial?.multiply.contents
-                eachatom.geometry = sphereGeometry
-            }
-            // reset all the bondnodes to prevent cast error from SCNgeometry to SCNcylinder
-            for eachbond in (self.normalbondnode.childNodes + self.selectedbondnode.childNodes) {
-                let v1 = eachbond.boundingBox.min
-                let v2 = eachbond.boundingBox.max
-                let new_geometry = SCNCylinder(radius: abs(v2.x-v1.x)/2, height: abs(v2.y-v1.y))
-                new_geometry.firstMaterial?.multiply.contents = eachbond.geometry!.firstMaterial?.multiply.contents
-                eachbond.geometry = new_geometry
-            }
-            // reset the rotate button
-            appdelegate.menu_rotate.state = .off
-            windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
-            // reset view_controller
-            view_controller.reset()
-            return true
-        }
-        catch {
-            return false
-        }
-    }
+
     
     func change_texture(texture: String) {
         for eachatom in self.normalatomnode.childNodes + self.normalbondnode.childNodes {
@@ -1084,9 +1110,13 @@ class MySceneView: SCNView {
                 let traj : [SCNVector3] = atomnode.value(forUndefinedKey: "trajectory") as! [SCNVector3]
                 atomnode.position = traj[valid_frame]
             }
+            self.update_bond_nodes()
+            self.update_info_bar()
             // update UI components
             self.view_controller.slider.integerValue = valid_frame
             self.view_controller.slider_text.integerValue = valid_frame
+            // store current frame
+            self.current_frame = valid_frame
         }
     }
     
