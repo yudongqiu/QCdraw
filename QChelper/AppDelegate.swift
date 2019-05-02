@@ -71,6 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
 
+    @IBOutlet weak var menu_file_trajectory: NSMenuItem!
     
     
 }

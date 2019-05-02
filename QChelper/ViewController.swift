@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Bruce. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 import SceneKit
 
 class ViewController: NSViewController {
@@ -18,6 +18,9 @@ class ViewController: NSViewController {
     @IBOutlet weak var slider_text: NSTextField!
     @IBOutlet weak var play_button: NSButton!
     @IBOutlet weak var speed_slider: NSSlider!
+    @IBOutlet weak var progress_box: NSBox!
+    @IBOutlet weak var progress_indicator: NSProgressIndicator!
+    @IBOutlet weak var progress_label: NSTextField!
     
     let appdelegate = NSApplication.shared.delegate as! AppDelegate
     var timer = Timer() // for play traj
@@ -36,32 +39,6 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
-
-    @IBAction func save_snapshot(sender: NSButton) {
-        // deselect all selected items before taking snapshot
-        self.mySceneView.reset_selection()
-        // Set double resolution if desired
-        let oldsize = self.mySceneView.frame.size // restore original size
-        if self.appdelegate.menu_high_reso.state == .on {
-            let newsize = NSMakeSize(oldsize.width*2,oldsize.height*2)
-            self.mySceneView.frame.size = newsize
-        }
-        // save panel
-        let newsavepanel = NSSavePanel()
-        newsavepanel.title = "Save Graphic"
-        let filetypes : [String] = ["png","PNG","pdf","PDF"]
-        newsavepanel.allowedFileTypes = filetypes
-        newsavepanel.begin {(result) -> Void in
-            if result == NSApplication.ModalResponse.OK {
-                if let url = newsavepanel.url {
-                    if self.mySceneView.save_file(url: url) {
-                        // Set resolution back
-                        self.mySceneView.frame.size = oldsize
-                    }
-                }
-            }
-        }
-    }
     
     @IBAction func open_file(sender: AnyObject) {
         let openpanel = NSOpenPanel()
@@ -75,32 +52,75 @@ class ViewController: NSViewController {
         self.appdelegate.menu_vdw_representation.state = .off
     }
     
-    @IBAction func rotate_molecule(sender: NSButton) {
-        let windowController = NSApplication.shared.windows[0].windowController as! CustomWindowController
-        if appdelegate.menu_rotate.state == .off {
-            appdelegate.menu_rotate.state = .on
-            windowController.toolbar_rotate.image = NSImage(named: "rotating.png")
+    @IBAction func save_snapshot(sender: NSButton) {
+        // deselect all selected items before taking snapshot
+        self.mySceneView.reset_selection()
+        // save panel
+        let newsavepanel = NSSavePanel()
+        newsavepanel.title = "Save Graphic"
+        let filetypes : [String] = ["png","PNG","pdf","PDF"]
+        newsavepanel.allowedFileTypes = filetypes
+        newsavepanel.begin {(result) -> Void in
+            if result == NSApplication.ModalResponse.OK {
+                if let url = newsavepanel.url {
+                    // Set double resolution if desired
+                    let oldsize = self.mySceneView.bounds.size // restore original size
+                    if self.appdelegate.menu_high_reso.state == .on {
+                        let newsize = NSMakeSize(oldsize.width*2,oldsize.height*2)
+                        self.mySceneView.setBoundsSize(newsize)
+                    }
+                    if !self.mySceneView.save_file(url: url) {
+                        self.info_bar.stringValue = "Error saving " + url.path
+                    }
+                    // Set resolution back
+                    self.mySceneView.setBoundsSize(oldsize)
+                }
+            }
         }
-        else {
-            appdelegate.menu_rotate.state = .off
-            windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
-        }
-        mySceneView.toggleRotateAnimation()
     }
     
-    @IBAction func add_bond(sender: NSButton) {
-        mySceneView.add_bond()
-        mySceneView.reset_selection()
-    }
-    
-    @IBAction func remove_selected_node(sender: NSButton) {
-        for eachnode in mySceneView.selectedatomnode.childNodes + mySceneView.selectedbondnode.childNodes {
-            mySceneView.remove_node(thisnode: eachnode)
+    @IBAction func save_trajectory_snapshot(sender: NSButton) {
+        // deselect all selected items before taking snapshot
+        self.mySceneView.reset_selection()
+        self.reset()
+        // save panel
+        let newsavepanel = NSSavePanel()
+        newsavepanel.title = "Save Graphic for Trajectory"
+        newsavepanel.begin {(result) -> Void in
+            if result == NSApplication.ModalResponse.OK {
+                if let url = newsavepanel.url {
+                    do {
+                        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                    } catch {
+                        self.info_bar.stringValue = "Failed to create folder " + url.path
+                    }
+                    let digits = max(Int(log10(Double(self.mySceneView.traj_length))), 2)
+                    let fmt_str = "frame-%0" + String(digits) + "d.png"
+                    DispatchQueue.global(qos: .utility).async { [weak self] in
+                        guard let self = self else {
+                            return
+                        }
+                        for i_frame in 0 ..< self.mySceneView.traj_length {
+                            DispatchQueue.main.sync {
+                                self.show_progress(nFinished: i_frame, total: self.mySceneView.traj_length, title: "Saving Images")
+                                self.mySceneView.choose_frame(frame: i_frame)
+                            }
+                            let frame_url = url.appendingPathComponent(String(format: fmt_str, i_frame))
+                            if !self.mySceneView.save_file(url: frame_url) {
+                                DispatchQueue.main.sync {
+                                    self.info_bar.stringValue = "Error saving " + url.path
+                                }
+                                break
+                            }
+                        }
+                        DispatchQueue.main.sync {
+                            self.hide_progress()
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    @IBAction func selectAll(sender: AnyObject?) {
-        mySceneView.select_all()
+        
     }
     
     @IBAction func export_dae(sender: AnyObject?) {
@@ -137,6 +157,78 @@ class ViewController: NSViewController {
                 }
             }
         }
+    }
+    
+    @IBAction func export_trajectory_json(sender: AnyObject?) {
+        // save panel
+        let newsavepanel = NSSavePanel()
+        newsavepanel.title = "Export Json File"
+        newsavepanel.begin {(result) -> Void in
+            if result == NSApplication.ModalResponse.OK {
+                if let url = newsavepanel.url {
+                    do {
+                        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                    } catch {
+                        self.info_bar.stringValue = "Failed to create folder " + url.path
+                        return
+                    }
+                    let digits = max(Int(log10(Double(self.mySceneView.traj_length))), 2)
+                    let fmt_str = "frame-%0" + String(digits) + "d.json"
+                    for i_frame in 0 ..< self.mySceneView.traj_length {
+                        self.mySceneView.choose_frame(frame: i_frame)
+                        let frame_url = url.appendingPathComponent(String(format: fmt_str, i_frame))
+                        if !self.mySceneView.export_json_tungsten(fileurl: frame_url) {
+                            self.info_bar.stringValue = "Failed to export json at " + frame_url.path
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func show_progress(nFinished: Int, total: Int, title: String = "Progress") {
+        if self.progress_box.isHidden {
+            self.progress_box.isHidden = false
+            if let blurFilter = CIFilter(name: "CIGaussianBlur", parameters: [kCIInputRadiusKey: 3]) {
+                self.progress_box.backgroundFilters = [blurFilter]
+            }
+        }
+        self.progress_indicator.doubleValue = Double(nFinished) / Double(total) * 100
+        self.progress_label.stringValue = "\(nFinished) / \(total)"
+        self.progress_box.title = title
+    }
+    
+    func hide_progress() {
+        self.progress_box.isHidden = true
+        self.progress_box.backgroundFilters = []
+    }
+    
+    @IBAction func rotate_molecule(sender: NSButton) {
+        let windowController = NSApplication.shared.windows[0].windowController as! CustomWindowController
+        if appdelegate.menu_rotate.state == .off {
+            appdelegate.menu_rotate.state = .on
+            windowController.toolbar_rotate.image = NSImage(named: "rotating.png")
+        }
+        else {
+            appdelegate.menu_rotate.state = .off
+            windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
+        }
+        mySceneView.toggleRotateAnimation()
+    }
+    
+    @IBAction func add_bond(sender: NSButton) {
+        mySceneView.add_bond()
+        mySceneView.reset_selection()
+    }
+    
+    @IBAction func remove_selected_node(sender: NSButton) {
+        for eachnode in mySceneView.selectedatomnode.childNodes + mySceneView.selectedbondnode.childNodes {
+            mySceneView.remove_node(thisnode: eachnode)
+        }
+    }
+
+    @IBAction func selectAll(sender: AnyObject?) {
+        mySceneView.select_all()
     }
     
     @IBAction func change_texture_none(sender: AnyObject?) {
@@ -244,6 +336,7 @@ class ViewController: NSViewController {
         self.timer.invalidate()
         self.play_button.state = .off
         self.slider.integerValue = 0
+        self.slider_text.integerValue = 0
     }
     
 }

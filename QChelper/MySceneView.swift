@@ -177,8 +177,10 @@ class MySceneView: SCNView {
         // add bond between every pair of atoms in selected atomnodes
         for i in 0 ..< self.selectedatomnode.childNodes.count {
             for j in i+1 ..< self.selectedatomnode.childNodes.count {
-                let point_a = self.selectedatomnode.childNodes[i].position
-                let point_b = self.selectedatomnode.childNodes[j].position
+                let atom_a = self.selectedatomnode.childNodes[i]
+                let point_a = atom_a.position
+                let atom_b = self.selectedatomnode.childNodes[j]
+                let point_b = atom_b.position
                 // draw a cylinder
                 let d = point_a - point_b
                 let length = d.length()
@@ -190,6 +192,8 @@ class MySceneView: SCNView {
                 // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
                 bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
                 bondNode.position = (point_a + point_b) * 0.5
+                bondNode.setValue(atom_a, forUndefinedKey: "atom_a")
+                bondNode.setValue(atom_b, forUndefinedKey: "atom_b")
                 // check if the bondNode already exists
                 var exist = false
                 for eachnode in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
@@ -243,7 +247,7 @@ class MySceneView: SCNView {
                 try pngdata.write(to: url, options: .atomic)
             }
             success = true
-        } catch _ {
+        } catch {
             success = false
         }
         return success
@@ -835,14 +839,15 @@ class MySceneView: SCNView {
                     for dx in 0 ... 1 {
                         let nx = bx + dx
                         if nx >= 0 && nx < dimX {
-                            for dy in -dx ... 1 {
+                            for dy in -1 ... 1 {
                                 let ny = by + dy
                                 if ny >= 0 && ny < dimY {
-                                    for dz in -max(dx,dy) ... 1 {
+                                    for dz in -1 ... 1 {
                                         let nz = bz + dz
                                         if nz >= 0 && nz < dimZ {
-                                            if dx != 0 || dx != 0 || dz != 0 {
-                                                neighbors.append((nx, ny, nz))
+                                            let ngbor = (nx, ny, nz)
+                                            if ngbor > (bx, by, bz) {
+                                                neighbors.append(ngbor)
                                             }
                                         }
                                     }
@@ -1098,8 +1103,10 @@ class MySceneView: SCNView {
         if length > 1 {
             self.view_controller.toolbox.isHidden = false
             self.view_controller.slider.maxValue = Double(length-1)
+            self.appdelegate.menu_file_trajectory.isHidden = false
         } else {
             self.view_controller.toolbox.isHidden = true
+            self.appdelegate.menu_file_trajectory.isHidden = true
         }
     }
     

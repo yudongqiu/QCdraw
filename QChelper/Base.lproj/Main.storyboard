@@ -65,7 +65,7 @@
                                                 <action selector="save_snapshotWithSender:" target="Ady-hI-5gd" id="xJc-bE-v4L"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Save 3D" keyEquivalent="3" id="O3I-QX-txq">
+                                        <menuItem title="Save 3D..." keyEquivalent="3" id="O3I-QX-txq">
                                             <connections>
                                                 <action selector="export_daeWithSender:" target="Ady-hI-5gd" id="b8X-2O-3QK"/>
                                             </connections>
@@ -75,6 +75,25 @@
                                             <connections>
                                                 <action selector="export_jsonWithSender:" target="Ady-hI-5gd" id="JRD-KZ-XoS"/>
                                             </connections>
+                                        </menuItem>
+                                        <menuItem title="Trajectory" hidden="YES" id="LsY-7H-Row">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Trajectory" id="p28-he-zzn">
+                                                <items>
+                                                    <menuItem title="Save..." id="ObB-lL-Urt">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="save_trajectory_snapshotWithSender:" target="Ady-hI-5gd" id="ihD-ys-OYg"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Export tungsten json" id="XG9-WM-rMI">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="export_trajectory_jsonWithSender:" target="Ady-hI-5gd" id="RJi-Vi-GDH"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
                                         <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
@@ -171,7 +190,7 @@ CA
                                                 <action selector="switch_VdW_representationWithSender:" target="Ady-hI-5gd" id="Wvd-cN-7M9"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Increase Resolution" id="g3Y-RO-r6M">
+                                        <menuItem title="Extra Saving Resolution" id="g3Y-RO-r6M">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="menu_high_reso_switchWithSender:" target="Voe-Tx-rLC" id="pcH-qG-13m"/>
@@ -264,6 +283,7 @@ CA
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="QCdraw" customModuleProvider="target">
                     <connections>
                         <outlet property="menu_cast_shadow" destination="y7j-2A-EYG" id="0U1-7W-8cZ"/>
+                        <outlet property="menu_file_trajectory" destination="LsY-7H-Row" id="cB2-nm-eVG"/>
                         <outlet property="menu_high_reso" destination="g3Y-RO-r6M" id="Wlm-fb-3Lt"/>
                         <outlet property="menu_rotate" destination="pa3-QI-u2k" id="Iym-Xf-RB4"/>
                         <outlet property="menu_vdw_representation" destination="ePW-6g-ekt" id="GZg-JX-K3h"/>
@@ -527,7 +547,7 @@ DQ
                                     <rect key="frame" x="3" y="3" width="815" height="40"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cWo-VS-fCn">
+                                        <slider canDrawConcurrently="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cWo-VS-fCn">
                                             <rect key="frame" x="84" y="12" width="583" height="19"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="15" id="2qQ-3E-xG8"/>
@@ -595,6 +615,38 @@ DQ
                                     <constraint firstAttribute="height" constant="40" id="fpI-hx-hu7"/>
                                 </constraints>
                             </box>
+                            <box hidden="YES" autoresizesSubviews="NO" focusRingType="none" fixedFrame="YES" title="Progress" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="a8v-bR-P3C">
+                                <rect key="frame" x="194" y="213" width="427" height="116"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" id="TM9-En-BTl">
+                                    <rect key="frame" x="3" y="3" width="421" height="91"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <progressIndicator wantsLayer="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="1iS-qd-WLY">
+                                            <rect key="frame" x="31" y="33" width="258" height="20"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="258" id="mCo-wn-Q6V"/>
+                                            </constraints>
+                                        </progressIndicator>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OP2-Al-56B">
+                                            <rect key="frame" x="312" y="37" width="91" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="ProgressLabel" id="WmG-6s-8yg">
+                                                <font key="font" usesAppearanceFont="YES"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="OP2-Al-56B" firstAttribute="leading" secondItem="1iS-qd-WLY" secondAttribute="trailing" constant="25" id="0pz-Qc-nWe"/>
+                                        <constraint firstItem="1iS-qd-WLY" firstAttribute="leading" secondItem="TM9-En-BTl" secondAttribute="leading" constant="31" id="DS5-lC-1Gm"/>
+                                        <constraint firstAttribute="bottom" secondItem="OP2-Al-56B" secondAttribute="bottom" constant="37" id="dNF-RE-nMp"/>
+                                        <constraint firstAttribute="trailing" secondItem="OP2-Al-56B" secondAttribute="trailing" constant="20" id="nbf-zk-O3E"/>
+                                        <constraint firstAttribute="bottom" secondItem="1iS-qd-WLY" secondAttribute="bottom" constant="34" id="rmx-ah-CL2"/>
+                                    </constraints>
+                                </view>
+                                <font key="titleFont" metaFont="system"/>
+                            </box>
                         </subviews>
                         <constraints>
                             <constraint firstItem="iXf-9x-KPI" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="5" id="6qC-qT-TMA"/>
@@ -613,6 +665,9 @@ DQ
                         <outlet property="info_bar" destination="iXf-9x-KPI" id="UTf-kT-mNL"/>
                         <outlet property="mySceneView" destination="0Gw-Ns-Apl" id="7hT-c1-y1z"/>
                         <outlet property="play_button" destination="yzz-cI-P55" id="7CI-3c-PBM"/>
+                        <outlet property="progress_box" destination="a8v-bR-P3C" id="6ko-Z8-XUG"/>
+                        <outlet property="progress_indicator" destination="1iS-qd-WLY" id="MvB-bh-Fkv"/>
+                        <outlet property="progress_label" destination="OP2-Al-56B" id="Mmd-S8-gVp"/>
                         <outlet property="slider" destination="26R-VD-9rP" id="kgd-mT-pSi"/>
                         <outlet property="slider_text" destination="Nz7-Qp-f81" id="I2A-O1-qKs"/>
                         <outlet property="speed_slider" destination="E1i-Y8-Le5" id="AcS-lx-50v"/>
