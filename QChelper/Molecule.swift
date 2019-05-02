@@ -397,11 +397,8 @@ class Molecule {
     /**
      Read molecular geometry from pdb file.
      
-     - returns:
-     None
-     
      - parameters:
-     - path: Path to input pdb file
+        - path: Path to input pdb file
      
      
      PDB is a strict format, I am following instructions here:
