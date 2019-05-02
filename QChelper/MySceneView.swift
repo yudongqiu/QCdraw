@@ -967,6 +967,8 @@ class MySceneView: SCNView {
             }
             if success {
                 view_controller.info_bar.stringValue = path.lastPathComponent
+                // Add the succesfully opened file to "Open Recent" menu
+                NSDocumentController.shared.noteNewRecentDocumentURL(url!)
             }
             else {
                 view_controller.info_bar.stringValue = "File " + path + " not recognized"

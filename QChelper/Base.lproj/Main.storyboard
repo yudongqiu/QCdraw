@@ -57,8 +57,20 @@
                                     <items>
                                         <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                             <connections>
-                                                <action selector="open_fileWithSender:" target="Ady-hI-5gd" id="dcX-yL-DSf"/>
+                                                <action selector="open_fileWithSender:" target="Ady-hI-5gd" id="LZd-Cd-cXA"/>
                                             </connections>
+                                        </menuItem>
+                                        <menuItem title="Open Recent" id="wq4-y0-L0t">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Open Recent" systemMenu="recentDocuments" id="8f3-IJ-gp6">
+                                                <items>
+                                                    <menuItem title="Clear Menu" id="1tz-pe-InM">
+                                                        <connections>
+                                                            <action selector="clearRecentDocuments:" target="Ady-hI-5gd" id="gIi-wX-qc1"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
                                         <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
                                             <connections>

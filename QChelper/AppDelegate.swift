@@ -21,22 +21,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         // Insert code here to initialize your application
         // Remove the extra default menu items that we don't want
-        let EditMenu = NSApplication.shared.mainMenu!.item(withTitle: "Edit")
-        if (EditMenu != nil)    {
-            let Count: Int = EditMenu!.submenu!.numberOfItems
-            if (EditMenu!.submenu!.item(at: Count - 1)!.title == "Special Characters…")
-            {
-                EditMenu!.submenu!.removeItem(at: Count - 1)
-            }
-            if (EditMenu!.submenu!.item(at: Count - 1)!.title == "Emoji & Symbols")
-            {
-                EditMenu!.submenu!.removeItem(at: Count - 1)
-            }
-            if (EditMenu!.submenu!.item(at: Count - 2)!.title == "Start Dictation…")
-            {
-                EditMenu!.submenu!.removeItem(at: Count - 2)
-            }
-        }
+//        let EditMenu = NSApplication.shared.mainMenu!.item(withTitle: "Edit")
+//        if (EditMenu != nil)    {
+//            let Count: Int = EditMenu!.submenu!.numberOfItems
+//            if (EditMenu!.submenu!.item(at: Count - 1)!.title == "Special Characters…")
+//            {
+//                EditMenu!.submenu!.removeItem(at: Count - 1)
+//            }
+//            if (EditMenu!.submenu!.item(at: Count - 1)!.title == "Emoji & Symbols")
+//            {
+//                EditMenu!.submenu!.removeItem(at: Count - 1)
+//            }
+//            if (EditMenu!.submenu!.item(at: Count - 2)!.title == "Start Dictation…")
+//            {
+//                EditMenu!.submenu!.removeItem(at: Count - 2)
+//            }
+//        }
         
     }
 
