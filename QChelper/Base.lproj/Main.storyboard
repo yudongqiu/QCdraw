@@ -149,7 +149,7 @@ CA
                                                 <action selector="remove_selected_nodeWithSender:" target="Ady-hI-5gd" id="MMa-Gp-mfX"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Rotate" keyEquivalent="r" id="pa3-QI-u2k">
+                                        <menuItem title="Rotating" keyEquivalent="r" id="pa3-QI-u2k">
                                             <connections>
                                                 <action selector="rotate_moleculeWithSender:" target="Ady-hI-5gd" id="DcK-7A-BDm"/>
                                             </connections>
@@ -162,7 +162,7 @@ CA
                                         </menuItem>
                                         <menuItem title="Select All" keyEquivalent="a" id="Ruw-6m-B2m">
                                             <connections>
-                                                <action selector="selectAllWithSender:" target="Ady-hI-5gd" id="f9c-Zv-Kl7"/>
+                                                <action selector="menu_select_allWithSender:" target="Voe-Tx-rLC" id="wdn-er-wjo"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -326,15 +326,15 @@ CA
                                 <rect key="frame" x="-1" y="39" width="434" height="233"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="1by-L2-zgE">
-                                    <rect key="frame" x="1" y="1" width="417" height="231"/>
+                                    <rect key="frame" x="1" y="1" width="432" height="231"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="GrP-qd-WOP">
-                                            <rect key="frame" x="0.0" y="0.0" width="417" height="231"/>
+                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" fieldEditor="YES" usesFontPanel="YES" findStyle="bar" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" textCompletion="NO" id="GrP-qd-WOP">
+                                            <rect key="frame" x="0.0" y="0.0" width="432" height="231"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="417" height="231"/>
+                                            <size key="minSize" width="432" height="231"/>
                                             <size key="maxSize" width="479" height="10000000"/>
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
@@ -345,7 +345,7 @@ CA
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="yt8-en-5Hv">
-                                    <rect key="frame" x="418" y="1" width="15" height="231"/>
+                                    <rect key="frame" x="417" y="1" width="16" height="231"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>

@@ -227,7 +227,7 @@ class ViewController: NSViewController {
         }
     }
 
-    @IBAction func selectAll(sender: AnyObject?) {
+    func select_all() {
         mySceneView.select_all()
     }
     

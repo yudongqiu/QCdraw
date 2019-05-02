@@ -55,6 +55,11 @@ class CartesianEditorViewController: NSViewController {
             textfield.string += a.content + "\n"
         }
     }
+    
+    func select_all () {
+        textfield.selectAll(self)
+    }
+    
 }
 
 
