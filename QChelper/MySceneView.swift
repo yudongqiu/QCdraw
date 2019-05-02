@@ -899,6 +899,14 @@ class MySceneView: SCNView {
         return bonds
     }
     
+    func reset_bond_nodes() {
+        // remove all existing bonds
+        for node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
+            node.removeFromParentNode()
+        }
+        self.auto_add_bond()
+    }
+    
     func dict_atom_max_bond_length(myDict: NSDictionary, name_a: NSString, name_b: NSString) -> CGFloat {
         // default max bond length if not found
         let result : CGFloat = 1.6
@@ -1118,10 +1126,10 @@ class MySceneView: SCNView {
         if length > 1 {
             self.view_controller.toolbox.isHidden = false
             self.view_controller.slider.maxValue = Double(length-1)
-            self.appdelegate.menu_file_trajectory.isHidden = false
+            self.appdelegate.menu_trajectory.isHidden = false
         } else {
             self.view_controller.toolbox.isHidden = true
-            self.appdelegate.menu_file_trajectory.isHidden = true
+            self.appdelegate.menu_trajectory.isHidden = true
         }
     }
     
@@ -1132,7 +1140,11 @@ class MySceneView: SCNView {
                 let traj : [SCNVector3] = atomnode.value(forUndefinedKey: "trajectory") as! [SCNVector3]
                 atomnode.position = traj[valid_frame]
             }
-            self.update_bond_nodes()
+            if appdelegate.menu_traj_update_bonds.state == .on {
+                self.reset_bond_nodes()
+            } else {
+                self.update_bond_nodes()
+            }            
             self.update_info_bar()
             // update UI components
             self.view_controller.slider.integerValue = valid_frame

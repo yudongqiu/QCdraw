@@ -278,6 +278,10 @@ class ViewController: NSViewController {
         self.mySceneView.recenter()
     }
     
+    @IBAction func reset_bonds(sender: AnyObject?) {
+        self.mySceneView.reset_bond_nodes()
+    }
+    
     
     @IBAction func cast_shadows(sender: AnyObject?) {
         let windowController = NSApplication.shared.windows[0].windowController as! CustomWindowController

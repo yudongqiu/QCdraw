@@ -70,9 +70,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
     
-
-    @IBOutlet weak var menu_file_trajectory: NSMenuItem!
-    
     @IBAction func menu_select_all(sender: AnyObject) {
         if let window = NSApp.mainWindow{
             if let activeController = window.contentViewController {
@@ -82,6 +79,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     viewController.select_all()
                 }
             }
+        }
+    }
+    
+    
+    @IBOutlet weak var menu_trajectory: NSMenuItem!
+    
+    
+    @IBOutlet weak var menu_traj_update_bonds: NSMenuItem!
+    @IBAction func toggle_menu_traj_update_bonds(_ sender: Any) {
+        if menu_traj_update_bonds.state == .off {
+            menu_traj_update_bonds.state = .on
+            if let window = NSApp.mainWindow, let viewController = window.contentViewController as? ViewController {
+                viewController.mySceneView.reset_bond_nodes()
+            }
+        } else {
+            menu_traj_update_bonds.state = .off
         }
     }
     

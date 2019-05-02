@@ -88,25 +88,6 @@
                                                 <action selector="export_jsonWithSender:" target="Ady-hI-5gd" id="JRD-KZ-XoS"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Trajectory" hidden="YES" id="LsY-7H-Row">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Trajectory" id="p28-he-zzn">
-                                                <items>
-                                                    <menuItem title="Save..." id="ObB-lL-Urt">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="save_trajectory_snapshotWithSender:" target="Ady-hI-5gd" id="ihD-ys-OYg"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Export tungsten json" id="XG9-WM-rMI">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="export_trajectory_jsonWithSender:" target="Ady-hI-5gd" id="RJi-Vi-GDH"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
-                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
                                         <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
                                             <connections>
@@ -161,11 +142,6 @@ CA
                                                 <action selector="remove_selected_nodeWithSender:" target="Ady-hI-5gd" id="MMa-Gp-mfX"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Rotating" keyEquivalent="r" id="pa3-QI-u2k">
-                                            <connections>
-                                                <action selector="rotate_moleculeWithSender:" target="Ady-hI-5gd" id="DcK-7A-BDm"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="Transparentize" id="JYh-zZ-EzZ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -180,20 +156,58 @@ CA
                                     </items>
                                 </menu>
                             </menuItem>
+                            <menuItem title="Trajectory" hidden="YES" id="btC-uU-C0E">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Trajectory" id="4uL-0u-0HM">
+                                    <items>
+                                        <menuItem title="Save..." id="ObB-lL-Urt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="save_trajectory_snapshotWithSender:" target="Ady-hI-5gd" id="ihD-ys-OYg"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export tungsten json" id="XG9-WM-rMI">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="export_trajectory_jsonWithSender:" target="Ady-hI-5gd" id="RJi-Vi-GDH"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="keA-vw-YdB"/>
+                                        <menuItem title="Updating Bonds" id="YRU-qQ-2xa">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggle_menu_traj_update_bonds:" target="Voe-Tx-rLC" id="bci-ox-Sxw"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="Options" id="jxT-CU-nIS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Options" id="GEO-Iw-cKr">
                                     <items>
-                                        <menuItem title="Cartesian Editor" id="1HX-so-3TE">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="Cartesian Editor" keyEquivalent="e" id="1HX-so-3TE">
                                             <connections>
                                                 <segue destination="BRf-wn-tXi" kind="show" id="uei-y4-W6g"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="jbX-yv-qHx"/>
                                         <menuItem title="Recenter" id="58X-Le-JjP">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="view_recenterWithSender:" target="Ady-hI-5gd" id="tfb-OO-zLY"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reset Bonds" id="aQr-CU-0uT">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="reset_bondsWithSender:" target="Ady-hI-5gd" id="zze-bf-v3p"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="8tA-jl-ECg"/>
+                                        <menuItem title="Rotating" keyEquivalent="r" id="pa3-QI-u2k">
+                                            <connections>
+                                                <action selector="rotate_moleculeWithSender:" target="Ady-hI-5gd" id="DcK-7A-BDm"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="VdW Representation" id="ePW-6g-ekt">
@@ -214,6 +228,7 @@ CA
                                                 <action selector="cast_shadowsWithSender:" target="Ady-hI-5gd" id="xYX-QH-ynl"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="mo3-qf-sdf"/>
                                         <menuItem title="Texture" id="IGp-7r-3Q1">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Texture" id="yIh-6V-vck">
@@ -295,9 +310,10 @@ CA
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="QCdraw" customModuleProvider="target">
                     <connections>
                         <outlet property="menu_cast_shadow" destination="y7j-2A-EYG" id="0U1-7W-8cZ"/>
-                        <outlet property="menu_file_trajectory" destination="LsY-7H-Row" id="cB2-nm-eVG"/>
                         <outlet property="menu_high_reso" destination="g3Y-RO-r6M" id="Wlm-fb-3Lt"/>
                         <outlet property="menu_rotate" destination="pa3-QI-u2k" id="Iym-Xf-RB4"/>
+                        <outlet property="menu_traj_update_bonds" destination="YRU-qQ-2xa" id="lOR-WC-QZv"/>
+                        <outlet property="menu_trajectory" destination="btC-uU-C0E" id="TKb-Xt-dzi"/>
                         <outlet property="menu_vdw_representation" destination="ePW-6g-ekt" id="GZg-JX-K3h"/>
                     </connections>
                 </customObject>
