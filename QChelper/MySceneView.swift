@@ -682,7 +682,6 @@ class MySceneView: SCNView {
     }
     
     override func rightMouseDown(with theEvent: NSEvent) {
-        
         reset_selection()
         self.click_location = theEvent.locationInWindow
         if let pov = self.pointOfView {

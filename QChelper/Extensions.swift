@@ -109,4 +109,14 @@ extension String {
     func strip() -> String {
         return self.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+    func slice(_ start: Int, _ end: Int) -> String {
+        if start >= end || start >= self.count || end <= 0 {
+            return ""
+        }
+        let _start = max(0, start)
+        let _end = min(self.count, end)
+        let _start_idx = self.index(self.startIndex, offsetBy: _start)
+        let _end_idx = self.index(self.startIndex, offsetBy: _end)
+        return String(self[_start_idx..<_end_idx])
+    }
 }

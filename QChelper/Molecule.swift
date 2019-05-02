@@ -53,6 +53,8 @@ class Molecule {
         let file_format = self.determine_file_format(path: path)
         if file_format == "xyz" {
             self.read_xyz(path: path)
+        } else if file_format == "pdb" {
+            self.read_pdb(path: path)
         } else if file_format == "psi4" {
             self.read_psi4(path: path)
         } else if file_format == "molpro" {
@@ -67,7 +69,7 @@ class Molecule {
     func determine_file_format(path: String) -> String {
         var res: String = "unknown"
         let ext = path.pathExtension
-        if ext == "xyz" {
+        if ext == "xyz"{
             res = "xyz"
         } else if ext == "pdb" {
             res = "pdb"
@@ -388,6 +390,86 @@ class Molecule {
                 }
                 // else break
                 break
+            }
+        }
+    }
+    
+    func read_pdb(path: String) {
+        """
+        PDB is a strict format, I am following instructions here:
+        http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+        COLUMNS        DATA TYPE       CONTENTS
+        --------------------------------------------------------------------------------
+        1 -  6         Record name     "ATOM  "
+        7 - 11         Integer         Atom serial number.
+        13 - 16        Atom            Atom name.
+        17             Character       Alternate location indicator.
+        18 - 20        Residue name    Residue name.
+        22             Character       Chain identifier.
+        23 - 26        Integer         Residue sequence number.
+        27             AChar           Code for insertion of residues.
+        31 - 38        Real(8.3)       Orthogonal coordinates for X in Angstroms.
+        39 - 46        Real(8.3)       Orthogonal coordinates for Y in Angstroms.
+        47 - 54        Real(8.3)       Orthogonal coordinates for Z in Angstroms.
+        55 - 60        Real(6.2)       Occupancy.
+        61 - 66        Real(6.2)       Temperature factor (Default = 0.0).
+        73 - 76        LString(4)      Segment identifier, left-justified.
+        77 - 78        LString(2)      Element symbol, right-justified.
+        79 - 80        LString(2)      Charge on the atom.
+        
+        http://www.bmsc.washington.edu/CrystaLinks/man/pdb/part_69.html
+        Record Format
+        COLUMNS         DATA TYPE        FIELD           DEFINITION
+        ---------------------------------------------------------------------------------
+        1 -  6          Record name      "CONECT"
+        7 - 11          Integer          serial          Atom serial number
+        12 - 16         Integer          serial          Serial number of bonded atom
+        17 - 21         Integer          serial          Serial number of bonded atom
+        22 - 26         Integer          serial          Serial number of bonded atom
+        27 - 31         Integer          serial          Serial number of bonded atom
+        32 - 36         Integer          serial          Serial number of hydrogen bonded atom
+        37 - 41         Integer          serial          Serial number of hydrogen bonded atom
+        42 - 46         Integer          serial          Serial number of salt bridged atom
+        47 - 51         Integer          serial          Serial number of hydrogen bonded atom
+        52 - 56         Integer          serial          Serial number of hydrogen bonded atom
+        57 - 61         Integer          serial          Serial number of salt bridged atom
+        """
+        self.atomlist = []
+        // open the element radius dictionary
+        let dict_element_radius = myDict!.object(forKey: "Element Radius") as! Dictionary<String,Any>
+        if let aStreamReader = StreamReader(path: path) {
+            defer {
+                aStreamReader.close()
+            }
+            var found_geo = false
+            for line in aStreamReader {
+                if line.slice(0,6) == "ATOM  "{
+                    // determine element
+                    var element = "X"
+                    if line.count >= 78 {
+                        element = line.slice(76, 78).strip()
+                    } else {
+                        // use the first 2 character of "name" field if element symbol not provided
+                        element = line.slice(12, 14).strip().capitalized
+                        if dict_element_radius[element] == nil {
+                            // use the first character of the "name" field is element not recognized
+                            element = line.slice(12, 13)
+                        }
+                    }
+                    // determine pos
+                    if let x = line.slice(30, 38).doubleValue {
+                        if let y = line.slice(38, 46).doubleValue {
+                            if let z = line.slice(46, 54).doubleValue {
+                                self.add_new_atom(name: element, posx: x, posy: y, posz: z)
+                            }
+                        }
+                    }
+                    found_geo = true
+                }
+                // else break
+                else if found_geo {
+                    break
+                }
             }
         }
     }
