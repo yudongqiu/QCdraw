@@ -32,6 +32,10 @@ class MySceneView: SCNView {
     var traj_length = 0 // length of trajectory
     var current_frame = 0
     
+    // center of the atoms in molecule
+    var mol_center_pos = SCNVector3(0,0,0)
+    var camera_distance : CGFloat = 1.0
+    
     func init_scene() {
         //clean old nodes
         self.moleculeNode = SCNNode()
@@ -49,16 +53,20 @@ class MySceneView: SCNView {
         let scene = SCNScene()
         
         // create and add a camera to the scene
-        self.cameraNode.name = "camera"
-        self.cameraNode.camera = SCNCamera()
-        self.cameraNode.camera?.fieldOfView = 40
-        self.cameraNode.camera?.zNear = 0.5
-        self.cameraNode.camera?.zFar = 1000
-//        self.cameraNode.camera?.focalSize = 20.0
-//        self.cameraNode.camera?.focalBlurRadius = 5.0
-//        self.cameraNode.camera?.focalDistance = 1.0
+        self.cameraNode.name = "cameraNode"
+        let camera = SCNCamera()
+        camera.fieldOfView = 40
+        camera.zNear = 0.5
+        camera.zFar = 1000
+//        camera.wantsDepthOfField = true
+//        camera.focalBlurSampleCount = 10
+//        camera.apertureBladeCount = 6
+//        camera.focusDistance = 10
+//        camera.fStop = 0.01
+        self.cameraNode.camera = camera
         self.cameraNode.position = SCNVector3(x: 0, y: 0, z: 0)
         scene.rootNode.addChildNode(self.cameraNode)
+        self.cameraControlConfiguration.allowsTranslation = true
         
         // create and add a light to the scene
         self.lightNode.light = SCNLight()
@@ -274,172 +282,173 @@ class MySceneView: SCNView {
         var known_bsdfs = Set<String>()
         var lowest_y : CGFloat = CGFloat.greatestFiniteMagnitude
         var lowest_z : CGFloat = CGFloat.greatestFiniteMagnitude
-        for eachatom in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
-            var name = eachatom.name!
-            if eachatom.opacity < 1.0 {
-                name += "_trans"
-            }
-            let p = eachatom.position
-            let radius = (eachatom.geometry as! SCNSphere).radius
-            let primitive : NSDictionary = ["name": name, "transform": ["position": [p.x, p.y, p.z], "scale": radius], "type": "sphere", "bsdf": name]
-            primitives.append(primitive)
-            // Store the atom's color in bsdfs
-            if !known_bsdfs.contains(name){
-                known_bsdfs.insert(name)
-                let color = eachatom.geometry!.firstMaterial?.multiply.contents as! NSColor
-                let r = (1.0 - color.redComponent)
-                let g = (1.0 - color.greenComponent)
-                let b = (1.0 - color.blueComponent)
+        if let pov = self.pointOfView {
+            for eachatom in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
+                var name = eachatom.name!
                 if eachatom.opacity < 1.0 {
-                    let bsdf : NSDictionary = ["name": name,
-                                               "albedo": 1.0,
-                                               "type": "thinsheet",
-                                               "ior": 1.3,
-                                               "thickness": 1.0,
-                                               "sigma_a": [r*0.5, g*0.5, b*0.5]]
-                    bsdfs.append(bsdf)
-                }
-                else {
-                    let bsdf : NSDictionary = ["name": name,
-                                               "albedo": 1.0,
-                                               "type": "plastic",
-                                               "ior": 1.3,
-                                               "thickness": 1.0,
-                                               "sigma_a": [r, g, b]]
-                    bsdfs.append(bsdf)
-                }
-            }
-            // record the lowest y
-            let p_pov = self.pointOfView!.convertPosition(eachatom.position, from: nil)
-            lowest_y = min(lowest_y, p_pov.y)
-            lowest_z = min(lowest_z, p_pov.z)
-        }
-        // add the bonds
-        if self.moleculeNode.childNodes.contains(self.bondnodes) {
-            for eachbond in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
-                let v1 = eachbond.boundingBox.min
-                let v2 = eachbond.boundingBox.max
-                let radius = abs(v2.x-v1.x)
-                let length = abs(v2.y-v1.y)
-                let p = eachbond.position
-                let rotation = convert_tungsten_rotation(rotation: eachbond.eulerAngles)
-                var name = "bond"
-                if eachbond.opacity < 1.0 {
                     name += "_trans"
                 }
-                let prim_bond : NSDictionary = ["name": name,
-                                                "transform": ["position": [p.x, p.y, p.z],
-                                                              "scale": [radius, length, radius],
-                                                              "rotation": rotation
-                                                              ],
-                                                "type": "cylinder",
-                                                "bsdf": name]
-                primitives.append(prim_bond)
+                let p = eachatom.position
+                let radius = (eachatom.geometry as! SCNSphere).radius
+                let primitive : NSDictionary = ["name": name, "transform": ["position": [p.x, p.y, p.z], "scale": radius], "type": "sphere", "bsdf": name]
+                primitives.append(primitive)
+                // Store the atom's color in bsdfs
+                if !known_bsdfs.contains(name){
+                    known_bsdfs.insert(name)
+                    let color = eachatom.geometry!.firstMaterial?.multiply.contents as! NSColor
+                    let r = (1.0 - color.redComponent)
+                    let g = (1.0 - color.greenComponent)
+                    let b = (1.0 - color.blueComponent)
+                    if eachatom.opacity < 1.0 {
+                        let bsdf : NSDictionary = ["name": name,
+                                                   "albedo": 1.0,
+                                                   "type": "thinsheet",
+                                                   "ior": 1.3,
+                                                   "thickness": 1.0,
+                                                   "sigma_a": [r*0.5, g*0.5, b*0.5]]
+                        bsdfs.append(bsdf)
+                    }
+                    else {
+                        let bsdf : NSDictionary = ["name": name,
+                                                   "albedo": 1.0,
+                                                   "type": "plastic",
+                                                   "ior": 1.3,
+                                                   "thickness": 1.0,
+                                                   "sigma_a": [r, g, b]]
+                        bsdfs.append(bsdf)
+                    }
+                }
+                // record the lowest y
+                let p_pov = pov.convertPosition(eachatom.position, from: nil)
+                lowest_y = min(lowest_y, p_pov.y)
+                lowest_z = min(lowest_z, p_pov.z)
             }
-            let bond_bsdf : NSDictionary = ["name": "bond",
-                                            "albedo": 1.0,
-                                            "type": "rough_plastic",
-                                            "ior": 1.3,
-                                            "sigma_a" : 0.6,
-                                            "roughness": 0.1]
-            let bond_trans_bsdf : NSDictionary = ["name": "bond_trans",
-                                            "albedo": 1.0,
-                                            "type": "thinsheet",
-                                            "ior": 1.3,
-                                            "sigma_a" : 0.4
-                                            ]
-            bsdfs.append(bond_bsdf)
-            bsdfs.append(bond_trans_bsdf)
-        }
-        
-        // Set the camera
-        let pov = self.pointOfView!
-        let p = pov.position
-        let p1 = pov.convertPosition(SCNVector3(0,0,-11), to: nil)
-        let p_up = pov.convertPosition(SCNVector3(0,1,0), to: nil) - p
-        let camera: NSDictionary = ["tonemap": "filmic",
-                                    "resolution": [self.bounds.width*2, self.bounds.height*2],
-                                    "reconstruction_filter": "tent",
-                                    "transform": ["position": [p.x, p.y, p.z],
-                                                  "look_at": [p1.x, p1.y, p1.z],
-                                                  "up": [p_up.x, p_up.y, p_up.z]],
-                                    "type": "pinhole",
-                                    "fov": pov.camera!.fieldOfView+20]
-
-        let integrator: NSDictionary = ["min_bounces": 0,
-                                        "max_bounces": 64,
-                                        "enable_consistency_checks": false,
-                                        "enable_two_sided_shading": true,
-                                        "type": "path_tracer",
-                                        "enable_light_sampling": true,
-                                        "enable_volume_light_sampling": true]
-        
-        let renderer: NSDictionary = ["overwrite_output_files": false,
-                                      "adaptive_sampling": true,
-                                      "enable_resume_render": false,
-                                      "stratified_sampler": true,
-                                      "scene_bvh": true,
-                                      "spp": 32,
-                                      "spp_step": 16,
-                                      "timeout": "0",
-                                      "output_file": "TungstenRender.png",
-                                      "resume_render_file": "RenderState.dat"]
-        
-        // Add the envmap
-        let envmap : NSDictionary = ["name": "Envmap",
-                                     "transform": ["position": [0, 0, 0],
-                                                   "up": [p_up.x, p_up.y, p_up.z]],
-                                     "type": "infinite_sphere",
-                                     "emission": "envmap.hdr",
-                                     "sample": true]
-        primitives.append(envmap)
-        
-        // Add the floor
-        let pf = pov.convertPosition(SCNVector3(0, lowest_y-1, 0), to: nil)
-        let floor : NSDictionary = ["name": "Floor",
-                                    "transform": ["position" : [pf.x, pf.y, pf.z],
-                                                  "up" : [p_up.x, p_up.y, p_up.z],
-                                                  "scale": 200.0],
-                                    "type": "quad",
-                                    "bsdf": "Floor"
-                                    ]
-        primitives.append(floor)
-        let bsdf_floor : NSDictionary = ["name": "Floor",
-                                         "albedo": 0.1,
-                                         "type": "lambert"
-                                        ]
-        bsdfs.append(bsdf_floor)
-        
-        // Add backwall
-        let p_wall = pov.convertPosition(SCNVector3(0,0,lowest_z-5), to: nil)
-        let w1 = pov.convertPosition(SCNVector3(0,0,1), to: nil) - p
-        let wall : NSDictionary = [ "name": "Wall",
-                                    "transform": ["position" : [p_wall.x, p_wall.y, p_wall.z],
-                                                  "up" : [w1.x, w1.y, w1.z],
-                                                  "scale": 100.0],
-                                    "type": "quad",
-                                    "bsdf": "Floor"]
-        
-        primitives.append(wall)
-        // Add a spotlight directed from top to bottom
-        let plight = pov.convertPosition(SCNVector3(0,50,0), to: nil) - p
-        let spotlight: NSDictionary = ["name": "SpotLight",
-                                       "transform": ["position": [plight.x, plight.y, plight.z],
-                                                     "up": [-p_up.x, -p_up.y, -p_up.z],
-                                                     "scale": 3],
-                                       "type": "disk",
-                                       "emission": 40,
-                                       "bsdf": ["albedo": 1.0, "type": "null"]
-                                      ]
-        primitives.append(spotlight)
-        let dictonary :  NSDictionary = ["media": [], "bsdfs": bsdfs, "primitives": primitives, "camera": camera,
-                                         "integrator": integrator, "renderer": renderer]
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: dictonary, options: .prettyPrinted)
-            try jsonData.write(to: fileurl, options: .atomic)
-            success = true
-        } catch {
-            NSLog("Error creating JSON object")
+            // add the bonds
+            if self.moleculeNode.childNodes.contains(self.bondnodes) {
+                for eachbond in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
+                    let v1 = eachbond.boundingBox.min
+                    let v2 = eachbond.boundingBox.max
+                    let radius = abs(v2.x-v1.x)
+                    let length = abs(v2.y-v1.y)
+                    let p = eachbond.position
+                    let rotation = convert_tungsten_rotation(rotation: eachbond.eulerAngles)
+                    var name = "bond"
+                    if eachbond.opacity < 1.0 {
+                        name += "_trans"
+                    }
+                    let prim_bond : NSDictionary = ["name": name,
+                                                    "transform": ["position": [p.x, p.y, p.z],
+                                                                  "scale": [radius, length, radius],
+                                                                  "rotation": rotation
+                        ],
+                                                    "type": "cylinder",
+                                                    "bsdf": name]
+                    primitives.append(prim_bond)
+                }
+                let bond_bsdf : NSDictionary = ["name": "bond",
+                                                "albedo": 1.0,
+                                                "type": "rough_plastic",
+                                                "ior": 1.3,
+                                                "sigma_a" : 0.6,
+                                                "roughness": 0.1]
+                let bond_trans_bsdf : NSDictionary = ["name": "bond_trans",
+                                                      "albedo": 1.0,
+                                                      "type": "thinsheet",
+                                                      "ior": 1.3,
+                                                      "sigma_a" : 0.4
+                ]
+                bsdfs.append(bond_bsdf)
+                bsdfs.append(bond_trans_bsdf)
+            }
+            
+            // Set the camera
+            let p = pov.position
+            let p1 = pov.convertPosition(SCNVector3(0,0,-11), to: nil)
+            let p_up = pov.convertPosition(SCNVector3(0,1,0), to: nil) - p
+            let camera: NSDictionary = ["tonemap": "filmic",
+                                        "resolution": [self.bounds.width*2, self.bounds.height*2],
+                                        "reconstruction_filter": "tent",
+                                        "transform": ["position": [p.x, p.y, p.z],
+                                                      "look_at": [p1.x, p1.y, p1.z],
+                                                      "up": [p_up.x, p_up.y, p_up.z]],
+                                        "type": "pinhole",
+                                        "fov": pov.camera!.fieldOfView+20]
+            
+            let integrator: NSDictionary = ["min_bounces": 0,
+                                            "max_bounces": 64,
+                                            "enable_consistency_checks": false,
+                                            "enable_two_sided_shading": true,
+                                            "type": "path_tracer",
+                                            "enable_light_sampling": true,
+                                            "enable_volume_light_sampling": true]
+            
+            let renderer: NSDictionary = ["overwrite_output_files": false,
+                                          "adaptive_sampling": true,
+                                          "enable_resume_render": false,
+                                          "stratified_sampler": true,
+                                          "scene_bvh": true,
+                                          "spp": 32,
+                                          "spp_step": 16,
+                                          "timeout": "0",
+                                          "output_file": "TungstenRender.png",
+                                          "resume_render_file": "RenderState.dat"]
+            
+            // Add the envmap
+            let envmap : NSDictionary = ["name": "Envmap",
+                                         "transform": ["position": [0, 0, 0],
+                                                       "up": [p_up.x, p_up.y, p_up.z]],
+                                         "type": "infinite_sphere",
+                                         "emission": "envmap.hdr",
+                                         "sample": true]
+            primitives.append(envmap)
+            
+            // Add the floor
+            let pf = pov.convertPosition(SCNVector3(0, lowest_y-1, 0), to: nil)
+            let floor : NSDictionary = ["name": "Floor",
+                                        "transform": ["position" : [pf.x, pf.y, pf.z],
+                                                      "up" : [p_up.x, p_up.y, p_up.z],
+                                                      "scale": 200.0],
+                                        "type": "quad",
+                                        "bsdf": "Floor"
+            ]
+            primitives.append(floor)
+            let bsdf_floor : NSDictionary = ["name": "Floor",
+                                             "albedo": 0.1,
+                                             "type": "lambert"
+            ]
+            bsdfs.append(bsdf_floor)
+            
+            // Add backwall
+            let p_wall = pov.convertPosition(SCNVector3(0,0,lowest_z-5), to: nil)
+            let w1 = pov.convertPosition(SCNVector3(0,0,1), to: nil) - p
+            let wall : NSDictionary = [ "name": "Wall",
+                                        "transform": ["position" : [p_wall.x, p_wall.y, p_wall.z],
+                                                      "up" : [w1.x, w1.y, w1.z],
+                                                      "scale": 100.0],
+                                        "type": "quad",
+                                        "bsdf": "Floor"]
+            
+            primitives.append(wall)
+            // Add a spotlight directed from top to bottom
+            let plight = pov.convertPosition(SCNVector3(0,50,0), to: nil) - p
+            let spotlight: NSDictionary = ["name": "SpotLight",
+                                           "transform": ["position": [plight.x, plight.y, plight.z],
+                                                         "up": [-p_up.x, -p_up.y, -p_up.z],
+                                                         "scale": 3],
+                                           "type": "disk",
+                                           "emission": 40,
+                                           "bsdf": ["albedo": 1.0, "type": "null"]
+            ]
+            primitives.append(spotlight)
+            let dictonary :  NSDictionary = ["media": [], "bsdfs": bsdfs, "primitives": primitives, "camera": camera,
+                                             "integrator": integrator, "renderer": renderer]
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: dictonary, options: .prettyPrinted)
+                try jsonData.write(to: fileurl, options: .atomic)
+                success = true
+            } catch {
+                NSLog("Error creating JSON object")
+            }
         }
         return success
     }
@@ -484,27 +493,33 @@ class MySceneView: SCNView {
         if hitResults.count > 0 {
             // retrieved the first clicked object
             let hitnode = hitResults[0].node
-            let parentNode = hitnode.parent!
-            if parentNode == self.normalatomnode {
-                hitnode.removeFromParentNode()
-                self.addBlinkAnimation(node: hitnode)
-                self.selectedatomnode.addChildNode(hitnode)
+            if let parentNode = hitnode.parent {
+                if parentNode == self.normalatomnode {
+                    hitnode.removeFromParentNode()
+                    self.addBlinkAnimation(node: hitnode)
+                    self.selectedatomnode.addChildNode(hitnode)
+                }
+                else if parentNode == self.selectedatomnode {
+                    hitnode.removeFromParentNode()
+                    self.removeBlinkAnimation(node: hitnode)
+                    self.normalatomnode.addChildNode(hitnode)
+                }
+                else if parentNode == self.normalbondnode {
+                    hitnode.removeFromParentNode()
+                    self.addBlinkAnimation(node: hitnode)
+                    self.selectedbondnode.addChildNode(hitnode)
+                }
+                else if parentNode == self.selectedbondnode {
+                    hitnode.removeFromParentNode()
+                    self.removeBlinkAnimation(node: hitnode)
+                    self.normalbondnode.addChildNode(hitnode)
+                }
             }
-            else if parentNode == self.selectedatomnode {
-                hitnode.removeFromParentNode()
-                self.removeBlinkAnimation(node: hitnode)
-                self.normalatomnode.addChildNode(hitnode)
-            }
-            else if parentNode == self.normalbondnode {
-                hitnode.removeFromParentNode()
-                self.addBlinkAnimation(node: hitnode)
-                self.selectedbondnode.addChildNode(hitnode)
-            }
-            else if parentNode == self.selectedbondnode {
-                hitnode.removeFromParentNode()
-                self.removeBlinkAnimation(node: hitnode)
-                self.normalbondnode.addChildNode(hitnode)
-            }
+        }
+        // make sure the control angle is consistent with view angle
+        // putting the below function in mouseUp() will cause the pov jump a little
+        if let pov = self.pointOfView {
+            self.defaultCameraController.worldUp = pov.worldUp
         }
         super.mouseDown(with: theEvent)
     }
@@ -667,10 +682,16 @@ class MySceneView: SCNView {
     }
     
     override func rightMouseDown(with theEvent: NSEvent) {
-        // record the click location for drag        
+        
         reset_selection()
-        click_location = theEvent.locationInWindow
-        p_pov = self.pointOfView!.position
+        self.click_location = theEvent.locationInWindow
+        if let pov = self.pointOfView {
+            // record the click location for drag
+            self.p_pov = pov.position
+            // compute the distance of camera (for adjusting shift speed)
+            let rel_pos = pov.convertPosition(self.mol_center_pos, from: nil)
+            self.camera_distance = max(2.0, abs(rel_pos.z))
+        }
         super.rightMouseDown(with: theEvent)
     }
     
@@ -680,8 +701,11 @@ class MySceneView: SCNView {
         let point = theEvent.locationInWindow
         let dx = point.x - click_location.x
         let dy = point.y - click_location.y
-        let shift = self.pointOfView!.convertVector(SCNVector3(dx * 0.02, dy * 0.02, 0), to: nil)
-        self.pointOfView!.position = p_pov - shift
+        if let pov = self.pointOfView {
+            let move_speed = 0.001 * self.camera_distance
+            let shift = pov.convertVector(SCNVector3(dx * move_speed, dy * move_speed, 0), to: nil)
+            pov.position = self.p_pov - shift
+        }
         super.rightMouseDragged(with: theEvent)
     }
     
@@ -738,25 +762,17 @@ class MySceneView: SCNView {
         // check every pair of atoms to determine if a bond need to be added
         for (i, j) in self.compute_bonds(nodes: Array(self.normalatomnode.childNodes)) {
             let atom_a = self.normalatomnode.childNodes[i]
-//            let point_a = atom_a.position
             let atom_b = self.normalatomnode.childNodes[j]
-//            let point_b = atom_b.position
-//            let d = point_b - point_a
-//            let length = d.length()
             // build cylinder nodes for bonds
-//            let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
             let bondGeometry = SCNCylinder(radius: bond_thickness, height: 1.0)
             bondGeometry.radialSegmentCount = self.renderSegmentCount
             bondGeometry.firstMaterial?.multiply.contents = bond_color
             let bondNode = SCNNode(geometry: bondGeometry)
-            // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
-            // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
-//            bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
-//            bondNode.position = (point_a + point_b) * 0.5
             bondNode.setValue(atom_a, forUndefinedKey: "atom_a")
             bondNode.setValue(atom_b, forUndefinedKey: "atom_b")
             self.normalbondnode.addChildNode(bondNode)
         }
+        // The locations of the bond nodes are adjusted here
         self.update_bond_nodes()
     }
     
@@ -770,6 +786,8 @@ class MySceneView: SCNView {
                     let length = d.length()
                     let geometry = node.geometry as! SCNCylinder
                     geometry.height = length
+                    // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
+                    // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
                     node.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
                     node.position = (point_a + point_b) * 0.5
                 }
@@ -1021,21 +1039,27 @@ class MySceneView: SCNView {
     
     func adjust_focus() {
         let total_number_of_atoms = self.normalatomnode.childNodes.count + self.selectedatomnode.childNodes.count
-        if total_number_of_atoms > 0{
-            var sumx = 0.0 as CGFloat, sumy = 0.0 as CGFloat
+        if total_number_of_atoms > 0 {
+            var sumx = 0.0 as CGFloat, sumy = 0.0 as CGFloat, sumz = 0.0 as CGFloat
             var maxz = -CGFloat.greatestFiniteMagnitude
             // get average and standard deviation of all atoms' position
             for eachnode in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
                 sumx += eachnode.position.x
                 sumy += eachnode.position.y
+                sumz += eachnode.position.z
                 maxz = max(maxz, eachnode.position.z)
             }
             let ave_x = sumx / CGFloat(total_number_of_atoms)
             let ave_y = sumy / CGFloat(total_number_of_atoms)
+            let ave_z = sumy / CGFloat(total_number_of_atoms)
             // adjust camara position
-            self.pointOfView!.position = SCNVector3(x: ave_x, y: ave_y, z: maxz+11)
-            self.pointOfView!.eulerAngles = SCNVector3(0, 0, 0)
-            self.cameraNode.transform = self.pointOfView!.transform
+            if let pov = self.pointOfView {
+                pov.position = SCNVector3(x: ave_x, y: ave_y, z: maxz+11)
+                pov.eulerAngles = SCNVector3(0, 0, 0)
+                self.cameraNode.transform = pov.transform
+            }
+            // store center position
+            self.mol_center_pos = SCNVector3(ave_x, ave_y, ave_z)
         }
     }
     
@@ -1056,16 +1080,6 @@ class MySceneView: SCNView {
     }
     
     func recenter() {
-//        self.reset_selection()
-//        var shift = SCNVector3Zero
-//        for eachatom in self.normalatomnode.childNodes{
-//            shift += eachatom.position
-//        }
-//        let n = self.normalatomnode.childNodes.count + self.selectedatomnode.childNodes.count
-//        shift /= CGFloat(n)
-//        for eachnode in self.normalatomnode.childNodes + self.normalbondnode.childNodes {
-//            eachnode.position -= shift
-//        }
         self.adjust_focus()
     }
     
