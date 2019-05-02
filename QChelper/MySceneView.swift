@@ -759,9 +759,10 @@ class MySceneView: SCNView {
         let bond_thickness = dict_bond_thickness(myDict: myDict!)
         let bond_color : NSColor = dict_bond_color(myDict: myDict!)
         // check every pair of atoms to determine if a bond need to be added
-        for (i, j) in self.compute_bonds(nodes: Array(self.normalatomnode.childNodes)) {
-            let atom_a = self.normalatomnode.childNodes[i]
-            let atom_b = self.normalatomnode.childNodes[j]
+        let all_atom_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes
+        for (i, j) in self.compute_bonds(nodes: Array(all_atom_nodes)) {
+            let atom_a = all_atom_nodes[i]
+            let atom_b = all_atom_nodes[j]
             // build cylinder nodes for bonds
             let bondGeometry = SCNCylinder(radius: bond_thickness, height: 1.0)
             bondGeometry.radialSegmentCount = self.renderSegmentCount
