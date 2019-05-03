@@ -951,9 +951,8 @@ class MySceneView: SCNView {
     
     func open_file(url: URL?) {
         if let path = url?.path {
-            var success = false
             if path.pathExtension == "dae" {
-                success = self.init_with_dae(url: url!)
+                let success = self.init_with_dae(url: url!)
                 if success {
                     self.view_controller.info_bar.stringValue = path.lastPathComponent
                     // Add the succesfully opened file to "Open Recent" menu
@@ -966,16 +965,20 @@ class MySceneView: SCNView {
             else {
                 var input = Molecule()
                 self.view_controller.show_progress(nFinished: 0, total: 1, title: "Reading File")
-                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                DispatchQueue.global(qos: .userInteractive).async { [weak self] in
                     guard let self = self else {
                         return
                     }
+                    var success = false
                     do {
                         input = try Molecule(path: path)
                     } catch {
                         success = false
                     }
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else {
+                            return
+                        }
                         if input.atomlist.count > 0 {
                             self.init_scene()
                             self.renderSegmentCount = max(20, Int(50-input.atomlist.count/30))
