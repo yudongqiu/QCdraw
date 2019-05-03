@@ -24,6 +24,9 @@ class ViewController: NSViewController {
     
     let appdelegate = NSApplication.shared.delegate as! AppDelegate
     var timer = Timer() // for play traj
+    var to_show_progress = false // for delayed showing of progress bar
+    // create a blur filter for progress box
+    let blurFilter = CIFilter(name: "CIGaussianBlur", parameters: [kCIInputRadiusKey: 3])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +35,8 @@ class ViewController: NSViewController {
         mySceneView.backgroundColor = NSColor.clear
         info_bar.stringValue = "Click Open or drag in file"
         mySceneView.registerForDraggedTypes([.fileURL])
+        // create a blur filter for progress box
+        
     }
 
     override var representedObject: Any? {
@@ -186,21 +191,46 @@ class ViewController: NSViewController {
         }
     }
     
-    func show_progress(nFinished: Int, total: Int, title: String = "Progress") {
-        if self.progress_box.isHidden {
-            self.progress_box.isHidden = false
-            if let blurFilter = CIFilter(name: "CIGaussianBlur", parameters: [kCIInputRadiusKey: 3]) {
-                self.progress_box.backgroundFilters = [blurFilter]
+    func show_progress(nFinished: Int, total: Int, title: String = "Progress", delay: TimeInterval = 0.0) {
+        if delay == 0.0 {
+            // run without async
+            if self.progress_box.isHidden {
+                self.progress_box.isHidden = false
+                if let blur_filter = self.blurFilter {
+                    self.progress_box.backgroundFilters = [blur_filter]
+                }
+            }
+            self.progress_indicator.doubleValue = Double(nFinished) / Double(total) * 100
+            self.progress_label.stringValue = "\(nFinished) / \(total)"
+            self.progress_box.title = title
+        } else if delay > 0 {
+            // run with async to delay the showing
+            self.to_show_progress = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                // only run if we still want to show progress after the delay
+                if self.to_show_progress {
+                    if self.progress_box.isHidden {
+                        self.progress_box.isHidden = false
+                        if let blur_filter = self.blurFilter {
+                            self.progress_box.backgroundFilters = [blur_filter]
+                        }
+                    }
+                    self.progress_indicator.doubleValue = Double(nFinished) / Double(total) * 100
+                    self.progress_label.stringValue = "\(nFinished) / \(total)"
+                    self.progress_box.title = title
+                }
             }
         }
-        self.progress_indicator.doubleValue = Double(nFinished) / Double(total) * 100
-        self.progress_label.stringValue = "\(nFinished) / \(total)"
-        self.progress_box.title = title
     }
     
     func hide_progress() {
+        self.to_show_progress = false // this cancel the delayed showing
         self.progress_box.isHidden = true
         self.progress_box.backgroundFilters = []
+        self.progress_box.alphaValue = 1.0
     }
     
     @IBAction func rotate_molecule(sender: NSButton) {

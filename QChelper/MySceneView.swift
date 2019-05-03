@@ -964,7 +964,7 @@ class MySceneView: SCNView {
             }
             else {
                 var input = Molecule()
-                self.view_controller.show_progress(nFinished: 0, total: 1, title: "Reading File")
+                self.view_controller.show_progress(nFinished: 0, total: 1, title: "Reading File", delay: 0.2)
                 DispatchQueue.global(qos: .userInteractive).async { [weak self] in
                     guard let self = self else {
                         return
