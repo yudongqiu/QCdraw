@@ -220,8 +220,10 @@ class Molecule {
                     // only create trajectory if there are > 1 frames
                     if block_elem_list.count > 1 {
                         for geo in block_geo_list {
-                            let atom_xyz = geo[i]
-                            traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
+                            if geo.count == init_geo.count {
+                                let atom_xyz = geo[i]
+                                traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
+                            }
                         }
                     }
                     self.add_new_atom(name: name, posx: pos[0], posy: pos[1], posz: pos[2], trajectory: traj)
