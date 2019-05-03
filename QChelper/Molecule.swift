@@ -187,7 +187,7 @@ class Molecule {
                             for _ in 0 ..< noa {
                                 if let geoline = aStreamReader.nextLine() {
                                     let inline = geoline.split()
-                                    if inline.count == 4 {
+                                    if inline.count >= 4 {
                                         if let posx = inline[1].doubleValue {
                                             if let posy = inline[2].doubleValue {
                                                 if let posz = inline[3].doubleValue{
