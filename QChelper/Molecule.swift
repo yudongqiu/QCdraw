@@ -17,6 +17,7 @@ class Molecule {
     var atomlist : [Atom] = []
     let bohr_to_angstrom = 0.529177208
     var myDict: NSDictionary?
+    var bonds : [(Int, Int)]? = nil
     
     var traj_length: Int { get {
         var res = 0
@@ -454,37 +455,79 @@ class Molecule {
             defer {
                 aStreamReader.close()
             }
-            var found_geo = false
-            for line in aStreamReader {
-                let record_name = line.slice(0,6)
-                if record_name == "ATOM  " || record_name == "HETATM" {
-                    // determine element
-                    var element = "X"
-                    if line.count >= 78 {
-                        element = line.slice(76, 78).strip()
-                    } else {
-                        // use the first 2 character of "name" field if element symbol not provided
-                        element = line.slice(12, 14).strip().capitalized
-                        if dict_element_radius[element] == nil {
-                            // use the first character of the "name" field is element not recognized
-                            element = line.slice(12, 13)
-                        }
-                    }
-                    // determine pos
-                    if let x = line.slice(30, 38).doubleValue {
-                        if let y = line.slice(38, 46).doubleValue {
-                            if let z = line.slice(46, 54).doubleValue {
-                                self.add_new_atom(name: element, posx: x, posy: y, posz: z)
+            var block_elem_list: [[String]] = []
+            var block_geo_list: [[[Double]]] = []
+            // create the first empty blocks
+            var block_elem: [String] = []
+            var block_geo: [[Double]] = []
+            while true {
+                if let line = aStreamReader.nextLine() {
+                    let record_name = line.slice(0,6)
+                    if record_name == "ATOM  " || record_name == "HETATM" {
+                        // determine element
+                        var element = "X"
+                        if line.count >= 78 {
+                            element = line.slice(76, 78).strip()
+                        } else {
+                            // use the first 2 character of "name" field if element symbol not provided
+                            element = line.slice(12, 14).strip().capitalized
+                            if dict_element_radius[element] == nil {
+                                // use the first character of the "name" field is element not recognized
+                                element = line.slice(12, 13)
                             }
                         }
+                        // determine pos
+                        if let x = line.slice(30, 38).doubleValue {
+                            if let y = line.slice(38, 46).doubleValue {
+                                if let z = line.slice(46, 54).doubleValue {
+                                    block_elem.append(element)
+                                    block_geo.append([x, y, z])
+                                }
+                            }
+                        }
+                    } else if record_name == "ENDMDL" {
+                        // add the block to result list
+                        block_elem_list.append(block_elem)
+                        block_geo_list.append(block_geo)
+                        // create new block
+                        block_elem = []
+                        block_geo = []
+                    } else if record_name == "CONECT" {
+                        
                     }
-                    found_geo = true
-                }
-                // else break
-                else if found_geo {
+                } else {
+                    // add the last block if not empty
+                    if block_elem.count > 0 {
+                        block_elem_list.append(block_elem)
+                        block_geo_list.append(block_geo)
+                    }
                     break
                 }
+            } // end of while loop
+            if block_elem_list.count >= 1 {
+                let elems = block_elem_list[0]
+                let init_geo = block_geo_list[0]
+                for i in 0 ..< elems.count {
+                    let name = elems[i]
+                    let pos = init_geo[i]
+                    var traj : [SCNVector3] = []
+                    // only create trajectory if there are > 1 frames
+                    if block_elem_list.count > 1 {
+                        for i_b in 0 ..< block_elem_list.count {
+                            // check if elem column is consistent in each block
+                            if block_elem_list[i_b] != elems {
+                                print("elem not consistent in block \(i_b)")
+                                continue
+                            }
+                            let geo = block_geo_list[i_b]
+                            let atom_xyz = geo[i]
+                            traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
+                        }
+                    }
+                    self.add_new_atom(name: name, posx: pos[0], posy: pos[1], posz: pos[2], trajectory: traj)
+                }
             }
+            // end of reading file
         }
     }
 
