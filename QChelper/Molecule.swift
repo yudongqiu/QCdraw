@@ -219,11 +219,15 @@ class Molecule {
                     var traj : [SCNVector3] = []
                     // only create trajectory if there are > 1 frames
                     if block_elem_list.count > 1 {
-                        for geo in block_geo_list {
-                            if geo.count == init_geo.count {
-                                let atom_xyz = geo[i]
-                                traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
+                        for i_b in 0 ..< block_elem_list.count {
+                            // check if elem column is consistent in each block
+                            if block_elem_list[i_b] != elems {
+                                print("elem not consistent in block \(i_b)")
+                                continue
                             }
+                            let geo = block_geo_list[i_b]
+                            let atom_xyz = geo[i]
+                            traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
                         }
                     }
                     self.add_new_atom(name: name, posx: pos[0], posy: pos[1], posz: pos[2], trajectory: traj)
