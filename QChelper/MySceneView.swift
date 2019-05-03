@@ -954,33 +954,51 @@ class MySceneView: SCNView {
             var success = false
             if path.pathExtension == "dae" {
                 success = self.init_with_dae(url: url!)
-            }
-            else {
-                do {
-                    let input = try Molecule(path: path)
-                    if input.atomlist.count > 0 {
-                        self.init_scene()
-                        self.renderSegmentCount = max(20, Int(50-input.atomlist.count/30))
-                        for (idx, eachatom) in input.atomlist.enumerated() {
-                            self.add_atom(thisatom: eachatom, index: idx)
-                        }
-                        // set the trajectory length
-                        self.update_traj_length(length: input.traj_length)
-                        self.auto_add_bond()
-                        self.adjust_focus()
-                        success = true
-                    }
-                } catch {
-                    success = false
+                if success {
+                    self.view_controller.info_bar.stringValue = path.lastPathComponent
+                    // Add the succesfully opened file to "Open Recent" menu
+                    NSDocumentController.shared.noteNewRecentDocumentURL(url!)
+                }
+                else {
+                    self.view_controller.info_bar.stringValue = "File " + path + " not recognized"
                 }
             }
-            if success {
-                view_controller.info_bar.stringValue = path.lastPathComponent
-                // Add the succesfully opened file to "Open Recent" menu
-                NSDocumentController.shared.noteNewRecentDocumentURL(url!)
-            }
             else {
-                view_controller.info_bar.stringValue = "File " + path + " not recognized"
+                var input = Molecule()
+                self.view_controller.show_progress(nFinished: 0, total: 1, title: "Reading File")
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    guard let self = self else {
+                        return
+                    }
+                    do {
+                        input = try Molecule(path: path)
+                    } catch {
+                        success = false
+                    }
+                    DispatchQueue.main.async {
+                        if input.atomlist.count > 0 {
+                            self.init_scene()
+                            self.renderSegmentCount = max(20, Int(50-input.atomlist.count/30))
+                            for (idx, eachatom) in input.atomlist.enumerated() {
+                                self.add_atom(thisatom: eachatom, index: idx)
+                            }
+                            // set the trajectory length
+                            self.update_traj_length(length: input.traj_length)
+                            self.auto_add_bond()
+                            self.adjust_focus()
+                            success = true
+                        }
+                        if success {
+                            self.view_controller.info_bar.stringValue = path.lastPathComponent
+                            // Add the succesfully opened file to "Open Recent" menu
+                            NSDocumentController.shared.noteNewRecentDocumentURL(url!)
+                        }
+                        else {
+                            self.view_controller.info_bar.stringValue = "File " + path + " not recognized"
+                        }
+                        self.view_controller.hide_progress()
+                    }
+                }
             }
         }
     }
