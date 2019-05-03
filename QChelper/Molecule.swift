@@ -452,7 +452,8 @@ class Molecule {
             }
             var found_geo = false
             for line in aStreamReader {
-                if line.slice(0,6) == "ATOM  "{
+                let record_name = line.slice(0,6)
+                if record_name == "ATOM  " || record_name == "HETATM" {
                     // determine element
                     var element = "X"
                     if line.count >= 78 {
