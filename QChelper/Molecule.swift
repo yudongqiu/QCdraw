@@ -493,7 +493,18 @@ class Molecule {
                         block_elem = []
                         block_geo = []
                     } else if record_name == "CONECT" {
-                        
+                        if self.bonds == nil {
+                            self.bonds = []
+                        }
+                        if let idx_from = line.slice(6, 11).integerValue {
+                            var to_start_pos = 11
+                            while let idx_to = line.slice(to_start_pos, to_start_pos+5).integerValue {
+                                if idx_to >= idx_from {
+                                    self.bonds?.append((idx_from-1, idx_to-1))
+                                }
+                                to_start_pos += 5
+                            }
+                        }
                     }
                 } else {
                     // add the last block if not empty

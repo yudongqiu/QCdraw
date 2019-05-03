@@ -751,7 +751,7 @@ class MySceneView: SCNView {
         material.removeAnimation(forKey: "blink")
     }
     
-    func auto_add_bond() {
+    func auto_add_bond(bonds: [(Int,Int)]? = nil) {
         // open Elements.plist
         let path = Bundle.main.path(forResource: "Elements", ofType: "plist")
         let myDict = NSDictionary(contentsOfFile: path!)
@@ -760,7 +760,16 @@ class MySceneView: SCNView {
         let bond_color : NSColor = dict_bond_color(myDict: myDict!)
         // check every pair of atoms to determine if a bond need to be added
         let all_atom_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes
-        for (i, j) in self.compute_bonds(nodes: Array(all_atom_nodes)) {
+        var bonds_to_use : [(Int,Int)] = []
+        if let input_bonds = bonds {
+            // use input bonds
+            bonds_to_use = input_bonds
+            print(bonds_to_use)
+        } else {
+            // check every pair of atoms to determine if a bond need to be added
+            bonds_to_use = self.compute_bonds(nodes: all_atom_nodes)
+        }
+        for (i, j) in bonds_to_use {
             let atom_a = all_atom_nodes[i]
             let atom_b = all_atom_nodes[j]
             // build cylinder nodes for bonds
@@ -987,7 +996,7 @@ class MySceneView: SCNView {
                             }
                             // set the trajectory length
                             self.update_traj_length(length: input.traj_length)
-                            self.auto_add_bond()
+                            self.auto_add_bond(bonds: input.bonds)
                             self.adjust_focus()
                             success = true
                         }
