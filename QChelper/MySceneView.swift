@@ -739,7 +739,7 @@ class MySceneView: SCNView {
         let material = node.geometry!.firstMaterial!
         let animation = CABasicAnimation(keyPath: "intensity")
         animation.fromValue = 0.0
-        animation.toValue = 1.0
+        animation.toValue = 2.0
         animation.duration = 1.0
         animation.autoreverses = true
         animation.repeatCount = .infinity
