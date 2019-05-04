@@ -87,7 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     
     @IBOutlet weak var menu_traj_update_bonds: NSMenuItem!
-    @IBAction func toggle_menu_traj_update_bonds(_ sender: Any) {
+    @IBAction func toggle_menu_traj_update_bonds(sender: Any) {
         if menu_traj_update_bonds.state == .off {
             menu_traj_update_bonds.state = .on
             if let window = NSApp.mainWindow, let viewController = window.contentViewController as? ViewController {
@@ -95,6 +95,74 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } else {
             menu_traj_update_bonds.state = .off
+        }
+    }
+    
+    @IBOutlet weak var menu_adv_render: NSMenuItem!
+    @IBAction func toggle_menu_adv_render(_ sender: Any) {
+        if let window = NSApp.mainWindow, let viewController =  window.contentViewController as? ViewController {
+            if menu_adv_render.state == .off {
+                menu_adv_render.state = .on
+                viewController.mySceneView.toggleAdvancedRendering(enable: true)
+            } else {
+                menu_adv_render.state = .off
+                viewController.mySceneView.toggleAdvancedRendering(enable: false)
+            }
+        }
+    }
+    
+    @IBOutlet weak var menu_background_image: NSMenuItem!
+    @IBAction func toggle_menu_show_background_image(sender: Any) {
+        if let window = NSApp.mainWindow, let viewController =  window.contentViewController as? ViewController {
+            if menu_background_image.state == .off {
+                menu_background_image.state = .on
+                viewController.mySceneView.toggleBackgroundImage(show: true)
+            } else {
+                menu_background_image.state = .off
+                viewController.mySceneView.toggleBackgroundImage(show: false)
+            }
+        }
+    }
+    
+    @IBOutlet weak var menu_texture_default: NSMenuItem!
+    @IBAction func change_texture_default(sender: AnyObject?) {
+        menu_texture_default.state = .on
+        menu_texture_metal.state = .off
+        menu_texture_mirror.state = .off
+        menu_texture_wood.state = .off
+        self.change_texture(texture: defaultTexture)
+    }
+    
+    @IBOutlet weak var menu_texture_metal: NSMenuItem!
+    @IBAction func change_texture_metal(sender: AnyObject?) {
+        menu_texture_default.state = .off
+        menu_texture_metal.state = .on
+        menu_texture_mirror.state = .off
+        menu_texture_wood.state = .off
+        self.change_texture(texture: metalTexture)
+    }
+    
+    @IBOutlet weak var menu_texture_mirror: NSMenuItem!
+    @IBAction func change_texture_mirror(sender: AnyObject?) {
+        menu_texture_default.state = .off
+        menu_texture_metal.state = .off
+        menu_texture_mirror.state = .on
+        menu_texture_wood.state = .off
+        self.change_texture(texture: mirrorTexture)
+    }
+
+    @IBOutlet weak var menu_texture_wood: NSMenuItem!
+    @IBAction func change_texture_wood(sender: AnyObject?) {
+        menu_texture_default.state = .off
+        menu_texture_metal.state = .off
+        menu_texture_mirror.state = .off
+        menu_texture_wood.state = .on
+        self.change_texture(texture: woodTexture)
+    }
+    
+    func change_texture(texture: Texture) {
+        if let window = NSApp.mainWindow, let viewController =  window.contentViewController as? ViewController {
+            viewController.mySceneView.change_texture(texture: texture)
         }
     }
     

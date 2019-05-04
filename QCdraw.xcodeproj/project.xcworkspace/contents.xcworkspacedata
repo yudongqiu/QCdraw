@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/dong/Dropbox/study/Programming Project/QChelper/QCdraw.xcodeproj">
+      location = "group:/Users/qyd/codes/QCdraw/QChelper/envmap-blur.jpg">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>

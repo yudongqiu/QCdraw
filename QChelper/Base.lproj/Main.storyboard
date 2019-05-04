@@ -176,7 +176,7 @@ CA
                                         <menuItem title="Updating Bonds" id="YRU-qQ-2xa">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="toggle_menu_traj_update_bonds:" target="Voe-Tx-rLC" id="bci-ox-Sxw"/>
+                                                <action selector="toggle_menu_traj_update_bondsWithSender:" target="Voe-Tx-rLC" id="oCr-la-Ioy"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -229,36 +229,48 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="mo3-qf-sdf"/>
+                                        <menuItem title="Advanced Rendering" id="iiO-2N-ghf">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggle_menu_adv_render:" target="Voe-Tx-rLC" id="GMD-8B-QmY"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Texture" id="IGp-7r-3Q1">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Texture" id="yIh-6V-vck">
                                                 <items>
-                                                    <menuItem title="Default" id="6mW-ce-tjq">
+                                                    <menuItem title="Default" state="on" id="6mW-ce-tjq">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_noneWithSender:" target="Ady-hI-5gd" id="wfl-WO-pgq"/>
+                                                            <action selector="change_texture_defaultWithSender:" target="Voe-Tx-rLC" id="hck-xt-aPS"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Metal" id="eVO-vv-xOR">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_metalWithSender:" target="Ady-hI-5gd" id="KMf-Q1-aYO"/>
+                                                            <action selector="change_texture_metalWithSender:" target="Voe-Tx-rLC" id="opA-uZ-fI8"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Marble" id="Ksj-7q-Bvi">
+                                                    <menuItem title="Mirror" id="Ksj-7q-Bvi">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_marbleWithSender:" target="Ady-hI-5gd" id="BhJ-Um-klq"/>
+                                                            <action selector="change_texture_mirrorWithSender:" target="Voe-Tx-rLC" id="NZG-Wr-h81"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Wood" id="WxP-fS-O6n">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="change_texture_woodWithSender:" target="Ady-hI-5gd" id="9JV-uT-WLd"/>
+                                                            <action selector="change_texture_woodWithSender:" target="Voe-Tx-rLC" id="VYO-J7-I1A"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
                                             </menu>
+                                        </menuItem>
+                                        <menuItem title="Background Image" id="LVW-pq-2CL">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="toggle_menu_show_background_imageWithSender:" target="Voe-Tx-rLC" id="NBD-DI-tuz"/>
+                                            </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
@@ -309,9 +321,15 @@ CA
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="QCdraw" customModuleProvider="target">
                     <connections>
+                        <outlet property="menu_adv_render" destination="iiO-2N-ghf" id="ABW-3a-59j"/>
+                        <outlet property="menu_background_image" destination="LVW-pq-2CL" id="qAr-dw-rFK"/>
                         <outlet property="menu_cast_shadow" destination="y7j-2A-EYG" id="0U1-7W-8cZ"/>
                         <outlet property="menu_high_reso" destination="g3Y-RO-r6M" id="Wlm-fb-3Lt"/>
                         <outlet property="menu_rotate" destination="pa3-QI-u2k" id="Iym-Xf-RB4"/>
+                        <outlet property="menu_texture_default" destination="6mW-ce-tjq" id="5fo-7k-P5L"/>
+                        <outlet property="menu_texture_metal" destination="eVO-vv-xOR" id="74b-vi-n5q"/>
+                        <outlet property="menu_texture_mirror" destination="Ksj-7q-Bvi" id="BbJ-f1-sXB"/>
+                        <outlet property="menu_texture_wood" destination="WxP-fS-O6n" id="OnN-6q-DJ9"/>
                         <outlet property="menu_traj_update_bonds" destination="YRU-qQ-2xa" id="lOR-WC-QZv"/>
                         <outlet property="menu_trajectory" destination="btC-uU-C0E" id="TKb-Xt-dzi"/>
                         <outlet property="menu_vdw_representation" destination="ePW-6g-ekt" id="GZg-JX-K3h"/>
@@ -354,15 +372,15 @@ CA
                                 <rect key="frame" x="-1" y="39" width="434" height="233"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="1by-L2-zgE">
-                                    <rect key="frame" x="1" y="1" width="432" height="231"/>
+                                    <rect key="frame" x="1" y="1" width="417" height="231"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView ambiguous="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" usesFontPanel="YES" findStyle="bar" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" textCompletion="NO" id="GrP-qd-WOP">
-                                            <rect key="frame" x="0.0" y="0.0" width="432" height="231"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="417" height="231"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="432" height="231"/>
+                                            <size key="minSize" width="417" height="231"/>
                                             <size key="maxSize" width="479" height="10000000"/>
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
@@ -373,7 +391,7 @@ CA
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="yt8-en-5Hv">
-                                    <rect key="frame" x="417" y="1" width="16" height="231"/>
+                                    <rect key="frame" x="418" y="1" width="15" height="231"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>

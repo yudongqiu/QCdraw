@@ -261,26 +261,6 @@ class ViewController: NSViewController {
         mySceneView.select_all()
     }
     
-    @IBAction func change_texture_none(sender: AnyObject?) {
-        self.mySceneView.reset_selection()
-        self.mySceneView.change_texture(texture: "none")
-    }
-    
-    @IBAction func change_texture_metal(sender: AnyObject?) {
-        self.mySceneView.reset_selection()
-        self.mySceneView.change_texture(texture: "metal")
-    }
-    
-    @IBAction func change_texture_marble(sender: AnyObject?) {
-        self.mySceneView.reset_selection()
-        self.mySceneView.change_texture(texture: "marble")
-    }
-    
-    @IBAction func change_texture_wood(sender: AnyObject?) {
-        self.mySceneView.reset_selection()
-        self.mySceneView.change_texture(texture: "wood")
-    }
-    
     @IBAction func transparentize(sender: AnyObject?) {
         for eachnode in mySceneView.selectedatomnode.childNodes + mySceneView.selectedbondnode.childNodes {
             if eachnode.opacity == 1.0 {

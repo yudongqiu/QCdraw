@@ -20,6 +20,7 @@ class MySceneView: SCNView {
     
     var cameraNode = SCNNode()
     var lightNode = SCNNode()
+    var ambientLightNode = SCNNode()
     
     let view_controller = NSApplication.shared.windows[0].contentViewController as! ViewController
     let appdelegate = NSApplication.shared.delegate as! AppDelegate
@@ -36,6 +37,10 @@ class MySceneView: SCNView {
     var mol_center_pos = SCNVector3(0,0,0)
     var camera_distance : CGFloat = 1.0
     
+    var current_texture: Texture = defaultTexture
+    
+    var advancedRendering: Bool = false
+    
     func init_scene() {
         //clean old nodes
         self.moleculeNode = SCNNode()
@@ -48,6 +53,7 @@ class MySceneView: SCNView {
         
         self.cameraNode = SCNNode()
         self.lightNode = SCNNode()
+        self.ambientLightNode = SCNNode()
         
         // create a new scene
         let scene = SCNScene()
@@ -76,12 +82,13 @@ class MySceneView: SCNView {
         self.cameraNode.addChildNode(self.lightNode)
         
         // add an ambient light to the scene
-        let ambientLightNode = SCNNode()
-        ambientLightNode.name = "ambientlght"
-        ambientLightNode.light = SCNLight()
-        ambientLightNode.light!.type = SCNLight.LightType.ambient
-        ambientLightNode.light!.color = NSColor(deviceWhite: 0.2, alpha: 1)
-        scene.rootNode.addChildNode(ambientLightNode)
+        
+        self.ambientLightNode.name = "ambientlight"
+        self.ambientLightNode.light = SCNLight()
+        self.ambientLightNode.light!.type = .ambient
+        self.ambientLightNode.light!.color = NSColor(deviceWhite: 1.0, alpha: 1.0)
+        self.ambientLightNode.light!.intensity = 300
+        scene.rootNode.addChildNode(self.ambientLightNode)
         
         // setup nodes hierarchy
         scene.rootNode.addChildNode(self.moleculeNode)
@@ -104,6 +111,17 @@ class MySceneView: SCNView {
         
         // reset view_controller elements
         view_controller.reset()
+        
+        // enable advanced rendering
+        self.advancedRendering = false
+        if appdelegate.menu_adv_render.state == .on {
+            self.toggleAdvancedRendering(enable: true)
+        }
+        
+        // show background based on menu state
+        if appdelegate.menu_background_image.state == .on {
+            self.toggleBackgroundImage(show: true)
+        }
     }
     
     func init_with_dae(url: URL) -> Bool {
@@ -153,6 +171,15 @@ class MySceneView: SCNView {
             windowController.toolbar_rotate.image = NSImage(named: "rotate.png")
             // reset view_controller
             view_controller.reset()
+            // enable advanced rendering
+            self.advancedRendering = false
+            if appdelegate.menu_adv_render.state == .on {
+                self.toggleAdvancedRendering(enable: true)
+            }
+            // show background based on menu state
+            if appdelegate.menu_background_image.state == .on {
+                self.toggleBackgroundImage(show: true)
+            }
             return true
         }
         catch {
@@ -168,6 +195,7 @@ class MySceneView: SCNView {
         let color = NSColor(red: thisatom.color[0], green: thisatom.color[1], blue: thisatom.color[2], alpha: 1)
         sphereGeometry.firstMaterial?.multiply.contents = color
         let sphereNode = SCNNode(geometry: sphereGeometry)
+        self.apply_texture(sphereNode, self.current_texture)
         sphereNode.name = thisatom.name as String
         sphereNode.position = thisatom.pos
         sphereNode.setValue(index, forUndefinedKey: "atom_index")
@@ -196,6 +224,7 @@ class MySceneView: SCNView {
                 bondGeometry.radialSegmentCount = self.renderSegmentCount
                 bondGeometry.firstMaterial?.multiply.contents = bond_color
                 let bondNode = SCNNode(geometry: bondGeometry)
+                self.apply_texture(bondNode, self.current_texture)
                 // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
                 // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
                 bondNode.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
@@ -777,6 +806,7 @@ class MySceneView: SCNView {
             bondGeometry.radialSegmentCount = self.renderSegmentCount
             bondGeometry.firstMaterial?.multiply.contents = bond_color
             let bondNode = SCNNode(geometry: bondGeometry)
+            self.apply_texture(bondNode, self.current_texture)
             bondNode.setValue(atom_a, forUndefinedKey: "atom_a")
             bondNode.setValue(atom_b, forUndefinedKey: "atom_b")
             self.normalbondnode.addChildNode(bondNode)
@@ -910,6 +940,7 @@ class MySceneView: SCNView {
     }
     
     func reset_bond_nodes() {
+        // could be improved, be smart at which bond to delete and insert
         // remove all existing bonds
         for node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
             node.removeFromParentNode()
@@ -966,6 +997,7 @@ class MySceneView: SCNView {
                     self.view_controller.info_bar.stringValue = path.lastPathComponent
                     // Add the succesfully opened file to "Open Recent" menu
                     NSDocumentController.shared.noteNewRecentDocumentURL(url!)
+                    self.update_traj_length(length: 0)
                 }
                 else {
                     self.view_controller.info_bar.stringValue = "File " + path + " not recognized"
@@ -1015,36 +1047,60 @@ class MySceneView: SCNView {
         }
     }
     
-
-    
-    func change_texture(texture: String) {
-        for eachatom in self.normalatomnode.childNodes + self.normalbondnode.childNodes {
-            if let material = eachatom.geometry?.firstMaterial {
-                if texture == "none" { // reset all texture
-                    material.diffuse.contents = nil
-                    material.normal.contents = nil
-                    material.specular.contents = nil
-                    material.reflective.contents = nil
+    func toggleAdvancedRendering(enable: Bool) {
+        if enable != self.advancedRendering {
+            self.advancedRendering = enable
+            let all_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes +
+                self.normalbondnode.childNodes + self.selectedbondnode.childNodes
+            if self.advancedRendering == true {
+                for node in all_nodes {
+                    if let material = node.geometry?.firstMaterial {
+                        material.lightingModel = .physicallyBased
+                    }
                 }
-                if texture == "metal" {
-                    material.diffuse.contents = NSImage(named: "diffuse-metal.jpg")
-                    material.normal.contents = NSImage(named: "normal-metal.jpg")
-                    material.specular.contents = nil
-                    material.reflective.contents = nil
+                // update lightingEnvironment
+                self.scene?.lightingEnvironment.contents = NSImage(named: "envmap2.jpg")
+                self.scene?.lightingEnvironment.intensity = 2.0
+                self.ambientLightNode.removeFromParentNode()
+            } else {
+                for node in all_nodes {
+                    if let material = node.geometry?.firstMaterial {
+                        material.lightingModel = .blinn
+                    }
                 }
-                if texture == "marble" {
-                    material.diffuse.contents = NSImage(named: "diffuse-marble.jpg")
-                    material.normal.contents = NSImage(named: "normal-marble.jpg")
-                    material.specular.contents = nil
-                    material.reflective.contents = nil
-                }
-                if texture == "wood" {
-                    material.diffuse.contents = NSImage(named: "diffuse-wood.jpg")
-                    material.normal.contents = NSImage(named: "normal-wood.png")
-                    material.specular.contents = nil
-                    material.reflective.contents = nil
-                }
+                self.scene?.lightingEnvironment.contents = nil
+                self.scene?.rootNode.addChildNode(self.ambientLightNode)
             }
+        }
+    }
+    
+    func toggleBackgroundImage(show: Bool) {
+        if show {
+            self.scene?.background.contents = NSImage(named: "envmap2-blur.jpg")
+        } else {
+            self.scene?.background.contents = nil
+        }
+    }
+    
+    func change_texture(texture: Texture) {
+        if self.current_texture.name != texture.name {
+            self.current_texture = texture
+            let all_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes +
+                self.normalbondnode.childNodes + self.selectedbondnode.childNodes
+            for node in all_nodes {
+                self.apply_texture(node, texture)
+            }
+        }
+    }
+    
+    func apply_texture(_ node: SCNNode, _ texture: Texture) {
+        if let material = node.geometry?.firstMaterial {
+            material.diffuse.contents = texture.diffuse
+            material.normal.contents = texture.normal
+            material.roughness.contents = texture.roughness
+            material.metalness.contents = texture.metalness
+            material.fresnelExponent = texture.fresnelExponent
+            material.lightingModel = self.advancedRendering ? .physicallyBased : .blinn
         }
     }
 
