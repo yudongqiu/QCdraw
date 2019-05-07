@@ -35,8 +35,8 @@ class ViewController: NSViewController {
         mySceneView.backgroundColor = NSColor.clear
         info_bar.stringValue = "Click Open or drag in file"
         mySceneView.registerForDraggedTypes([.fileURL])
-        // create a blur filter for progress box
-        
+        // perform one time init operations
+        mySceneView.finish_view_load()
     }
 
     override var representedObject: Any? {

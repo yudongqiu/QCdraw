@@ -41,6 +41,61 @@ class MySceneView: SCNView {
     
     var advancedRendering: Bool = false
     
+    // the following attibutes are read from Elements.plist, by calling self.read_elements.plist()
+    var dict_bond_thickness : CGFloat = 0.08
+    var dict_bond_color : NSColor = NSColor(deviceRed: 0.25, green: 0.25, blue: 0.25, alpha: 1)
+    var dict_element_max_distance : Dictionary<Bond, CGFloat> = [:]
+    
+    // max allowed bond lengh for building boxes in compute_bonds
+    var max_bond_length: CGFloat = 3.0
+    // cache for getting bond length
+    var known_bond_length: [String: CGFloat] = [:]
+    
+    func finish_view_load() {
+        // custom init function that only run onces after program starts
+        self.read_elements_plist()
+    }
+    
+    func read_elements_plist() {
+        if let dpath = Bundle.main.path(forResource: "Elements", ofType: "plist") {
+            if let myDict = NSDictionary(contentsOfFile: dpath) {
+                // read bond thickness
+                if let bond_thickness = myDict.object(forKey: "Bond Thickness") as? NSNumber {
+                    self.dict_bond_thickness = CGFloat(bond_thickness.floatValue)
+                }
+                // read bond color
+                if let color = myDict.object(forKey: "Bond Color") as? [NSNumber] {
+                    if color.count == 3{
+                        let red = CGFloat(color[0].floatValue/255)
+                        let green = CGFloat(color[1].floatValue/255)
+                        let blue = CGFloat(color[2].floatValue/255)
+                        self.dict_bond_color = NSColor(red: red, green: green, blue: blue, alpha: 1)
+                    }
+                }
+                // read atom radius
+                if let bond_length_dict = myDict.object(forKey: "Element Max Bond Length") as? NSDictionary {
+                    for (elem_a, dict_a) in bond_length_dict {
+                        if let e_a = elem_a as? String {
+                            if let elem_a_idx = ElementsIdxDict[e_a.lowercased()] {
+                                if let d = dict_a as? NSDictionary {
+                                    for (elem_b, bond_length) in d {
+                                        if let e_b = elem_b as? String, let value = bond_length as? CGFloat {
+                                            if let elem_b_idx = ElementsIdxDict[e_b.lowercased()] {
+                                                self.dict_element_max_distance[Bond(elem_a_idx, elem_b_idx)] = value
+                                                self.max_bond_length = max(self.max_bond_length, value)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // end of reading
+            }
+        }
+    }
+    
     func init_scene() {
         //clean old nodes
         self.moleculeNode = SCNNode()
@@ -196,20 +251,15 @@ class MySceneView: SCNView {
         sphereGeometry.firstMaterial?.multiply.contents = color
         let sphereNode = SCNNode(geometry: sphereGeometry)
         self.apply_texture(sphereNode, self.current_texture)
-        sphereNode.name = thisatom.name as String
+        sphereNode.name = thisatom.name
         sphereNode.position = thisatom.pos
         sphereNode.setValue(index, forUndefinedKey: "atom_index")
         sphereNode.setValue(thisatom.trajectory, forUndefinedKey: "trajectory")
         self.normalatomnode.addChildNode(sphereNode)
+        // note: SCNGeometry.SCNLevelOfDetail may be able to improve render performance
     }
     
     func add_bond() -> Void {
-        // open Elements.plist
-        let path = Bundle.main.path(forResource: "Elements", ofType: "plist")
-        let myDict = NSDictionary(contentsOfFile: path!)
-        // get bond thickness and color from Elements.plist
-        let bond_thickness = dict_bond_thickness(myDict: myDict!)
-        let bond_color : NSColor = dict_bond_color(myDict: myDict!)
         // add bond between every pair of atoms in selected atomnodes
         for i in 0 ..< self.selectedatomnode.childNodes.count {
             for j in i+1 ..< self.selectedatomnode.childNodes.count {
@@ -220,9 +270,9 @@ class MySceneView: SCNView {
                 // draw a cylinder
                 let d = point_a - point_b
                 let length = d.length()
-                let bondGeometry = SCNCylinder(radius: bond_thickness, height: length)
+                let bondGeometry = SCNCylinder(radius: self.dict_bond_thickness, height: length)
                 bondGeometry.radialSegmentCount = self.renderSegmentCount
-                bondGeometry.firstMaterial?.multiply.contents = bond_color
+                bondGeometry.firstMaterial?.multiply.contents = self.dict_bond_color
                 let bondNode = SCNNode(geometry: bondGeometry)
                 self.apply_texture(bondNode, self.current_texture)
                 // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
@@ -580,8 +630,11 @@ class MySceneView: SCNView {
         }
         // print bond length (only one)
         else if self.selectedbondnode.childNodes.count == 1 && self.selectedatomnode.childNodes.count == 0 {
-            let geometry = self.selectedbondnode.childNodes[0].geometry as! SCNCylinder
-            info_str = String(format: "R = %.5f Å", geometry.height)
+            let bond_a = self.selectedbondnode.childNodes[0]
+            let a_start = (bond_a.value(forUndefinedKey: "atom_a") as! SCNNode).position
+            let a_end = (bond_a.value(forUndefinedKey: "atom_b") as! SCNNode).position
+            let length = a_start.distance(a_end)
+            info_str = String(format: "R = %.5f Å", length)
         }
         // print bond angles (if two connected bonds are selected)
         else if self.selectedbondnode.childNodes.count == 2 {
@@ -592,12 +645,10 @@ class MySceneView: SCNView {
             let a_end = (bond_a.value(forUndefinedKey: "atom_b") as! SCNNode).position
             let b_start = (bond_b.value(forUndefinedKey: "atom_a") as! SCNNode).position
             let b_end = (bond_b.value(forUndefinedKey: "atom_b") as! SCNNode).position
-//            let (a_start, a_end) = compute_bond_ends(bondnode: bond_a)
             let a_vector : float3 = float3(a_start - a_end)
-//            let (b_start, b_end) = compute_bond_ends(bondnode: bond_b)
             let b_vector : float3 = float3(b_start - b_end)
-            let a_length = (bond_a.geometry as! SCNCylinder).height
-            let b_length = (bond_b.geometry as! SCNCylinder).height
+            let a_length = a_start.distance(a_end)
+            let b_length = b_start.distance(b_end)
             let theta = acos(dot(a_vector,b_vector)/Float(a_length * b_length)) / .pi * 180.0
             if a_start ~= b_start || a_end ~= b_end {
                 info_str = String(format: "θ = %.4f°", theta)
@@ -617,7 +668,6 @@ class MySceneView: SCNView {
                 let start = (thisbond.value(forUndefinedKey: "atom_a") as! SCNNode).position
                 let end = (thisbond.value(forUndefinedKey: "atom_b") as! SCNNode).position
                 bond_ends.append((start, end))
-//                bond_ends.append(compute_bond_ends(bondnode: thisbond))
             }
             // find out the connection between bonds
             var mid = -1
@@ -687,28 +737,29 @@ class MySceneView: SCNView {
         }
     }
     
-    func compute_bond_ends(bondnode : SCNNode) -> (start: SCNVector3, end:SCNVector3) {
-        // read cylinder infomation from bondnode
-        let center = bondnode.position
-        let x = bondnode.rotation.x
-        let z = bondnode.rotation.z
-        let w = bondnode.rotation.w
-        // get the half vector length
-        let cylinder = bondnode.geometry as! SCNCylinder
-        let r = cylinder.height * 0.5
-        // start compute bond vector
-        // explaination: the half bond vector bv was rotated from (0,1,0), along (x,0,z) axis by w angle
-        // bv project on y axis = r * cos(w)
-        // bv project on the xz plain has length r * sin(w)
-        // bv project on xz plain has angle of (x,0,z) axis rotated by 90 degree clockwise ->  (-z,x)
-        let dx = r * sin(w) * (-z / sqrt(z*z+x*x))
-        let dy = r * cos(w)
-        let dz = r * sin(w) * (x / sqrt(z*z+x*x))
-        let dr = SCNVector3Make(dx, dy, dz)
-        let starting_point = center + dr
-        let ending_point = center - dr
-        return (starting_point, ending_point)
-    }
+    // This function is not used any more, because we now store the bond start and end nodes explicitly
+//    func compute_bond_ends(bondnode : SCNNode) -> (start: SCNVector3, end:SCNVector3) {
+//        // read cylinder infomation from bondnode
+//        let center = bondnode.position
+//        let x = bondnode.rotation.x
+//        let z = bondnode.rotation.z
+//        let w = bondnode.rotation.w
+//        // get the half vector length
+//        let cylinder = bondnode.geometry as! SCNCylinder
+//        let r = cylinder.height * 0.5
+//        // start compute bond vector
+//        // explaination: the half bond vector bv was rotated from (0,1,0), along (x,0,z) axis by w angle
+//        // bv project on y axis = r * cos(w)
+//        // bv project on the xz plain has length r * sin(w)
+//        // bv project on xz plain has angle of (x,0,z) axis rotated by 90 degree clockwise ->  (-z,x)
+//        let dx = r * sin(w) * (-z / sqrt(z*z+x*x))
+//        let dy = r * cos(w)
+//        let dz = r * sin(w) * (x / sqrt(z*z+x*x))
+//        let dr = SCNVector3Make(dx, dy, dz)
+//        let starting_point = center + dr
+//        let ending_point = center - dr
+//        return (starting_point, ending_point)
+//    }
     
     override func rightMouseDown(with theEvent: NSEvent) {
         reset_selection()
@@ -780,31 +831,26 @@ class MySceneView: SCNView {
         material.removeAnimation(forKey: "blink")
     }
     
-    func auto_add_bond(bonds: [(Int,Int)]? = nil) {
-        // open Elements.plist
-        let path = Bundle.main.path(forResource: "Elements", ofType: "plist")
-        let myDict = NSDictionary(contentsOfFile: path!)
-        // get bond thickness and color from Elements.plist
-        let bond_thickness = dict_bond_thickness(myDict: myDict!)
-        let bond_color : NSColor = dict_bond_color(myDict: myDict!)
+    func auto_add_bond(bonds: [Bond]? = nil) {
         // check every pair of atoms to determine if a bond need to be added
         let all_atom_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes
-        var bonds_to_use : [(Int,Int)] = []
+        var bonds_to_use : [Bond] = []
         if let input_bonds = bonds {
             // use input bonds
             bonds_to_use = input_bonds
-            print(bonds_to_use)
         } else {
             // check every pair of atoms to determine if a bond need to be added
             bonds_to_use = self.compute_bonds(nodes: all_atom_nodes)
         }
-        for (i, j) in bonds_to_use {
+        for bond in bonds_to_use {
+            let i = bond.first, j = bond.second
             let atom_a = all_atom_nodes[i]
             let atom_b = all_atom_nodes[j]
             // build cylinder nodes for bonds
-            let bondGeometry = SCNCylinder(radius: bond_thickness, height: 1.0)
+            let bond_length = atom_a.position.distance(atom_b.position)
+            let bondGeometry = SCNCylinder(radius: self.dict_bond_thickness, height: bond_length)
             bondGeometry.radialSegmentCount = self.renderSegmentCount
-            bondGeometry.firstMaterial?.multiply.contents = bond_color
+            bondGeometry.firstMaterial?.multiply.contents = self.dict_bond_color
             let bondNode = SCNNode(geometry: bondGeometry)
             self.apply_texture(bondNode, self.current_texture)
             bondNode.setValue(atom_a, forUndefinedKey: "atom_a")
@@ -824,7 +870,10 @@ class MySceneView: SCNView {
                     let d = point_b - point_a
                     let length = d.length()
                     let geometry = node.geometry as! SCNCylinder
-                    geometry.height = length
+                    // this step is expensive in rendering, so we try to avoid it
+                    if abs(geometry.height - length) > 0.3 {
+                        geometry.height = length
+                    }
                     // the rotation axis (0,1,0)*(dx, dy, dz) = (dz, 0, dx)
                     // the rotation angle θ = arccos( (0,1,0).(dx, dy, dz)/|(dx, dy, dz)|)
                     node.rotation = SCNVector4Make(d.z, 0 , -d.x, acos(d.y/length))
@@ -834,13 +883,11 @@ class MySceneView: SCNView {
         }
     }
     
-    func compute_bonds(nodes: [SCNNode]) -> [(Int, Int)]{
+    func compute_bonds(nodes: [SCNNode]) -> [Bond]{
         if nodes.count < 2 {
             return []
         }
-        let path = Bundle.main.path(forResource: "Elements", ofType: "plist")
-        let myDict = NSDictionary(contentsOfFile: path!)
-        let maxDist = 5.0 as CGFloat
+        let maxDist = max(self.max_bond_length, 5.0) as CGFloat
         // collect the min and max of all coords
         var minX = CGFloat.greatestFiniteMagnitude, minY = CGFloat.greatestFiniteMagnitude, minZ = CGFloat.greatestFiniteMagnitude
         var maxX = -CGFloat.greatestFiniteMagnitude, maxY = -CGFloat.greatestFiniteMagnitude, maxZ = -CGFloat.greatestFiniteMagnitude
@@ -867,7 +914,7 @@ class MySceneView: SCNView {
             box3D[idX][idY][idZ].append(i)
         }
         // loop over box and add bonds for atoms in same and neighboring boxes
-        var bonds = [(Int, Int)]()
+        var bonds = [Bond]()
         for bx in 0 ..< dimX {
             for by in 0 ..< dimY {
                 for bz in 0 ..< dimZ {
@@ -876,17 +923,17 @@ class MySceneView: SCNView {
                     for i in 0 ..< nodeIdxs.count {
                         let idx_I = nodeIdxs[i]
                         let atom_I = nodes[idx_I]
-                        let name_I = atom_I.name! as NSString
+                        let name_I = atom_I.name!
                         let pos_I = atom_I.position
                         for j in i+1 ..< nodeIdxs.count {
                             let idx_J = nodeIdxs[j]
                             let atom_J = nodes[idx_J]
-                            let name_J = atom_J.name! as NSString
+                            let name_J = atom_J.name!
                             let pos_J = atom_J.position
                             let lenSq = (pos_I - pos_J).lengthSq()
-                            let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_I, name_b: name_J)
+                            let max_bond_length = self.get_max_bond_length(name_I, name_J)
                             if lenSq < max_bond_length * max_bond_length {
-                                let bond = (idx_I <= idx_J) ? (idx_I, idx_J) : (idx_J, idx_I)
+                                let bond = Bond(idx_I, idx_J)
                                 bonds.append(bond)
                             }
                         }
@@ -915,19 +962,19 @@ class MySceneView: SCNView {
                     for i in 0 ..< nodeIdxs.count {
                         let idx_I = nodeIdxs[i]
                         let atom_I = nodes[idx_I]
-                        let name_I = atom_I.name! as NSString
+                        let name_I = atom_I.name!
                         let pos_I = atom_I.position
                         for (nx, ny, nz) in neighbors{
                             let neiborNodeIdxs = box3D[nx][ny][nz]
                             for j in 0 ..< neiborNodeIdxs.count {
                                 let idx_J = neiborNodeIdxs[j]
                                 let atom_J = nodes[idx_J]
-                                let name_J = atom_J.name! as NSString
+                                let name_J = atom_J.name!
                                 let pos_J = atom_J.position
                                 let lenSq = (pos_I - pos_J).lengthSq()
-                                let max_bond_length = dict_atom_max_bond_length(myDict: myDict!, name_a: name_I, name_b: name_J)
+                                let max_bond_length = self.get_max_bond_length(name_I, name_J)
                                 if lenSq < max_bond_length * max_bond_length {
-                                    let bond = (idx_I <= idx_J) ? (idx_I, idx_J) : (idx_J, idx_I)
+                                    let bond = Bond(idx_I, idx_J)
                                     bonds.append(bond)
                                 }
                             }
@@ -940,52 +987,68 @@ class MySceneView: SCNView {
     }
     
     func reset_bond_nodes() {
-        // could be improved, be smart at which bond to delete and insert
+        // original implementation:
         // remove all existing bonds
-        for node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
-            node.removeFromParentNode()
+//        for node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
+//            node.removeFromParentNode()
+//        }
+//        self.auto_add_bond()
+        // Improved implementation, be smart at which bond to delete and insert
+        let all_atom_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes
+        var atom_idx_map: [SCNNode: Int] = [:]
+        for (index, node) in all_atom_nodes.enumerated() {
+            atom_idx_map[node] = index
         }
-        self.auto_add_bond()
+        
+        // compute new bonds
+        let bonds = self.compute_bonds(nodes: all_atom_nodes)
+        var new_bonds_set: Set<Bond> = Set(bonds)
+        // check to remove old bonds
+        for bond_node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
+            let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
+            let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
+            let bond_i = atom_idx_map[atom_a]!
+            let bond_j = atom_idx_map[atom_b]!
+            let bond = Bond(bond_i, bond_j)
+            if new_bonds_set.contains(bond) {
+                new_bonds_set.remove(bond)
+            } else {
+                bond_node.removeFromParentNode()
+            }
+        }
+        // add new bonds
+        for bond in new_bonds_set {
+            let i = bond.first, j = bond.second
+            let atom_a = all_atom_nodes[i]
+            let atom_b = all_atom_nodes[j]
+            // build cylinder nodes for bonds
+            let bond_length = atom_a.position.distance(atom_b.position)
+            let bondGeometry = SCNCylinder(radius: self.dict_bond_thickness, height: bond_length)
+            bondGeometry.radialSegmentCount = self.renderSegmentCount
+            bondGeometry.firstMaterial?.multiply.contents = self.dict_bond_color
+            let bondNode = SCNNode(geometry: bondGeometry)
+            self.apply_texture(bondNode, self.current_texture)
+            bondNode.setValue(atom_a, forUndefinedKey: "atom_a")
+            bondNode.setValue(atom_b, forUndefinedKey: "atom_b")
+            self.normalbondnode.addChildNode(bondNode)
+        }
+        self.update_bond_nodes()
     }
     
-    func dict_atom_max_bond_length(myDict: NSDictionary, name_a: NSString, name_b: NSString) -> CGFloat {
+    func get_max_bond_length(_ elem_a: String, _ elem_b: String) -> CGFloat {
+        // cache the results to improve the performance a little bit
+        let cache_key = elem_a + "_" + elem_b
+        if let res = self.known_bond_length[cache_key] {
+            return res
+        }
         // default max bond length if not found
-        let result : CGFloat = 1.6
-        if let bond_length_dict = myDict.object(forKey: "Element Max Bond Length") as? NSDictionary {
-            if let a_max = bond_length_dict.object(forKey: name_a) as? NSDictionary {
-                if let max_bond_length = a_max.object(forKey: name_b) as? NSNumber {
-                    return CGFloat(max_bond_length.floatValue)
-                }
-            }
-            if let b_max = bond_length_dict.object(forKey: name_b) as? NSDictionary {
-                if let max_bond_length = b_max.object(forKey: name_a) as? NSNumber {
-                    return CGFloat(max_bond_length.floatValue)
-                }
+        var result : CGFloat = 2.0
+        if let elem_a_idx = ElementsIdxDict[elem_a.lowercased()], let elem_b_idx = ElementsIdxDict[elem_b.lowercased()] {
+            if let value = self.dict_element_max_distance[Bond(elem_a_idx, elem_b_idx)] {
+                result = value
             }
         }
-        return result
-    }
-    
-    func dict_bond_thickness(myDict: NSDictionary) -> CGFloat {
-        // default value if no entry found in dict
-        var result: CGFloat = 0.08
-        if let bond_thickness = myDict.object(forKey: "Bond Thickness") as? NSNumber {
-            result = CGFloat(bond_thickness.floatValue)
-        }
-        return result
-    }
-    
-    func dict_bond_color(myDict: NSDictionary) -> NSColor {
-        // default value if no entry found in dict
-        var result = NSColor(deviceRed: 0.25, green: 0.25, blue: 0.25, alpha: 1)
-        if let color = myDict.object(forKey: "Bond Color") as? [NSNumber] {
-            if color.count == 3{
-                let red = CGFloat(color[0].floatValue/255)
-                let green = CGFloat(color[1].floatValue/255)
-                let blue = CGFloat(color[2].floatValue/255)
-                result = NSColor(red: red, green: green, blue: blue, alpha: 1)
-            }
-        }
+        self.known_bond_length[cache_key] = result
         return result
     }
     

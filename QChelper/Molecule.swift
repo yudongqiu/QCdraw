@@ -17,7 +17,7 @@ class Molecule {
     var atomlist : [Atom] = []
     let bohr_to_angstrom = 0.529177208
     var myDict: NSDictionary?
-    var bonds : [(Int, Int)]? = nil
+    var bonds : [Bond]? = nil
     
     var traj_length: Int { get {
         var res = 0
@@ -101,7 +101,7 @@ class Molecule {
     
     func add_new_atom(name: String, posx: Double, posy: Double, posz: Double, trajectory: [SCNVector3] = []) {
         var new_atom = Atom()
-        new_atom.name = name.capitalized as NSString
+        new_atom.name = name.capitalized
         new_atom.pos = SCNVector3(posx, posy, posz)
         new_atom.radius = dict_atom_radius(name: new_atom.name)
         new_atom.color = dict_atom_color(name: new_atom.name)
@@ -477,9 +477,9 @@ class Molecule {
                             }
                         }
                         // determine pos
-                        if let x = line.slice(30, 38).doubleValue {
-                            if let y = line.slice(38, 46).doubleValue {
-                                if let z = line.slice(46, 54).doubleValue {
+                        if let x = line.slice(30, 38).strip().doubleValue {
+                            if let y = line.slice(38, 46).strip().doubleValue {
+                                if let z = line.slice(46, 54).strip().doubleValue {
                                     block_elem.append(element)
                                     block_geo.append([x, y, z])
                                 }
@@ -500,7 +500,7 @@ class Molecule {
                             var to_start_pos = 11
                             while let idx_to = line.slice(to_start_pos, to_start_pos+5).integerValue {
                                 if idx_to >= idx_from {
-                                    self.bonds?.append((idx_from-1, idx_to-1))
+                                    self.bonds?.append(Bond(idx_from-1, idx_to-1))
                                 }
                                 to_start_pos += 5
                             }
@@ -555,7 +555,7 @@ class Molecule {
         }
     }
     
-    func dict_atom_radius(name: NSString) -> CGFloat {
+    func dict_atom_radius(name: String) -> CGFloat {
         var result : CGFloat = 0.5
         if let dict = myDict {
             if let element_radius = (dict.object(forKey: "Element Radius") as! NSDictionary).object(forKey: name) as? NSNumber {
@@ -565,7 +565,7 @@ class Molecule {
         return result
     }
     
-    func dict_atom_color(name: NSString) -> [CGFloat] {
+    func dict_atom_color(name: String) -> [CGFloat] {
         var result : [CGFloat] = [0.8, 0.8, 0.8]
         if let dict = myDict {
             let element_color = (dict.object(forKey: "Element Colors") as! NSDictionary).object(forKey: name) as? [NSNumber]

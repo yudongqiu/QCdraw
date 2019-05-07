@@ -64,7 +64,7 @@ extension SCNVector3
     func length() -> CGFloat {
         return sqrt(x*x + y*y + z*z)
     }
-    func distance(vector: SCNVector3) -> CGFloat {
+    func distance(_ vector: SCNVector3) -> CGFloat {
         return (self - vector).length()
     }
     public var stringValue: String {
@@ -85,14 +85,19 @@ extension String {
         }
         return(line_split)
     }
+    // Update, below are new features of Swift 4.2, faster than NumberFormatter
+    // However, the sting should be striped before calling them, i.e. Double(" 123") = nil
     var doubleValue:Double? {
-        return NumberFormatter().number(from: self)?.doubleValue
+        return Double(self)
+        //return NumberFormatter().number(from: self)?.doubleValue
     }
     var floatValue:Float? {
-        return NumberFormatter().number(from: self)?.floatValue
+        return Float(self)
+        //return NumberFormatter().number(from: self)?.floatValue
     }
     var integerValue:Int? {
-        return NumberFormatter().number(from: self)?.intValue
+        return Int(self)
+        //return NumberFormatter().number(from: self)?.intValue
     }
     func contains(_ find: String) -> Bool {
         return self.range(of: find) != nil
