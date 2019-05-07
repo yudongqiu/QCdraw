@@ -42,6 +42,7 @@ class CartesianEditorViewController: NSViewController {
             var content: String
         }
         var atomlist: [AtomStr] = []
+        var xyz_str = ""
         for eachatom in self.view_controller.mySceneView.normalatomnode.childNodes + self.view_controller.mySceneView.selectedatomnode.childNodes {
             let name = String(format: "%2s", (eachatom.name! as NSString).utf8String!)
             let posx = String(format: "%17.6f", eachatom.position.x)
@@ -52,8 +53,9 @@ class CartesianEditorViewController: NSViewController {
         }
         atomlist.sort { $0.index < $1.index }
         for a in atomlist {
-            textfield.string += a.content + "\n"
+            xyz_str += a.content + "\n"
         }
+        textfield.string = xyz_str
     }
     
     func select_all () {
