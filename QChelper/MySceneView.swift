@@ -761,8 +761,18 @@ class MySceneView: SCNView {
 //        return (starting_point, ending_point)
 //    }
     
+    override func scrollWheel(with event: NSEvent) {
+        // this is the only way I found to detect if it's a mouse
+        if event.deviceID > 0 {
+            return super.scrollWheel(with: event)
+        }
+        if let pov = self.pointOfView {
+            pov.position += pov.convertVector(SCNVector3(0, 0, 0.5 * event.deltaY), to: nil)
+        }
+    }
+    
     override func rightMouseDown(with theEvent: NSEvent) {
-        reset_selection()
+        self.reset_selection()
         self.click_location = theEvent.locationInWindow
         if let pov = self.pointOfView {
             // record the click location for drag
