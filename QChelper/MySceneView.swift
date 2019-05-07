@@ -764,9 +764,8 @@ class MySceneView: SCNView {
     override func scrollWheel(with event: NSEvent) {
         // this is the only way I found to detect if it's a mouse
         if event.deviceID > 0 {
-            return super.scrollWheel(with: event)
-        }
-        if let pov = self.pointOfView {
+            super.scrollWheel(with: event)
+        } else if let pov = self.pointOfView {
             pov.position += pov.convertVector(SCNVector3(0, 0, 0.5 * event.deltaY), to: nil)
         }
     }
