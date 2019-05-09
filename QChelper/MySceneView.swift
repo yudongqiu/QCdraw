@@ -153,6 +153,11 @@ class MySceneView: SCNView {
         self.bondnodes.addChildNode(self.normalbondnode)
         self.bondnodes.addChildNode(self.selectedbondnode)
         
+        // the deallocation of the previous scene happens here
+        // It might be slow if the previous scene is heavy
+        // I tried to move the deallocation to a background thread but was not successfull
+        // Another option is to keep a strong reference to the previous scene, i.e. self.old_scene = self.scene
+        // This will help the slow dealloc issue, but keeps using more memory
         self.scene = scene
         
         // length of the trajectory
