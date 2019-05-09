@@ -465,15 +465,18 @@ class Molecule {
                     let record_name = line.slice(0,6)
                     if record_name == "ATOM  " || record_name == "HETATM" {
                         // determine element
-                        var element = "X"
-                        if line.count >= 78 {
-                            element = line.slice(76, 78).strip()
-                        } else {
-                            // use the first 2 character of "name" field if element symbol not provided
-                            element = line.slice(12, 14).strip().capitalized
+                        var element = ""
+                        // try to use the "element" column
+                        element = line.slice(76, 78).strip().capitalized
+                        // if not sucessful, try to use the name field
+                        if element.isEmpty {
+                            let name_str = line.slice(12, 16).strip()
+                            // try to use the first 2 characters
+                            // we don't capitalize here because it will mix names like CA, CE, HE
+                            element = name_str.slice(0,2)
                             if dict_element_radius[element] == nil {
-                                // use the first character of the "name" field is element not recognized
-                                element = line.slice(12, 13)
+                                // if element not recognized, use the first character
+                                element = element.slice(0, 1).uppercased()
                             }
                         }
                         // determine pos
@@ -496,9 +499,9 @@ class Molecule {
                         if self.bonds == nil {
                             self.bonds = []
                         }
-                        if let idx_from = line.slice(6, 11).integerValue {
+                        if let idx_from = line.slice(6, 11).strip().integerValue {
                             var to_start_pos = 11
-                            while let idx_to = line.slice(to_start_pos, to_start_pos+5).integerValue {
+                            while let idx_to = line.slice(to_start_pos, to_start_pos+5).strip().integerValue {
                                 if idx_to >= idx_from {
                                     self.bonds?.append(Bond(idx_from-1, idx_to-1))
                                 }
