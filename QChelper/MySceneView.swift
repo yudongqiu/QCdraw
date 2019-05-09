@@ -1218,7 +1218,7 @@ class MySceneView: SCNView {
             }
             let ave_x = sumx / CGFloat(total_number_of_atoms)
             let ave_y = sumy / CGFloat(total_number_of_atoms)
-            let ave_z = sumy / CGFloat(total_number_of_atoms)
+            let ave_z = sumz / CGFloat(total_number_of_atoms)
             // adjust camara position
             if let pov = self.pointOfView {
                 pov.position = SCNVector3(x: ave_x, y: ave_y, z: maxz+11)
