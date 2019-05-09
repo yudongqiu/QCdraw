@@ -127,7 +127,6 @@ class MySceneView: SCNView {
         self.cameraNode.camera = camera
         self.cameraNode.position = SCNVector3(x: 0, y: 0, z: 0)
         scene.rootNode.addChildNode(self.cameraNode)
-        self.cameraControlConfiguration.allowsTranslation = true
         
         // create and add a light to the scene
         self.lightNode.light = SCNLight()
@@ -1228,6 +1227,8 @@ class MySceneView: SCNView {
             }
             // store center position
             self.mol_center_pos = SCNVector3(ave_x, ave_y, ave_z)
+            // in OSX 10.13, the camera target is not automatically adjusted, so we manually do that here
+            self.defaultCameraController.target = self.mol_center_pos
         }
     }
     
