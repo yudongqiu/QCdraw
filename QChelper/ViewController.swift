@@ -53,8 +53,6 @@ class ViewController: NSViewController {
                 self.mySceneView.open_file(url: openpanel.url)
             }
         }
-        // reset the VDW representation to CPK
-        self.appdelegate.menu_vdw_representation.state = .off
     }
     
     @IBAction func save_snapshot(sender: NSButton) {
@@ -347,10 +345,13 @@ class ViewController: NSViewController {
     }
     
     func reset() {
+        // reset controller elements when open a new file
         self.timer.invalidate()
         self.play_button.state = .off
         self.slider.integerValue = 0
         self.slider_text.integerValue = 0
+        // reset the VDW representation to CPK
+        self.appdelegate.menu_vdw_representation.state = .off
     }
     
 }
