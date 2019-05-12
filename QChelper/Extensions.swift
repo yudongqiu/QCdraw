@@ -76,7 +76,7 @@ extension SCNVector3
 let digitSet = CharacterSet.decimalDigits
 let letterSet = CharacterSet.letters
 extension String {
-    func mysplit(delimiter: String.Element? = nil) -> [String] {
+    func mysplit(_ delimiter: String.Element? = nil) -> [String] {
         if let sep = delimiter {
             let line_split_raw = self.split(separator: sep)
             return line_split_raw.map({String($0)})
