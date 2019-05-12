@@ -1064,12 +1064,17 @@ class MySceneView: SCNView {
         for bond_node in self.normalbondnode.childNodes + self.selectedbondnode.childNodes {
             let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
             let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
-            let bond_i = atom_idx_map[atom_a]!
-            let bond_j = atom_idx_map[atom_b]!
-            let bond = Bond(bond_i, bond_j)
-            if new_bonds_set.contains(bond) {
-                new_bonds_set.remove(bond)
-            } else {
+            var keep_bond = false
+            if let bond_i = atom_idx_map[atom_a] {
+                if let bond_j = atom_idx_map[atom_b] {
+                    let bond = Bond(bond_i, bond_j)
+                    if new_bonds_set.contains(bond) {
+                        new_bonds_set.remove(bond)
+                        keep_bond = true
+                    }
+                }
+            }
+            if !keep_bond {
                 bond_node.removeFromParentNode()
             }
         }
