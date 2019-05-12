@@ -70,22 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
     
-    @IBAction func menu_select_all(sender: AnyObject) {
-        if let window = NSApp.mainWindow{
-            if let activeController = window.contentViewController {
-                if let viewController = activeController as? ViewController {
-                    viewController.select_all()
-                } else if let viewController = activeController as? CartesianEditorViewController {
-                    viewController.select_all()
-                }
-            }
-        }
-    }
-    
-    
     @IBOutlet weak var menu_trajectory: NSMenuItem!
-    
-    
     @IBOutlet weak var menu_traj_update_bonds: NSMenuItem!
     @IBAction func toggle_menu_traj_update_bonds(sender: Any) {
         if menu_traj_update_bonds.state == .off {

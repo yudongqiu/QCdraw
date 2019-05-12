@@ -45,6 +45,24 @@ class ViewController: NSViewController {
         }
     }
     
+    override func selectAll(_ sender: Any?) {
+        mySceneView.select_all()
+    }
+    
+    @IBAction func paste(_ sender: Any) {
+        let pasteboard = NSPasteboard.general
+        if let items = pasteboard.pasteboardItems {
+            let item = items[0]
+            if let item_str = item.string(forType: .fileURL) {
+                // open copied file
+                self.mySceneView.open_file(url: URL(string: item_str))
+            } else if let item_str = item.string(forType: .string) {
+                // read copied string similar to Cartesian Editor
+                self.mySceneView.load_from_text(text: item_str)
+            }
+        }
+    }
+    
     @IBAction func open_file(sender: AnyObject) {
         let openpanel = NSOpenPanel()
         openpanel.title = "Open File"
@@ -253,10 +271,6 @@ class ViewController: NSViewController {
         for eachnode in mySceneView.selectedatomnode.childNodes + mySceneView.selectedbondnode.childNodes {
             mySceneView.remove_node(thisnode: eachnode)
         }
-    }
-
-    func select_all() {
-        mySceneView.select_all()
     }
     
     @IBAction func transparentize(sender: AnyObject?) {

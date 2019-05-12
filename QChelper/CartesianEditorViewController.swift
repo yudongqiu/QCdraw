@@ -19,15 +19,7 @@ class CartesianEditorViewController: NSViewController {
     
     @IBAction func ok(sender: AnyObject) {
         let unit = unit_selection.selectedItem!.title.lowercased()
-        let molecule = Molecule(text: textfield.string, unit: unit)
-        self.view_controller.mySceneView.init_scene()
-        self.view_controller.reset()
-        for atom in molecule.atomlist {
-            self.view_controller.mySceneView.add_atom(atom)
-        }
-        self.view_controller.mySceneView.update_traj_length(length: 0)
-        self.view_controller.mySceneView.auto_add_bond()
-        self.view_controller.mySceneView.adjust_focus()
+        self.view_controller.mySceneView.load_from_text(text: textfield.string, unit: unit)
         self.view.window?.close()
     }
     
@@ -56,10 +48,6 @@ class CartesianEditorViewController: NSViewController {
             xyz_str += a.content + "\n"
         }
         textfield.string = xyz_str
-    }
-    
-    func select_all () {
-        textfield.selectAll(self)
     }
     
 }

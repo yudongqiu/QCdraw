@@ -1167,6 +1167,23 @@ class MySceneView: SCNView {
         }
     }
     
+    func load_from_text(text: String, unit: String? = nil) {
+        let molecule = Molecule(text: text, unit: unit)
+        if molecule.atomlist.count > 0 {
+            self.init_scene()
+            self.renderSegmentCount = max(20, Int(50 - molecule.atomlist.count/30))
+            for atom in molecule.atomlist {
+                self.add_atom(atom)
+            }
+            // set the trajectory length
+            self.update_traj_length(length: molecule.traj_length)
+            self.auto_add_bond(bonds: molecule.bonds)
+            self.adjust_focus()
+        } else {
+            self.view_controller.info_bar.stringValue = "Text not recognized"
+        }
+    }
+    
     func toggleAdvancedRendering(enable: Bool) {
         if enable != self.advancedRendering {
             self.advancedRendering = enable

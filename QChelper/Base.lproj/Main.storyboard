@@ -150,7 +150,7 @@ CA
                                         </menuItem>
                                         <menuItem title="Select All" keyEquivalent="a" id="Ruw-6m-B2m">
                                             <connections>
-                                                <action selector="menu_select_allWithSender:" target="Voe-Tx-rLC" id="wdn-er-wjo"/>
+                                                <action selector="selectAll:" target="Ady-hI-5gd" id="EFL-hi-3OQ"/>
                                             </connections>
                                         </menuItem>
                                     </items>
