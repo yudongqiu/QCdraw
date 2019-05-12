@@ -42,6 +42,8 @@ class Molecule {
             self.read_xyz(path: path)
         } else if file_format == "pdb" {
             self.read_pdb(path: path)
+        } else if file_format == "gro" {
+            self.read_gro(path: path)
         } else if file_format == "psi4" {
             self.read_psi4(path: path)
         } else if file_format == "molpro" {
@@ -55,11 +57,13 @@ class Molecule {
     
     func determine_file_format(path: String) -> String {
         var res: String = "unknown"
-        let ext = path.pathExtension
+        let ext = path.pathExtension.lowercased()
         if ext == "xyz"{
             res = "xyz"
         } else if ext == "pdb" {
             res = "pdb"
+        } else if ext == "gro" {
+            res = "gro"
         } else {
             if let aStreamReader = StreamReader(path: path) {
                 defer {
@@ -522,6 +526,123 @@ class Molecule {
                     break
                 }
             } // end of while loop
+            if block_elem_list.count >= 1 {
+                let elems = block_elem_list[0]
+                let init_geo = block_geo_list[0]
+                let names = block_name_list[0]
+                let indices = block_index_list[0]
+                for i in 0 ..< elems.count {
+                    let elem = elems[i]
+                    let pos = init_geo[i]
+                    let index = indices[i]
+                    let name = names[i]
+                    var traj : [SCNVector3] = []
+                    // only create trajectory if there are > 1 frames
+                    if block_elem_list.count > 1 {
+                        for i_b in 0 ..< block_elem_list.count {
+                            // check if elem column is consistent in each block
+                            if block_elem_list[i_b] != elems {
+                                print("elem not consistent in block \(i_b)")
+                                continue
+                            }
+                            let geo = block_geo_list[i_b]
+                            let atom_xyz = geo[i]
+                            traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
+                        }
+                    }
+                    self.add_new_atom(element: elem, posx: pos[0], posy: pos[1], posz: pos[2], index: index, name: name, trajectory: traj)
+                }
+            }
+            // end of reading file
+        }
+    }
+    
+    /**
+     Read molecular geometry from gro file.
+     
+     - parameters:
+        - path: Path to input gro file
+     
+     gro is a fixed format.
+     http://manual.gromacs.org/archive/5.0.3/online/gro.html
+     
+     - Each frame contains
+         - title string (free format string, optional time in ps after 't=')
+         - number of atoms (free format integer)
+         - one line for each atom (fixed format, see below)
+         - box vectors (free format, space separated reals), values: v1(x) v2(y) v3(z) v1(y) v1(z) v2(x) v2(z) v3(x) v3(y), the last 6 values may be omitted (they will be set to zero). Gromacs only supports boxes with v1(y)=v1(z)=v2(z)=0.
+     
+     - Each line of atom contains:
+         - residue number (5 positions, integer)
+         - residue name (5 characters)
+         - atom name (5 characters)
+         - atom number (5 positions, integer)
+         - position (in nm, x y z in 3 columns, each 8 positions with 3 decimal places)
+         - velocity (in nm/ps (or km/s), x y z in 3 columns, each 8 positions with 4 decimal places)
+     
+     - note
+         - since it's popular to use gro file with unlimited decimal, we need to "break" the rule of fixed positions.
+     
+    */
+    
+    func read_gro(path: String) {
+        if let aStreamReader = StreamReader(path: path) {
+            defer {
+                aStreamReader.close()
+            }
+            var block_elem_list: [[String]] = []
+            var block_geo_list: [[[Double]]] = []
+            var block_name_list: [[String]] = []
+            var block_index_list: [[Int]] = []
+            while true {
+                if !aStreamReader.atEof {
+                    // skip the title line
+                    aStreamReader.skiplines(lineNumber: 1)
+                    // read the number of atoms from next line
+                    if let noa_line = aStreamReader.nextLine() {
+                        if let noa = noa_line.strip().integerValue {
+                            // create an empty block
+                            var block_elem: [String] = []
+                            var block_geo: [[Double]] = []
+                            var block_name: [String] = []
+                            var block_index: [Int] = []
+                            for _ in 0 ..< noa {
+                                // read one atom line
+                                if let line = aStreamReader.nextLine() {
+                                    let atom_name = line.slice(10, 15).strip()
+                                    let element = self.guess_element_from_name(atom_name)
+                                    if let atom_index = line.slice(15, 20).strip().integerValue {
+                                        let inline = line.slice(20, line.count).mysplit()
+                                        if inline.count >= 3 {
+                                            if let posx = inline[0].strip().doubleValue {
+                                                if let posy = inline[1].strip().doubleValue {
+                                                    if let posz = inline[2].strip().doubleValue {
+                                                        // convert nm to angstrom
+                                                        let geo = [posx * 10, posy * 10, posz * 10]
+                                                        block_elem.append(element)
+                                                        block_geo.append(geo)
+                                                        block_index.append(atom_index)
+                                                        block_name.append(atom_name)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // add the content of the block to list
+                            block_elem_list.append(block_elem)
+                            block_geo_list.append(block_geo)
+                            block_index_list.append(block_index)
+                            block_name_list.append(block_name)
+                        }
+                    }
+                    // skip the box vectors line
+                    aStreamReader.skiplines(lineNumber: 1)
+                } else {
+                    break
+                }
+            }
             if block_elem_list.count >= 1 {
                 let elems = block_elem_list[0]
                 let init_geo = block_geo_list[0]
