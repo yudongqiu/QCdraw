@@ -16,7 +16,6 @@ enum MoleculeError: Error {
 class Molecule {
     var atomlist : [Atom] = []
     let bohr_to_angstrom = 0.529177208
-    var myDict: NSDictionary?
     var bonds : [Bond]? = nil
     
     var traj_length: Int { get {
@@ -27,26 +26,13 @@ class Molecule {
         return res
     }}
     
-    init() {
-        // Read Elements.plist for Elements Data
-        if let dpath = Bundle.main.path(forResource: "Elements", ofType: "plist") {
-            self.myDict = NSDictionary(contentsOfFile: dpath)
-        }
-    }
+    init() {}
     
     init (path: String) throws {
-        // Read Elements.plist for Elements Data
-        if let dpath = Bundle.main.path(forResource: "Elements", ofType: "plist") {
-            self.myDict = NSDictionary(contentsOfFile: dpath)
-        }
         try self.load(path: path)
     }
     
     init (text: String, unit: String?) {
-        // Read Elements.plist for Elements Data
-        if let dpath = Bundle.main.path(forResource: "Elements", ofType: "plist") {
-            self.myDict = NSDictionary(contentsOfFile: dpath)
-        }
         self.read_text(text: text, unit: unit)
     }
     
@@ -99,12 +85,12 @@ class Molecule {
         return res
     }
     
-    func add_new_atom(name: String, posx: Double, posy: Double, posz: Double, trajectory: [SCNVector3] = []) {
+    func add_new_atom(element: String, posx: Double, posy: Double, posz: Double, index: Int, name: String = "", trajectory: [SCNVector3] = []) {
         var new_atom = Atom()
-        new_atom.name = name.capitalized
+        new_atom.element = element.capitalized
         new_atom.pos = SCNVector3(posx, posy, posz)
-        new_atom.radius = dict_atom_radius(name: new_atom.name)
-        new_atom.color = dict_atom_color(name: new_atom.name)
+        new_atom.name = name
+        new_atom.index = index
         new_atom.trajectory = trajectory
         self.atomlist.append(new_atom)
     }
@@ -114,6 +100,7 @@ class Molecule {
         let text_lines = text.split(delimiter: "\n")
         // convertion factor based on unit
         let conv = (unit == "bohr") ? bohr_to_angstrom : 1.0
+        var index = 0
         for line in text_lines {
             let inline = line.split()
             // if the line satisfy all conditions, continue
@@ -121,11 +108,12 @@ class Molecule {
                 if let posx = inline[1].doubleValue {
                     if let posy = inline[2].doubleValue {
                         if let posz = inline[3].doubleValue {
-                            let name = inline[0]
+                            let elem = inline[0]
                             let x = posx * conv
                             let y = posy * conv
                             let z = posz * conv
-                            self.add_new_atom(name: name, posx: x, posy: y, posz: z)
+                            self.add_new_atom(element: elem, posx: x, posy: y, posz: z, index: index)
+                            index += 1
                         }
                     }
                 }
@@ -134,17 +122,18 @@ class Molecule {
                 if let posx = inline[2].doubleValue {
                     if let posy = inline[3].doubleValue {
                         if let posz = inline[4].doubleValue {
-                            var name: String = "X"
+                            var elem: String = "X"
                             if inline[0].doubleValue == nil {
-                                name = inline[0]
+                                elem = inline[0]
                             }
                             else if inline[1].doubleValue == nil {
-                                name = inline[1]
+                                elem = inline[1]
                             }
                             let x = posx * conv
                             let y = posy * conv
                             let z = posz * conv
-                            self.add_new_atom(name: name, posx: x, posy: y, posz: z)
+                            self.add_new_atom(element: elem, posx: x, posy: y, posz: z, index: index)
+                            index += 1
                             continue
                         }
                     }
@@ -154,11 +143,12 @@ class Molecule {
                 if let posx = inline[3].doubleValue {
                     if let posy = inline[4].doubleValue {
                         if let posz = inline[5].doubleValue{
-                            let name = inline[1]
+                            let elem = inline[1]
                             let x = posx * conv
                             let y = posy * conv
                             let z = posz * conv
-                            self.add_new_atom(name: name, posx: x, posy: y, posz: z)
+                            self.add_new_atom(element: elem, posx: x, posy: y, posz: z, index: index)
+                            index += 1
                             continue
                         }
                     }
@@ -215,7 +205,7 @@ class Molecule {
                 let elems = block_elem_list[0]
                 let init_geo = block_geo_list[0]
                 for i in 0 ..< elems.count {
-                    let name = elems[i]
+                    let elem = elems[i]
                     let pos = init_geo[i]
                     var traj : [SCNVector3] = []
                     // only create trajectory if there are > 1 frames
@@ -231,7 +221,7 @@ class Molecule {
                             traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
                         }
                     }
-                    self.add_new_atom(name: name, posx: pos[0], posy: pos[1], posz: pos[2], trajectory: traj)
+                    self.add_new_atom(element: elem, posx: pos[0], posy: pos[1], posz: pos[2], index: i, trajectory: traj)
                 }
             }
         }
@@ -265,6 +255,7 @@ class Molecule {
                 aStreamReader.skiplines(lineNumber: geoline)
             }
             var geofound = false // Did we find the geometry?
+            var index : Int = 0
             for line in aStreamReader {
                 let inline = line.split()
                 // if the line satisfy all conditions, continue
@@ -272,7 +263,8 @@ class Molecule {
                     if let posx = inline[1].doubleValue {
                         if let posy = inline[2].doubleValue {
                             if let posz = inline[3].doubleValue {
-                                self.add_new_atom(name: inline[0], posx: posx, posy: posy, posz: posz)
+                                self.add_new_atom(element: inline[0], posx: posx, posy: posy, posz: posz, index: index)
+                                index += 1
                                 geofound = true
                                 continue
                             }
@@ -309,6 +301,7 @@ class Molecule {
                     }
                 }
                 var geofound = false // Did we find the geometry?
+                var index : Int = 0
                 for line in aStreamReader {
                     let inline = line.split()
                     // if the line satisfy all conditions, continue
@@ -316,11 +309,12 @@ class Molecule {
                         if let posx = inline[3].doubleValue {
                             if let posy = inline[4].doubleValue {
                                 if let posz = inline[5].doubleValue{
-                                    let name = inline[1]
+                                    let elem = inline[1]
                                     let x = posx * bohr_to_angstrom
                                     let y = posy * bohr_to_angstrom
                                     let z = posz * bohr_to_angstrom
-                                    self.add_new_atom(name: name, posx: x, posy: y, posz: z)
+                                    self.add_new_atom(element: elem, posx: x, posy: y, posz: z, index: index)
+                                    index += 1
                                     geofound = true
                                     continue
                                 }
@@ -335,6 +329,7 @@ class Molecule {
                 // go to the last geometry section
                 aStreamReader.skiplines(lineNumber: geoline+1)
                 var geofound = false // Did we find the geometry?
+                var index: Int = 0
                 for line in aStreamReader {
                     let inline = line.split()
                     // if the line satisfy all conditions, continue
@@ -342,7 +337,8 @@ class Molecule {
                         if let posx = inline[1].doubleValue {
                             if let posy = inline[2].doubleValue {
                                 if let posz = inline[3].doubleValue{
-                                    self.add_new_atom(name: inline[0], posx: posx, posy: posy, posz: posz)
+                                    self.add_new_atom(element: inline[0], posx: posx, posy: posy, posz: posz, index: index)
+                                    index += 1
                                     geofound = true
                                     continue
                                 }
@@ -374,7 +370,7 @@ class Molecule {
             // go to the last geometry section
             aStreamReader.rewind()
             aStreamReader.skiplines(lineNumber: geoline+3)
-            
+            var index = 0
             for line in aStreamReader {
                 let inline = line.split()
                 if inline[0] == "X" { // check if it's a dummy atom
@@ -385,11 +381,12 @@ class Molecule {
                     if let posx = inline[2].doubleValue {
                         if let posy = inline[3].doubleValue {
                             if let posz = inline[4].doubleValue{
-                                let name = inline[0]
+                                let elem = inline[0]
                                 let x = posx * bohr_to_angstrom
                                 let y = posy * bohr_to_angstrom
                                 let z = posz * bohr_to_angstrom
-                                self.add_new_atom(name: name, posx: x, posy: y, posz: z)
+                                self.add_new_atom(element: elem, posx: x, posy: y, posz: z, index: index)
+                                index += 1
                                 continue
                             }
                         }
@@ -449,49 +446,54 @@ class Molecule {
     
     func read_pdb(path: String) {
         self.atomlist = []
-        // open the element radius dictionary
-        let dict_element_radius = myDict!.object(forKey: "Element Radius") as! Dictionary<String,Any>
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
             }
             var block_elem_list: [[String]] = []
             var block_geo_list: [[[Double]]] = []
+            var block_name_list: [[String]] = []
+            var block_index_list: [[Int]] = []
             // create the first empty blocks
             var block_elem: [String] = []
             var block_geo: [[Double]] = []
+            var block_name: [String] = []
+            var block_index: [Int] = []
             while true {
                 if let line = aStreamReader.nextLine() {
                     let record_name = line.slice(0,6)
                     if record_name == "ATOM  " || record_name == "HETATM" {
+                        let name_str = line.slice(12, 16).strip()
                         // determine element
                         var element = ""
                         // try to use the "element" column
                         element = line.slice(76, 78).strip().capitalized
                         // if not sucessful, try to use the name field
                         if element.isEmpty {
-                            let name_str = line.slice(12, 16).strip()
-                            // try to use the first 2 characters
-                            // we don't capitalize here because it will mix names like CA, CE, HE
-                            element = name_str.slice(0,2)
-                            if dict_element_radius[element] == nil {
-                                // if element not recognized, use the first character
-                                element = element.slice(0, 1).uppercased()
-                            }
+                            element = self.guess_element_from_name(name_str)
+                        } else if ElementsIdxDict[element] == nil {
+                            element = element.slice(0, 1)
                         }
                         // determine pos
-                        if let x = line.slice(30, 38).strip().doubleValue {
-                            if let y = line.slice(38, 46).strip().doubleValue {
-                                if let z = line.slice(46, 54).strip().doubleValue {
-                                    block_elem.append(element)
-                                    block_geo.append([x, y, z])
+                        if let index = line.slice(6, 11).strip().integerValue {
+                            if let x = line.slice(30, 38).strip().doubleValue {
+                                if let y = line.slice(38, 46).strip().doubleValue {
+                                    if let z = line.slice(46, 54).strip().doubleValue {
+                                        block_elem.append(element)
+                                        block_geo.append([x, y, z])
+                                        block_name.append(name_str)
+                                        block_index.append(index)
+                                    }
                                 }
                             }
                         }
+                        
                     } else if record_name == "ENDMDL" {
                         // add the block to result list
                         block_elem_list.append(block_elem)
                         block_geo_list.append(block_geo)
+                        block_name_list.append(block_name)
+                        block_index_list.append(block_index)
                         // create new block
                         block_elem = []
                         block_geo = []
@@ -514,6 +516,8 @@ class Molecule {
                     if block_elem.count > 0 {
                         block_elem_list.append(block_elem)
                         block_geo_list.append(block_geo)
+                        block_name_list.append(block_name)
+                        block_index_list.append(block_index)
                     }
                     break
                 }
@@ -521,9 +525,13 @@ class Molecule {
             if block_elem_list.count >= 1 {
                 let elems = block_elem_list[0]
                 let init_geo = block_geo_list[0]
+                let names = block_name_list[0]
+                let indices = block_index_list[0]
                 for i in 0 ..< elems.count {
-                    let name = elems[i]
+                    let elem = elems[i]
                     let pos = init_geo[i]
+                    let index = indices[i]
+                    let name = names[i]
                     var traj : [SCNVector3] = []
                     // only create trajectory if there are > 1 frames
                     if block_elem_list.count > 1 {
@@ -538,13 +546,23 @@ class Molecule {
                             traj.append(SCNVector3(atom_xyz[0], atom_xyz[1], atom_xyz[2]))
                         }
                     }
-                    self.add_new_atom(name: name, posx: pos[0], posy: pos[1], posz: pos[2], trajectory: traj)
+                    self.add_new_atom(element: elem, posx: pos[0], posy: pos[1], posz: pos[2], index: index, name: name, trajectory: traj)
                 }
             }
             // end of reading file
         }
     }
-
+    
+    func guess_element_from_name(_ name: String) -> String {
+        // try to use the first 2 characters
+        // we don't capitalize here because it will mix names like CA, CE, HE
+        var element = name.extractLetters().slice(0,2)
+        if ElementsIdxDict[element] == nil {
+            // if element not recognized, use the first character
+            element = element.slice(0, 1).uppercased()
+        }
+        return element
+    }
     
     func recenter () {
         var average_pos = SCNVector3()
@@ -556,31 +574,6 @@ class Molecule {
         for i in 0..<Int(natoms) {
             self.atomlist[i].pos -= average_pos
         }
-    }
-    
-    func dict_atom_radius(name: String) -> CGFloat {
-        var result : CGFloat = 0.5
-        if let dict = myDict {
-            if let element_radius = (dict.object(forKey: "Element Radius") as! NSDictionary).object(forKey: name) as? NSNumber {
-                result = CGFloat(element_radius.floatValue)
-            }
-        }
-        return result
-    }
-    
-    func dict_atom_color(name: String) -> [CGFloat] {
-        var result : [CGFloat] = [0.8, 0.8, 0.8]
-        if let dict = myDict {
-            let element_color = (dict.object(forKey: "Element Colors") as! NSDictionary).object(forKey: name) as? [NSNumber]
-            if let color = element_color {
-                if color.count == 3{
-                    result[0] = CGFloat(color[0].floatValue/255)
-                    result[1] = CGFloat(color[1].floatValue/255)
-                    result[2] = CGFloat(color[2].floatValue/255)
-                }
-            }
-        }
-        return result
     }
 }
 

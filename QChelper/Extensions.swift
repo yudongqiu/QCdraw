@@ -73,7 +73,8 @@ extension SCNVector3
 }
 
 // extend String with convenient Python-like methods
-
+let digitSet = CharacterSet.decimalDigits
+let letterSet = CharacterSet.letters
 extension String {
     func split(delimiter: String = " ") -> [String] {
         let line_split_raw = self.components(separatedBy: delimiter)
@@ -123,5 +124,11 @@ extension String {
         let _start_idx = self.index(self.startIndex, offsetBy: _start)
         let _end_idx = self.index(self.startIndex, offsetBy: _end)
         return String(self[_start_idx..<_end_idx])
+    }
+    func extractDigits() -> String {
+        return String(self.unicodeScalars.filter({digitSet.contains($0)}))
+    }
+    func extractLetters() -> String {
+        return String(self.unicodeScalars.filter({letterSet.contains($0)}))
     }
 }

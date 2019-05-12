@@ -22,8 +22,8 @@ class CartesianEditorViewController: NSViewController {
         let molecule = Molecule(text: textfield.string, unit: unit)
         self.view_controller.mySceneView.init_scene()
         self.view_controller.reset()
-        for (idx, eachatom) in molecule.atomlist.enumerated() {
-            self.view_controller.mySceneView.add_atom(thisatom: eachatom, index: idx)
+        for atom in molecule.atomlist {
+            self.view_controller.mySceneView.add_atom(atom)
         }
         self.view_controller.mySceneView.update_traj_length(length: 0)
         self.view_controller.mySceneView.auto_add_bond()

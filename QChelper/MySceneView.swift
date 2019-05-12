@@ -45,6 +45,8 @@ class MySceneView: SCNView {
     var dict_bond_thickness : CGFloat = 0.08
     var dict_bond_color : NSColor = NSColor(deviceRed: 0.25, green: 0.25, blue: 0.25, alpha: 1)
     var dict_element_max_distance : Dictionary<Bond, CGFloat> = [:]
+    var dict_elem_color : Dictionary<String, NSColor> = [:]
+    var dict_elem_radius : Dictionary<String, CGFloat> = [:]
     
     // max allowed bond lengh for building boxes in compute_bonds
     var max_bond_length: CGFloat = 3.0
@@ -72,21 +74,45 @@ class MySceneView: SCNView {
                         self.dict_bond_color = NSColor(red: red, green: green, blue: blue, alpha: 1)
                     }
                 }
-                // read atom radius
+                // read max bond length
                 if let bond_length_dict = myDict.object(forKey: "Element Max Bond Length") as? NSDictionary {
                     for (elem_a, dict_a) in bond_length_dict {
                         if let e_a = elem_a as? String {
-                            if let elem_a_idx = ElementsIdxDict[e_a.lowercased()] {
+                            if let elem_a_idx = ElementsIdxDict[e_a] {
                                 if let d = dict_a as? NSDictionary {
                                     for (elem_b, bond_length) in d {
                                         if let e_b = elem_b as? String, let value = bond_length as? CGFloat {
-                                            if let elem_b_idx = ElementsIdxDict[e_b.lowercased()] {
+                                            if let elem_b_idx = ElementsIdxDict[e_b] {
                                                 self.dict_element_max_distance[Bond(elem_a_idx, elem_b_idx)] = value
                                                 self.max_bond_length = max(self.max_bond_length, value)
                                             }
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                // read elem colors
+                if let element_color_dict = myDict.object(forKey: "Element Colors") as? NSDictionary {
+                    for (elem_str, color_rgb_array) in element_color_dict {
+                        if let element = elem_str as? String {
+                            if let color_rgb = color_rgb_array as? Array<NSNumber> {
+                                let red = CGFloat(color_rgb[0].floatValue / 255)
+                                let green = CGFloat(color_rgb[1].floatValue / 255)
+                                let blue = CGFloat(color_rgb[2].floatValue / 255)
+                                let color = NSColor(red: red, green: green, blue: blue, alpha: 1)
+                                self.dict_elem_color[element] = color
+                            }
+                        }
+                    }
+                }
+                // read atom radius
+                if let element_radius_dict = myDict.object(forKey: "Element Radius") as? NSDictionary {
+                    for (elem_str, radius_input) in element_radius_dict {
+                        if let element = elem_str as? String {
+                            if let radius = radius_input as? NSNumber {
+                                self.dict_elem_radius[element] = CGFloat(radius.floatValue)
                             }
                         }
                     }
@@ -246,19 +272,25 @@ class MySceneView: SCNView {
         }
     }
     
-    func add_atom(thisatom: Atom, index: Int = -1) -> Void {
+    func add_atom(_ atom: Atom) {
+        // Get element
+        let elem = atom.element
+        let index = atom.index
+        // Determine the color and radius
+        let color = self.dict_elem_color[elem] ?? NSColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0)
+        let radius = self.dict_elem_radius[elem] ?? 0.6
         // draw a sphere
-        let sphereGeometry = SCNSphere(radius: thisatom.radius)
+        let sphereGeometry = SCNSphere(radius: radius)
         sphereGeometry.isGeodesic = true
         sphereGeometry.segmentCount = self.renderSegmentCount
-        let color = NSColor(red: thisatom.color[0], green: thisatom.color[1], blue: thisatom.color[2], alpha: 1)
         sphereGeometry.firstMaterial?.multiply.contents = color
         let sphereNode = SCNNode(geometry: sphereGeometry)
         self.apply_texture(sphereNode, self.current_texture)
-        sphereNode.name = thisatom.name
-        sphereNode.position = thisatom.pos
+        sphereNode.name = atom.element
+        sphereNode.position = atom.pos
         sphereNode.setValue(index, forUndefinedKey: "atom_index")
-        sphereNode.setValue(thisatom.trajectory, forUndefinedKey: "trajectory")
+        sphereNode.setValue(atom.name, forUndefinedKey: "atom_name")
+        sphereNode.setValue(atom.trajectory, forUndefinedKey: "trajectory")
         self.normalatomnode.addChildNode(sphereNode)
         // note: SCNGeometry.SCNLevelOfDetail may be able to improve render performance
     }
@@ -629,16 +661,20 @@ class MySceneView: SCNView {
         if self.selectedatomnode.childNodes.count == 1 && self.selectedbondnode.childNodes.count == 0 {
             let node = self.selectedatomnode.childNodes[0]
             let index = node.value(forUndefinedKey: "atom_index") as! Int
+            let elem = node.name!
+            let name = node.value(forUndefinedKey: "atom_name") as! String
             let indexStr = index >= 0 ? String(index) : ""
-            info_str = String(format: "Atom %@: %@ %@", indexStr, node.name!, node.position.stringValue)
+            info_str = String(format: "Atom %@ %@: %@ %@", indexStr, name, elem, node.position.stringValue)
         }
         // print bond length (only one)
         else if self.selectedbondnode.childNodes.count == 1 && self.selectedatomnode.childNodes.count == 0 {
-            let bond_a = self.selectedbondnode.childNodes[0]
-            let a_start = (bond_a.value(forUndefinedKey: "atom_a") as! SCNNode).position
-            let a_end = (bond_a.value(forUndefinedKey: "atom_b") as! SCNNode).position
+            let bond_node = self.selectedbondnode.childNodes[0]
+            let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
+            let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
+            let a_start = atom_a.position
+            let a_end = atom_b.position
             let length = a_start.distance(a_end)
-            info_str = String(format: "R = %.5f Å", length)
+            info_str = String(format: "Bond %@-%@: R = %.5f Å", atom_a.name!, atom_b.name!, length)
         }
         // print bond angles (if two connected bonds are selected)
         else if self.selectedbondnode.childNodes.count == 2 {
@@ -732,6 +768,14 @@ class MySceneView: SCNView {
             else {
                 info_str = "Right click to deselect all"
             }
+        // print distance between to atoms even if not bonded
+        } else if self.selectedbondnode.childNodes.count == 0 && self.selectedatomnode.childNodes.count == 2 {
+            let atom_a = self.selectedatomnode.childNodes[0]
+            let atom_b = self.selectedatomnode.childNodes[1]
+            let a_start = atom_a.position
+            let a_end = atom_b.position
+            let length = a_start.distance(a_end)
+            info_str = String(format: "Distance %@-%@: R = %.5f Å", atom_a.name!, atom_b.name!, length)
         }
         else if self.selectedatomnode.childNodes.count + self.selectedbondnode.childNodes.count > 1 {
             info_str = "Right click to deselect all"
@@ -1056,7 +1100,7 @@ class MySceneView: SCNView {
         }
         // default max bond length if not found
         var result : CGFloat = 2.0
-        if let elem_a_idx = ElementsIdxDict[elem_a.lowercased()], let elem_b_idx = ElementsIdxDict[elem_b.lowercased()] {
+        if let elem_a_idx = ElementsIdxDict[elem_a], let elem_b_idx = ElementsIdxDict[elem_b] {
             if let value = self.dict_element_max_distance[Bond(elem_a_idx, elem_b_idx)] {
                 result = value
             }
@@ -1099,8 +1143,8 @@ class MySceneView: SCNView {
                         if input.atomlist.count > 0 {
                             self.init_scene()
                             self.renderSegmentCount = max(20, Int(50-input.atomlist.count/30))
-                            for (idx, eachatom) in input.atomlist.enumerated() {
-                                self.add_atom(thisatom: eachatom, index: idx)
+                            for atom in input.atomlist {
+                                self.add_atom(atom)
                             }
                             // set the trajectory length
                             self.update_traj_length(length: input.traj_length)
