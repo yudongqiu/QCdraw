@@ -44,6 +44,8 @@ class Molecule {
             self.read_pdb(path: path)
         } else if file_format == "gro" {
             self.read_gro(path: path)
+        } else if file_format == "mol2" {
+            self.read_mol2(path: path)
         } else if file_format == "psi4" {
             self.read_psi4(path: path)
         } else if file_format == "molpro" {
@@ -64,6 +66,8 @@ class Molecule {
             res = "pdb"
         } else if ext == "gro" {
             res = "gro"
+        } else if ext == "mol2" {
+            res = "mol2"
         } else {
             if let aStreamReader = StreamReader(path: path) {
                 defer {
@@ -101,7 +105,7 @@ class Molecule {
     
     func read_text(text: String, unit: String? = "angstrom") {
         self.atomlist = []
-        let text_lines = text.mysplit(delimiter: "\n")
+        let text_lines = text.mysplit("\n")
         // convertion factor based on unit
         let conv = (unit == "bohr") ? bohr_to_angstrom : 1.0
         var index = 0
@@ -586,6 +590,7 @@ class Molecule {
     */
     
     func read_gro(path: String) {
+        self.atomlist = []
         if let aStreamReader = StreamReader(path: path) {
             defer {
                 aStreamReader.close()
@@ -614,17 +619,13 @@ class Molecule {
                                     if let atom_index = line.slice(15, 20).strip().integerValue {
                                         let inline = line.slice(20, line.count).mysplit()
                                         if inline.count >= 3 {
-                                            if let posx = inline[0].strip().doubleValue {
-                                                if let posy = inline[1].strip().doubleValue {
-                                                    if let posz = inline[2].strip().doubleValue {
-                                                        // convert nm to angstrom
-                                                        let geo = [posx * 10, posy * 10, posz * 10]
-                                                        block_elem.append(element)
-                                                        block_geo.append(geo)
-                                                        block_index.append(atom_index)
-                                                        block_name.append(atom_name)
-                                                    }
-                                                }
+                                            if let posx = inline[0].doubleValue, let posy = inline[1].doubleValue, let posz = inline[2].doubleValue {
+                                                // convert nm to angstrom
+                                                let geo = [posx * 10, posy * 10, posz * 10]
+                                                block_elem.append(element)
+                                                block_geo.append(geo)
+                                                block_index.append(atom_index)
+                                                block_name.append(atom_name)                                                
                                             }
                                         }
                                     }
@@ -671,6 +672,75 @@ class Molecule {
                 }
             }
             // end of reading file
+        }
+    }
+    
+    func read_mol2(path: String) {
+        self.atomlist = []
+        if let aStreamReader = StreamReader(path: path) {
+            defer {
+                aStreamReader.close()
+            }
+            var reading_atoms = false
+            var reading_bonds = false
+            var finished_atoms = false
+            var finished_bonds = false
+            for line in aStreamReader {
+                let line = line.strip()
+                if line.starts(with: "@<TRIPOS>") {
+                    if reading_atoms {
+                        finished_atoms = true
+                    }
+                    if reading_bonds {
+                        finished_bonds = true
+                    }
+                    if finished_atoms && finished_bonds {
+                        // we only read one frame
+                        break
+                    }
+                    if line == "@<TRIPOS>ATOM" {
+                        reading_atoms = true
+                        reading_bonds = false
+                    } else if line == "@<TRIPOS>BOND" {
+                        reading_atoms = false
+                        reading_bonds = true
+                        self.bonds = []
+                    } else {
+                        reading_atoms = false
+                        reading_bonds = false
+                    }
+                } else {
+                    if reading_atoms {
+                        let inline = line.mysplit()
+                        if inline.count >= 6 {
+                            var elem = ""
+                            let atom_type_split = inline[5].mysplit(".")
+                            if atom_type_split.count > 0 {
+                                elem = self.guess_element_from_name(atom_type_split[0])
+                            }
+                            let atom_name = inline[1]
+                            if let atom_index = inline[0].integerValue {
+                                if let posx = inline[2].doubleValue, let posy = inline[3].doubleValue, let posz = inline[4].doubleValue {
+                                    self.add_new_atom(element: elem, posx: posx, posy: posy, posz: posz, index: atom_index, name: atom_name)
+                                }
+                            }
+                        }
+                    } else if reading_bonds {
+                        let inline = line.mysplit()
+                        if inline.count >= 3 {
+                            if let idx_from = inline[1].integerValue, let idx_to = inline[2].integerValue {
+                                // note: the index used in bonds are not the same as "atom_index" read from the file
+                                // Here we assume the bond records use atom index starting from 1,
+                                // and the mol2 file have atom index in ascending order 1 -- noa
+                                if idx_to >= idx_from {
+                                    self.bonds?.append(Bond(idx_from-1, idx_to-1))
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
         }
     }
     
