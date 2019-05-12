@@ -46,6 +46,8 @@ class Molecule {
             self.read_gro(path: path)
         } else if file_format == "mol2" {
             self.read_mol2(path: path)
+        } else if file_format == "sdf" {
+            self.read_sdf(path: path)
         } else if file_format == "psi4" {
             self.read_psi4(path: path)
         } else if file_format == "molpro" {
@@ -68,6 +70,8 @@ class Molecule {
             res = "gro"
         } else if ext == "mol2" {
             res = "mol2"
+        } else if ext == "sdf" {
+            res = "sdf"
         } else {
             if let aStreamReader = StreamReader(path: path) {
                 defer {
@@ -625,7 +629,7 @@ class Molecule {
                                                 block_elem.append(element)
                                                 block_geo.append(geo)
                                                 block_index.append(atom_index)
-                                                block_name.append(atom_name)                                                
+                                                block_name.append(atom_name)
                                             }
                                         }
                                     }
@@ -738,6 +742,56 @@ class Molecule {
                             }
                         }
                     }
+                }
+                
+            }
+        }
+    }
+    
+    func read_sdf(path: String) {
+        self.atomlist = []
+        if let aStreamReader = StreamReader(path: path) {
+            defer {
+                aStreamReader.close()
+            }
+            while true {
+                if var line = aStreamReader.nextLine() {
+                    line = line.strip()
+                    let inline = line.mysplit()
+                    if inline.count >= 10 && inline[inline.count-1] == "V2000" {
+                        if let noa = inline[0].integerValue, let n_bonds = inline[1].integerValue {
+                            // read atoms
+                            for i in 0 ..< noa {
+                                if let atom_line = aStreamReader.nextLine() {
+                                    let ls = atom_line.mysplit()
+                                    if ls.count >= 4 {
+                                        let elem = ls[3]
+                                        if let x = ls[0].doubleValue, let y = ls[1].doubleValue, let z = ls[2].doubleValue {
+                                            self.add_new_atom(element: elem, posx: x, posy: y, posz: z, index: i)
+                                        }
+                                    }
+                                }
+                            }
+                            // read bonds
+                            self.bonds = []
+                            for _ in 0 ..< n_bonds {
+                                if let bond_line = aStreamReader.nextLine() {
+                                    let ls = bond_line.mysplit()
+                                    if ls.count >= 2 {
+                                        if let idx_from = ls[0].integerValue, let idx_to = ls[1].integerValue {
+                                            if idx_to >= idx_from {
+                                                self.bonds?.append(Bond(idx_from-1, idx_to-1))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // we only read one molecule
+                        break
+                    }
+                } else {
+                    break
                 }
                 
             }
