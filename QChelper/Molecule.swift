@@ -97,12 +97,12 @@ class Molecule {
     
     func read_text(text: String, unit: String? = "angstrom") {
         self.atomlist = []
-        let text_lines = text.split(delimiter: "\n")
+        let text_lines = text.mysplit(delimiter: "\n")
         // convertion factor based on unit
         let conv = (unit == "bohr") ? bohr_to_angstrom : 1.0
         var index = 0
         for line in text_lines {
-            let inline = line.split()
+            let inline = line.mysplit()
             // if the line satisfy all conditions, continue
             if inline.count == 4 {
                 if let posx = inline[1].doubleValue {
@@ -168,7 +168,7 @@ class Molecule {
             while true {
                 if var line = aStreamReader.nextLine() {
                     line = line.strip()
-                    let ls = line.split()
+                    let ls = line.mysplit()
                     if ls.count == 1 {
                         if let noa = ls[0].integerValue {
                             // start a new geo block
@@ -177,7 +177,7 @@ class Molecule {
                             aStreamReader.skiplines(lineNumber: 1)
                             for _ in 0 ..< noa {
                                 if let geoline = aStreamReader.nextLine() {
-                                    let inline = geoline.split()
+                                    let inline = geoline.mysplit()
                                     if inline.count >= 4 {
                                         if let posx = inline[1].doubleValue {
                                             if let posy = inline[2].doubleValue {
@@ -257,7 +257,7 @@ class Molecule {
             var geofound = false // Did we find the geometry?
             var index : Int = 0
             for line in aStreamReader {
-                let inline = line.split()
+                let inline = line.mysplit()
                 // if the line satisfy all conditions, continue
                 if inline.count == 4 {
                     if let posx = inline[1].doubleValue {
@@ -303,7 +303,7 @@ class Molecule {
                 var geofound = false // Did we find the geometry?
                 var index : Int = 0
                 for line in aStreamReader {
-                    let inline = line.split()
+                    let inline = line.mysplit()
                     // if the line satisfy all conditions, continue
                     if inline.count == 6 {
                         if let posx = inline[3].doubleValue {
@@ -331,7 +331,7 @@ class Molecule {
                 var geofound = false // Did we find the geometry?
                 var index: Int = 0
                 for line in aStreamReader {
-                    let inline = line.split()
+                    let inline = line.mysplit()
                     // if the line satisfy all conditions, continue
                     if inline.count == 4 {
                         if let posx = inline[1].doubleValue {
@@ -372,7 +372,7 @@ class Molecule {
             aStreamReader.skiplines(lineNumber: geoline+3)
             var index = 0
             for line in aStreamReader {
-                let inline = line.split()
+                let inline = line.mysplit()
                 if inline[0] == "X" { // check if it's a dummy atom
                     continue
                 }

@@ -76,15 +76,16 @@ extension SCNVector3
 let digitSet = CharacterSet.decimalDigits
 let letterSet = CharacterSet.letters
 extension String {
-    func split(delimiter: String = " ") -> [String] {
-        let line_split_raw = self.components(separatedBy: delimiter)
-        var line_split : [String] = []
-        for item in line_split_raw {
-            if item != "" && item != "\t" && item != " " {
-                line_split.append(item)
-            }
-        }
-        return(line_split)
+    func mysplit(delimiter: String.Element = " ") -> [String] {
+        // method 1: 1.31s for 150k lines
+//        let line_split_raw = self.components(separatedBy: String(delimiter))
+//        return line_split_raw.filter({$0 != "" && $0 != "\t" && $0 != " "})
+        // method 2: 591 ms
+        let line_split_raw = self.split(separator: delimiter)
+        return line_split_raw.map({String($0)}).filter({$0 != "" && $0 != "\t" && $0 != " "})
+        // method 3: 813 ms
+//        let line_split_raw = self.split(separator: delimiter)
+//        return line_split_raw.map({String($0)}).filter({!" \t".contains($0)})
     }
     // Update, below are new features of Swift 4.2, faster than NumberFormatter
     // However, the sting should be striped before calling them, i.e. Double(" 123") = nil
