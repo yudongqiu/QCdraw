@@ -77,20 +77,21 @@ let digitSet = CharacterSet.decimalDigits
 let letterSet = CharacterSet.letters
 extension String {
     func mysplit(delimiter: String.Element? = nil) -> [String] {
-        // method 1: 1.31s for 150k lines
-//        let line_split_raw = self.components(separatedBy: String(delimiter))
-//        return line_split_raw.filter({$0 != "" && $0 != "\t" && $0 != " "})
-        // method 2: 591 ms
         if let sep = delimiter {
             let line_split_raw = self.split(separator: sep)
             return line_split_raw.map({String($0)})
         } else {
-            let line_split_raw = self.split(separator: " ")
-            return line_split_raw.map({String($0)}).filter({$0 != "\t" && $0 != "\n"})
+            var new = self
+            // use the if statement here make the common case faster
+            if new.contains("\t") {
+                new = new.replacingOccurrences(of: "\t", with: " ")
+            }
+            if new.contains("\n") {
+                new = new.replacingOccurrences(of: "\n", with: " ")
+            }
+            let line_split_raw = new.split(separator: " ")
+            return line_split_raw.map({String($0)})
         }
-        // method 3: 813 ms
-//        let line_split_raw = self.split(separator: delimiter)
-//        return line_split_raw.map({String($0)}).filter({!" \t".contains($0)})
     }
     // Update, below are new features of Swift 4.2, faster than NumberFormatter
     // However, the sting should be striped before calling them, i.e. Double(" 123") = nil
