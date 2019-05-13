@@ -42,6 +42,12 @@
                                                 <action selector="unhideAllApplications:" target="Ady-hI-5gd" id="Dhg-Le-xox"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Check Updates..." id="Kjy-5y-KdB">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="menu_check_updates:" target="Voe-Tx-rLC" id="laR-HG-ANY"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
                                         <menuItem title="Quit QCdraw" keyEquivalent="q" id="4sb-4s-VLi">
                                             <connections>

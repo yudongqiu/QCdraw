@@ -151,4 +151,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    @IBAction func menu_check_updates(_ sender: Any) {
+        let url = URL(string: "https://github.com/yudongqiu/QCdraw/releases")!
+        NSWorkspace.shared.open(url)
+    }
 }
