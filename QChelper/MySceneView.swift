@@ -814,7 +814,10 @@ class MySceneView: SCNView {
         if event.deviceID > 0 {
             super.scrollWheel(with: event)
         } else if let pov = self.pointOfView {
-            pov.position += pov.convertVector(SCNVector3(0, 0, 0.5 * event.deltaY), to: nil)
+            let rel_pos = pov.convertPosition(self.mol_center_pos, from: nil)
+            self.camera_distance = abs(rel_pos.z)
+            let speed = max(0.2, self.camera_distance * 0.05)
+            pov.position += pov.convertVector(SCNVector3(0, 0, speed * event.deltaY), to: nil)
         }
     }
     
@@ -826,7 +829,7 @@ class MySceneView: SCNView {
             self.p_pov = pov.position
             // compute the distance of camera (for adjusting shift speed)
             let rel_pos = pov.convertPosition(self.mol_center_pos, from: nil)
-            self.camera_distance = max(2.0, abs(rel_pos.z))
+            self.camera_distance = abs(rel_pos.z)
         }
         super.rightMouseDown(with: theEvent)
     }
@@ -838,7 +841,7 @@ class MySceneView: SCNView {
         let dx = point.x - click_location.x
         let dy = point.y - click_location.y
         if let pov = self.pointOfView {
-            let move_speed = 0.001 * self.camera_distance
+            let move_speed = 0.001 * max(2.0, self.camera_distance)
             let shift = pov.convertVector(SCNVector3(dx * move_speed, dy * move_speed, 0), to: nil)
             pov.position = self.p_pov - shift
         }
