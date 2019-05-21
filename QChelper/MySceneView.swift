@@ -1187,6 +1187,7 @@ class MySceneView: SCNView {
             self.update_traj_length(length: molecule.traj_length)
             self.auto_add_bond(bonds: molecule.bonds)
             self.adjust_focus()
+            self.view_controller.info_bar.stringValue = "Loaded from text"
         } else {
             self.view_controller.info_bar.stringValue = "Text not recognized"
         }
