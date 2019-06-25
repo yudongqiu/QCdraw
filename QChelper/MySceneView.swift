@@ -1229,13 +1229,14 @@ class MySceneView: SCNView {
     }
     
     func change_texture(texture: Texture) {
-        if self.current_texture.name != texture.name {
+        var all_nodes = self.selectedatomnode.childNodes + self.selectedbondnode.childNodes
+        if all_nodes.count == 0 {
+            all_nodes = self.normalatomnode.childNodes + self.normalbondnode.childNodes
+            // store the texture if all nodes use that
             self.current_texture = texture
-            let all_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes +
-                self.normalbondnode.childNodes + self.selectedbondnode.childNodes
-            for node in all_nodes {
-                self.apply_texture(node, texture)
-            }
+        }
+        for node in all_nodes {
+            self.apply_texture(node, texture)
         }
     }
     

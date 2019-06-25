@@ -111,37 +111,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBOutlet weak var menu_texture_default: NSMenuItem!
     @IBAction func change_texture_default(sender: AnyObject?) {
-        menu_texture_default.state = .on
-        menu_texture_metal.state = .off
-        menu_texture_mirror.state = .off
-        menu_texture_wood.state = .off
+//        menu_texture_default.state = .on
+//        menu_texture_metal.state = .off
+//        menu_texture_mirror.state = .off
+//        menu_texture_wood.state = .off
         self.change_texture(texture: defaultTexture)
     }
     
     @IBOutlet weak var menu_texture_metal: NSMenuItem!
     @IBAction func change_texture_metal(sender: AnyObject?) {
-        menu_texture_default.state = .off
-        menu_texture_metal.state = .on
-        menu_texture_mirror.state = .off
-        menu_texture_wood.state = .off
+//        menu_texture_default.state = .off
+//        menu_texture_metal.state = .on
+//        menu_texture_mirror.state = .off
+//        menu_texture_wood.state = .off
         self.change_texture(texture: metalTexture)
     }
     
     @IBOutlet weak var menu_texture_mirror: NSMenuItem!
     @IBAction func change_texture_mirror(sender: AnyObject?) {
-        menu_texture_default.state = .off
-        menu_texture_metal.state = .off
-        menu_texture_mirror.state = .on
-        menu_texture_wood.state = .off
+//        menu_texture_default.state = .off
+//        menu_texture_metal.state = .off
+//        menu_texture_mirror.state = .on
+//        menu_texture_wood.state = .off
         self.change_texture(texture: mirrorTexture)
     }
 
     @IBOutlet weak var menu_texture_wood: NSMenuItem!
     @IBAction func change_texture_wood(sender: AnyObject?) {
-        menu_texture_default.state = .off
-        menu_texture_metal.state = .off
-        menu_texture_mirror.state = .off
-        menu_texture_wood.state = .on
+//        menu_texture_default.state = .off
+//        menu_texture_metal.state = .off
+//        menu_texture_mirror.state = .off
+//        menu_texture_wood.state = .on
         self.change_texture(texture: woodTexture)
     }
     
