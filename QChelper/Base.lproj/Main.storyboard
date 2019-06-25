@@ -245,7 +245,7 @@ CA
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Change Texture" id="yIh-6V-vck">
                                                 <items>
-                                                    <menuItem title="Default" id="6mW-ce-tjq">
+                                                    <menuItem title="Default" state="mixed" id="6mW-ce-tjq">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="change_texture_defaultWithSender:" target="Voe-Tx-rLC" id="hck-xt-aPS"/>

@@ -1234,6 +1234,7 @@ class MySceneView: SCNView {
             all_nodes = self.normalatomnode.childNodes + self.normalbondnode.childNodes
             // store the texture if all nodes use that
             self.current_texture = texture
+            self.appdelegate.update_default_texture(texture: texture)
         }
         for node in all_nodes {
             self.apply_texture(node, texture)

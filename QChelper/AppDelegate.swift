@@ -145,6 +145,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.change_texture(texture: woodTexture)
     }
     
+    func update_default_texture(texture: Texture) {
+        menu_texture_default.state = .off
+        menu_texture_metal.state = .off
+        menu_texture_mirror.state = .off
+        menu_texture_wood.state = .off
+        if texture.name == defaultTexture.name {
+            menu_texture_wood.state = .mixed
+        } else if texture.name == metalTexture.name {
+            menu_texture_metal.state = .mixed
+        } else if texture.name == mirrorTexture.name {
+            menu_texture_mirror.state = .mixed
+        } else if texture.name == woodTexture.name {
+            menu_texture_wood.state = .mixed
+        }
+    }
+    
     func change_texture(texture: Texture) {
         if let window = NSApp.mainWindow, let viewController =  window.contentViewController as? ViewController {
             viewController.mySceneView.change_texture(texture: texture)
