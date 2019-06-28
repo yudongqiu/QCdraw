@@ -151,7 +151,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu_texture_mirror.state = .off
         menu_texture_wood.state = .off
         if texture.name == defaultTexture.name {
-            menu_texture_wood.state = .mixed
+            menu_texture_default.state = .mixed
         } else if texture.name == metalTexture.name {
             menu_texture_metal.state = .mixed
         } else if texture.name == mirrorTexture.name {
