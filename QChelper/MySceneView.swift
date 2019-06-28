@@ -875,6 +875,52 @@ class MySceneView: SCNView {
         }
     }
     
+    /** select all atoms and bonds that are bonded to the selected nodes */
+    func select_all_bonded() {
+        var new_atoms = self.selectedatomnode.childNodes
+        var new_bonds = self.selectedbondnode.childNodes
+        while new_atoms.count > 0 || new_bonds.count > 0 {
+            var next_new_atoms : [SCNNode] = []
+            var next_new_bonds : [SCNNode] = []
+            // select all bonds connected to these atoms
+            for atom_node in new_atoms {
+                for bond_node in self.normalbondnode.childNodes {
+                    let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
+                    let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
+                    if atom_a == atom_node || atom_b == atom_node {
+                        bond_node.removeFromParentNode()
+                        next_new_bonds.append(bond_node)
+                    }
+                }
+            }
+            // select all atoms connectes to new bonds
+            for bond_node in new_bonds {
+                let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
+                let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
+                if atom_a.parent == self.normalatomnode {
+                    atom_a.removeFromParentNode()
+                    next_new_atoms.append(atom_a)
+                }
+                if atom_b.parent == self.normalatomnode {
+                    atom_b.removeFromParentNode()
+                    next_new_atoms.append(atom_b)
+                }
+            }
+            for atom_node in next_new_atoms {
+                atom_node.removeFromParentNode()
+                self.addBlinkAnimation(node: atom_node)
+                self.selectedatomnode.addChildNode(atom_node)
+            }
+            for bond_node in next_new_bonds {
+                bond_node.removeFromParentNode()
+                self.addBlinkAnimation(node: bond_node)
+                self.selectedbondnode.addChildNode(bond_node)
+            }
+            new_atoms = next_new_atoms
+            new_bonds = next_new_bonds
+        }
+    }
+    
     func addBlinkAnimation(node: SCNNode) {
         let material = node.geometry!.firstMaterial!
         let animation = CABasicAnimation(keyPath: "intensity")

@@ -154,6 +154,12 @@ CA
                                                 <action selector="transparentizeWithSender:" target="Ady-hI-5gd" id="kH5-Yh-eo1"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Select Bonded" id="Anf-ft-BqC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="select_all_bonded:" target="Voe-Tx-rLC" id="lQP-3D-peE"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Select All" keyEquivalent="a" id="Ruw-6m-B2m">
                                             <connections>
                                                 <action selector="selectAll:" target="Ady-hI-5gd" id="EFL-hi-3OQ"/>

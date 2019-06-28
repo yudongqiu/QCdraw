@@ -167,6 +167,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    @IBAction func select_all_bonded(_ sender: Any) {
+        if let window = NSApp.mainWindow, let viewController =  window.contentViewController as? ViewController {
+            viewController.mySceneView.select_all_bonded()
+        }
+    }
+    
     @IBAction func menu_check_updates(_ sender: Any) {
         let url = URL(string: "https://github.com/yudongqiu/QCdraw/releases")!
         NSWorkspace.shared.open(url)
