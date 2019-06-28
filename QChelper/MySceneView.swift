@@ -877,47 +877,78 @@ class MySceneView: SCNView {
     
     /** select all atoms and bonds that are bonded to the selected nodes */
     func select_all_bonded() {
-        var new_atoms = self.selectedatomnode.childNodes
-        var new_bonds = self.selectedbondnode.childNodes
+        // counts
+        let n_normal_atoms = self.normalatomnode.childNodes.count
+        let n_selected_atoms = self.selectedatomnode.childNodes.count
+        let n_atoms = n_normal_atoms + n_selected_atoms
+        let n_normal_bonds = self.normalbondnode.childNodes.count
+        let n_selected_bonds = self.selectedbondnode.childNodes.count
+        let n_bonds = n_normal_bonds + n_selected_bonds
+        // return if no nodes are selected
+        if n_selected_atoms == 0 && n_selected_bonds == 0 {
+            return
+        }
+        // build an index map between atoms and bonds
+        let all_atom_nodes = self.normalatomnode.childNodes + self.selectedatomnode.childNodes
+        let all_bond_nodes = self.normalbondnode.childNodes + self.selectedbondnode.childNodes
+        var atoms_for_bond: [Bond] = []
+        var bonds_for_atom : [[Int]] = Array(repeating: [], count: n_atoms)
+        for (i_bond, bond_node) in all_bond_nodes.enumerated() {
+            let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
+            let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
+            if let idx_a = all_atom_nodes.firstIndex(of: atom_a), let idx_b = all_atom_nodes.firstIndex(of: atom_b) {
+                atoms_for_bond.append(Bond(idx_a, idx_b))
+                bonds_for_atom[idx_a].append(i_bond)
+                bonds_for_atom[idx_b].append(i_bond)
+            }
+        }
+        // list of selected atoms and selected bonds
+        var selected_atom_idxs: Set<Int> = Set(n_normal_atoms ..< n_atoms)
+        var selected_bond_idxs: Set<Int> = Set(n_normal_bonds ..< n_bonds)
+        // keep track of newly selected atoms and bonds
+        var new_atoms = selected_atom_idxs
+        var new_bonds = selected_bond_idxs
         while new_atoms.count > 0 || new_bonds.count > 0 {
-            var next_new_atoms : [SCNNode] = []
-            var next_new_bonds : [SCNNode] = []
-            // select all bonds connected to these atoms
-            for atom_node in new_atoms {
-                for bond_node in self.normalbondnode.childNodes {
-                    let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
-                    let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
-                    if atom_a == atom_node || atom_b == atom_node {
-                        bond_node.removeFromParentNode()
-                        next_new_bonds.append(bond_node)
+            var next_new_atoms = Set<Int>()
+            var next_new_bonds = Set<Int>()
+            // select all bonds connected to new atoms
+            for atom_idx in new_atoms {
+                for bond_idx in bonds_for_atom[atom_idx] {
+                    if !selected_bond_idxs.contains(bond_idx) {
+                        next_new_bonds.insert(bond_idx)
                     }
                 }
             }
             // select all atoms connectes to new bonds
-            for bond_node in new_bonds {
-                let atom_a = bond_node.value(forUndefinedKey: "atom_a") as! SCNNode
-                let atom_b = bond_node.value(forUndefinedKey: "atom_b") as! SCNNode
-                if atom_a.parent == self.normalatomnode {
-                    atom_a.removeFromParentNode()
-                    next_new_atoms.append(atom_a)
+            for bond_idx in new_bonds {
+                let bond = atoms_for_bond[bond_idx]
+                if !selected_atom_idxs.contains(bond.first) {
+                    next_new_atoms.insert(bond.first)
                 }
-                if atom_b.parent == self.normalatomnode {
-                    atom_b.removeFromParentNode()
-                    next_new_atoms.append(atom_b)
+                if !selected_atom_idxs.contains(bond.second) {
+                    next_new_atoms.insert(bond.second)
                 }
-            }
-            for atom_node in next_new_atoms {
-                atom_node.removeFromParentNode()
-                self.addBlinkAnimation(node: atom_node)
-                self.selectedatomnode.addChildNode(atom_node)
-            }
-            for bond_node in next_new_bonds {
-                bond_node.removeFromParentNode()
-                self.addBlinkAnimation(node: bond_node)
-                self.selectedbondnode.addChildNode(bond_node)
             }
             new_atoms = next_new_atoms
             new_bonds = next_new_bonds
+            // add the new selected
+            selected_atom_idxs.formUnion(next_new_atoms)
+            selected_bond_idxs.formUnion(next_new_bonds)
+        }
+        // remove current selected
+        self.reset_selection()
+        // select new atoms and bonds
+        for atom_idx in selected_atom_idxs {
+            let atom_node = all_atom_nodes[atom_idx]
+            atom_node.removeFromParentNode()
+            self.addBlinkAnimation(node: atom_node)
+            self.selectedatomnode.addChildNode(atom_node)
+        }
+        for bond_idx in selected_bond_idxs {
+            let bond_node = all_bond_nodes[bond_idx]
+            bond_node.removeFromParentNode()
+            self.addBlinkAnimation(node: bond_node)
+            self.selectedbondnode.addChildNode(bond_node)
         }
     }
     
