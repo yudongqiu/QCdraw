@@ -736,9 +736,7 @@ class Molecule {
                                 // note: the index used in bonds are not the same as "atom_index" read from the file
                                 // Here we assume the bond records use atom index starting from 1,
                                 // and the mol2 file have atom index in ascending order 1 -- noa
-                                if idx_to >= idx_from {
-                                    self.bonds?.append(Bond(idx_from-1, idx_to-1))
-                                }
+                                self.bonds?.append(Bond(idx_from-1, idx_to-1))
                             }
                         }
                     }
