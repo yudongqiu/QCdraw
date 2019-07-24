@@ -762,7 +762,9 @@ class MySceneView: SCNView {
                 let c_vector : float3 = float3(point3 - point4)
                 let Uab = cross(a_vector, b_vector)
                 let Ubc = cross(b_vector, c_vector)
-                let gamma = acos(dot(Uab,Ubc)/(length(Uab)*length(Ubc))) / .pi * 180.0
+                //let gamma = acos(dot(Uab,Ubc)/(length(Uab)*length(Ubc))) / .pi * 180.0
+                // better formula from https://en.wikipedia.org/wiki/Dihedral_angle
+                let gamma = atan2(dot(cross(Uab, Ubc), b_vector) / length(b_vector), dot(Uab, Ubc)) / .pi * 180.0
                 info_str = String(format: "Γ = %.4f°", gamma)
             } // end of print dihedral
             else {
@@ -900,6 +902,16 @@ class MySceneView: SCNView {
                 atoms_for_bond.append(Bond(idx_a, idx_b))
                 bonds_for_atom[idx_a].append(i_bond)
                 bonds_for_atom[idx_b].append(i_bond)
+            // dangling bonds may only have one atom connected
+            } else if let idx_a = all_atom_nodes.firstIndex(of: atom_a) {
+                atoms_for_bond.append(Bond(idx_a, -1))
+                bonds_for_atom[idx_a].append(i_bond)
+            } else if let idx_b = all_atom_nodes.firstIndex(of: atom_b) {
+                atoms_for_bond.append(Bond(idx_b, -1))
+                bonds_for_atom[idx_b].append(i_bond)
+            } else {
+                // add a fake atom index of no atoms are bonded
+                atoms_for_bond.append(Bond(-1, -1))
             }
         }
         // list of selected atoms and selected bonds
@@ -922,10 +934,10 @@ class MySceneView: SCNView {
             // select all atoms connectes to new bonds
             for bond_idx in new_bonds {
                 let bond = atoms_for_bond[bond_idx]
-                if !selected_atom_idxs.contains(bond.first) {
+                if bond.first >= 0 && !selected_atom_idxs.contains(bond.first) {
                     next_new_atoms.insert(bond.first)
                 }
-                if !selected_atom_idxs.contains(bond.second) {
+                if bond.second >= 0 && !selected_atom_idxs.contains(bond.second) {
                     next_new_atoms.insert(bond.second)
                 }
             }
