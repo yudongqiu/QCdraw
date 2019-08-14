@@ -420,6 +420,7 @@ class MySceneView: SCNView {
                             "name": bsdf_name,
                             "albedo": [r, g, b],
                             "type": "rough_conductor",
+                            "material": "Al",
                         ]
                     } else if texture_name == "Mirror" {
                         bsdf = [
@@ -501,6 +502,7 @@ class MySceneView: SCNView {
                                 "name": bsdf_name,
                                 "albedo": [r, g, b],
                                 "type": "rough_conductor",
+                                "material": "Al",
                             ]
                         } else if texture_name == "Mirror" {
                             bsdf = [
