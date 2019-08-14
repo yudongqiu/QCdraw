@@ -399,44 +399,77 @@ class MySceneView: SCNView {
         var lowest_z : CGFloat = CGFloat.greatestFiniteMagnitude
         if let pov = self.pointOfView {
             for eachatom in self.normalatomnode.childNodes + self.selectedatomnode.childNodes {
-                var name = eachatom.name!
-                if eachatom.opacity < 1.0 {
-                    name += "_trans"
-                }
-                let p = eachatom.position
+                let name = eachatom.name!
+                let p = pov.convertPosition(eachatom.position, from: nil)
                 let radius = (eachatom.geometry as! SCNSphere).radius
-                let primitive : NSDictionary = ["name": name, "transform": ["position": [p.x, p.y, p.z], "scale": radius], "type": "sphere", "bsdf": name]
-                primitives.append(primitive)
-                // Store the atom's color in bsdfs
-                if !known_bsdfs.contains(name){
-                    known_bsdfs.insert(name)
-                    let color = eachatom.geometry!.firstMaterial?.multiply.contents as! NSColor
-                    let r = (1.0 - color.redComponent)
-                    let g = (1.0 - color.greenComponent)
-                    let b = (1.0 - color.blueComponent)
-                    if eachatom.opacity < 1.0 {
-                        let bsdf : NSDictionary = ["name": name,
-                                                   "albedo": 1.0,
-                                                   "type": "thinsheet",
-                                                   "ior": 1.3,
-                                                   "thickness": 1.0,
-                                                   "sigma_a": [r*0.5, g*0.5, b*0.5]]
-                        bsdfs.append(bsdf)
-                    }
-                    else {
-                        let bsdf : NSDictionary = ["name": name,
-                                                   "albedo": 1.0,
-                                                   "type": "plastic",
-                                                   "ior": 1.3,
-                                                   "thickness": 1.0,
-                                                   "sigma_a": [r, g, b]]
-                        bsdfs.append(bsdf)
-                    }
+                var texture_name = "Default"
+                if let node_texture_name = eachatom.geometry!.firstMaterial?.value(forUndefinedKey: "texture_name") as? String {
+                    texture_name = node_texture_name
                 }
+                var bsdf_name = name + "-" + texture_name
+                // Store the atom's color in bsdfs
+                if !known_bsdfs.contains(bsdf_name){
+                    known_bsdfs.insert(bsdf_name)
+                    let color = eachatom.geometry!.firstMaterial?.multiply.contents as! NSColor
+                    let r = color.redComponent
+                    let g = color.greenComponent
+                    let b = color.blueComponent
+                    var bsdf = NSDictionary()
+                    if texture_name == "Metal" {
+                        bsdf = [
+                            "name": bsdf_name,
+                            "albedo": [r, g, b],
+                            "type": "rough_conductor",
+                        ]
+                    } else if texture_name == "Mirror" {
+                        bsdf = [
+                            "name": bsdf_name,
+                            "albedo": [r, g, b],
+                            "type": "mirror",
+                        ]
+                    } else {
+                        // default texture
+                        bsdf = [
+                            "name": bsdf_name,
+                            "albedo": 1.0,
+                            "type": "plastic",
+                            "ior": 1.3,
+                            "thickness": 1.0,
+                            "sigma_a": [1-r, 1-g, 1-b],
+                        ]
+                    }
+                    bsdfs.append(bsdf)
+                }
+                // create new bsdf for transparent atoms
+                if eachatom.opacity < 1.0 {
+                    let new_bsdf_name = bsdf_name + "_trans"
+                    if !known_bsdfs.contains(new_bsdf_name) {
+                        known_bsdfs.insert(new_bsdf_name)
+                        let bsdf_trans : NSDictionary = [
+                            "name": new_bsdf_name,
+                            "albedo": 1.0,
+                            "type": "transparency",
+                            "base": bsdf_name,
+                            "alpha": 0.5
+                        ]
+                        bsdfs.append(bsdf_trans)
+                    }
+                    // replace the bsdf_name so it's used later in primitives
+                    bsdf_name = new_bsdf_name
+                }
+                let primitive : NSDictionary = [
+                    "name": name,
+                    "transform": [
+                        "position": [p.x, p.y, p.z],
+                        "scale": radius
+                    ],
+                    "type": "sphere",
+                    "bsdf": bsdf_name
+                ]
+                primitives.append(primitive)
                 // record the lowest y
-                let p_pov = pov.convertPosition(eachatom.position, from: nil)
-                lowest_y = min(lowest_y, p_pov.y)
-                lowest_z = min(lowest_z, p_pov.z)
+                lowest_y = min(lowest_y, p.y)
+                lowest_z = min(lowest_z, p.z)
             }
             // add the bonds
             if self.moleculeNode.childNodes.contains(self.bondnodes) {
@@ -445,43 +478,90 @@ class MySceneView: SCNView {
                     let v2 = eachbond.boundingBox.max
                     let radius = abs(v2.x-v1.x)
                     let length = abs(v2.y-v1.y)
-                    let p = eachbond.position
-                    let rotation = convert_tungsten_rotation(rotation: eachbond.eulerAngles)
-                    var name = "bond"
-                    if eachbond.opacity < 1.0 {
-                        name += "_trans"
+                    let p = pov.convertPosition(eachbond.position, from: nil)
+                    let name = "bond"
+                    let bond_up = pov.convertVector(SCNVector3(0, 1, 0), from: eachbond)
+                    // old way of defining rotation
+                    // let rotation = convert_tungsten_rotation(rotation: eachbond.eulerAngles)
+                    // add bsdf (texture)
+                    var texture_name = "Default"
+                    if let node_texture_name = eachbond.geometry!.firstMaterial?.value(forUndefinedKey: "texture_name") as? String {
+                        texture_name = node_texture_name
                     }
-                    let prim_bond : NSDictionary = ["name": name,
-                                                    "transform": ["position": [p.x, p.y, p.z],
-                                                                  "scale": [radius, length, radius],
-                                                                  "rotation": rotation
+                    var bsdf_name = name + "-" + texture_name
+                    if !known_bsdfs.contains(bsdf_name){
+                        known_bsdfs.insert(bsdf_name)
+                        let color = eachbond.geometry!.firstMaterial?.multiply.contents as! NSColor
+                        let r = color.redComponent
+                        let g = color.greenComponent
+                        let b = color.blueComponent
+                        var bsdf = NSDictionary()
+                        if texture_name == "Metal" {
+                            bsdf = [
+                                "name": bsdf_name,
+                                "albedo": [r, g, b],
+                                "type": "rough_conductor",
+                            ]
+                        } else if texture_name == "Mirror" {
+                            bsdf = [
+                                "name": bsdf_name,
+                                "albedo": [r, g, b],
+                                "type": "mirror",
+                            ]
+                        } else {
+                            // default bond texture
+                            bsdf = [
+                                "name": bsdf_name,
+                                "albedo": 1.0,
+                                "type": "rough_plastic",
+                                "ior": 1.3,
+                                "thickness": 1.0,
+                                "sigma_a": 0.7,
+                                "roughness": 0.1
+                            ]
+                        }
+                        bsdfs.append(bsdf)
+                    }
+                    // create new bsdf for transparent atoms
+                    if eachbond.opacity < 1.0 {
+                        let new_bsdf_name = bsdf_name + "_trans"
+                        if !known_bsdfs.contains(new_bsdf_name) {
+                            known_bsdfs.insert(new_bsdf_name)
+                            let bsdf_trans : NSDictionary = [
+                                "name": new_bsdf_name,
+                                "albedo": 1.0,
+                                "type": "transparency",
+                                "base": bsdf_name,
+                                "alpha": 0.5
+                            ]
+                            bsdfs.append(bsdf_trans)
+                        }
+                        // replace the bsdf_name so it's used later in primitives
+                        bsdf_name = new_bsdf_name
+                    }
+                    // add primitive for bond
+                    let prim_bond : NSDictionary = [
+                        "name": name,
+                        "transform": [
+                            "position": [p.x, p.y, p.z],
+                            "scale": [radius, length, radius],
+                            "up": [bond_up.x, bond_up.y, bond_up.z],
                         ],
-                                                    "type": "cylinder",
-                                                    "bsdf": name]
+                        "type": "cylinder",
+                        "bsdf": bsdf_name
+                    ]
                     primitives.append(prim_bond)
                 }
-                let bond_bsdf : NSDictionary = ["name": "bond",
-                                                "albedo": 1.0,
-                                                "type": "rough_plastic",
-                                                "ior": 1.3,
-                                                "sigma_a" : 0.6,
-                                                "roughness": 0.1]
-                let bond_trans_bsdf : NSDictionary = ["name": "bond_trans",
-                                                      "albedo": 1.0,
-                                                      "type": "thinsheet",
-                                                      "ior": 1.3,
-                                                      "sigma_a" : 0.4
-                ]
-                bsdfs.append(bond_bsdf)
-                bsdfs.append(bond_trans_bsdf)
             }
             
             // Set the camera
-            let p = pov.position
-            let p1 = pov.convertPosition(SCNVector3(0,0,-11), to: nil)
-            let p_up = pov.convertPosition(SCNVector3(0,1,0), to: nil) - p
+            let p = SCNVector3(0,0,0)
+            let p1 = SCNVector3(0,0,-11)
+            let p_up = SCNVector3(0,1,0)
+            let res_w = self.appdelegate.menu_high_reso.state == .on ? self.bounds.width * 2 : self.bounds.width
+            let res_h = self.appdelegate.menu_high_reso.state == .on ? self.bounds.height * 2 : self.bounds.height
             let camera: NSDictionary = ["tonemap": "filmic",
-                                        "resolution": [self.bounds.width*2, self.bounds.height*2],
+                                        "resolution": [res_w, res_h],
                                         "reconstruction_filter": "tent",
                                         "transform": ["position": [p.x, p.y, p.z],
                                                       "look_at": [p1.x, p1.y, p1.z],
@@ -513,12 +593,12 @@ class MySceneView: SCNView {
                                          "transform": ["position": [0, 0, 0],
                                                        "up": [p_up.x, p_up.y, p_up.z]],
                                          "type": "infinite_sphere",
-                                         "emission": "envmap.hdr",
+                                         "emission": 0.5,
                                          "sample": true]
             primitives.append(envmap)
             
             // Add the floor
-            let pf = pov.convertPosition(SCNVector3(0, lowest_y-1, 0), to: nil)
+            let pf = SCNVector3(0, lowest_y-1, 0)
             let floor : NSDictionary = ["name": "Floor",
                                         "transform": ["position" : [pf.x, pf.y, pf.z],
                                                       "up" : [p_up.x, p_up.y, p_up.z],
@@ -534,23 +614,22 @@ class MySceneView: SCNView {
             bsdfs.append(bsdf_floor)
             
             // Add backwall
-            let p_wall = pov.convertPosition(SCNVector3(0,0,lowest_z-5), to: nil)
-            let w1 = pov.convertPosition(SCNVector3(0,0,1), to: nil) - p
+            let p_wall = SCNVector3(0, 0, lowest_z-5)
+            let w_up = SCNVector3(0, 0, 1)
             let wall : NSDictionary = [ "name": "Wall",
                                         "transform": ["position" : [p_wall.x, p_wall.y, p_wall.z],
-                                                      "up" : [w1.x, w1.y, w1.z],
+                                                      "up" : [w_up.x, w_up.y, w_up.z],
                                                       "scale": 100.0],
                                         "type": "quad",
                                         "bsdf": "Floor"]
             
             primitives.append(wall)
             // Add a spotlight directed from top to bottom
-            let plight = pov.convertPosition(SCNVector3(0,50,0), to: nil) - p
+            let plight = SCNVector3(0, 50, 0)
             let spotlight: NSDictionary = ["name": "SpotLight",
                                            "transform": ["position": [plight.x, plight.y, plight.z],
-                                                         "up": [-p_up.x, -p_up.y, -p_up.z],
-                                                         "scale": 3],
-                                           "type": "disk",
+                                                         "scale": 5],
+                                           "type": "sphere",
                                            "emission": 40,
                                            "bsdf": ["albedo": 1.0, "type": "null"]
             ]
@@ -1338,6 +1417,7 @@ class MySceneView: SCNView {
             material.metalness.contents = texture.metalness
             material.fresnelExponent = texture.fresnelExponent
             material.lightingModel = self.advancedRendering ? .physicallyBased : .blinn
+            material.setValue(texture.name, forUndefinedKey: "texture_name")
         }
     }
 
