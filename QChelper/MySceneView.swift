@@ -685,6 +685,17 @@ class MySceneView: SCNView {
     
     
     override func mouseDown(with theEvent: NSEvent) {
+        if theEvent.clickCount == 1 {
+            self.selectNodes(with: theEvent)
+        } else if theEvent.clickCount == 2 {
+            self.reset_selection()
+            self.selectNodes(with: theEvent)
+            self.select_all_bonded()
+        }
+        super.mouseDown(with: theEvent)
+    }
+    
+    func selectNodes(with theEvent: NSEvent) {
         let hitResults = hitTest(theEvent.locationInWindow, options: nil)
         if hitResults.count > 0 {
             // retrieved the first clicked object
@@ -717,7 +728,6 @@ class MySceneView: SCNView {
         if let pov = self.pointOfView {
             self.defaultCameraController.worldUp = pov.worldUp
         }
-        super.mouseDown(with: theEvent)
     }
     
     
