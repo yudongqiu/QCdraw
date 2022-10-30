@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "1400"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F54F8CF91B5038D2001665CF"
-               BuildableName = "QChelper.app"
-               BlueprintName = "QChelper"
-               ReferencedContainer = "container:QChelper.xcodeproj">
+               BuildableName = "QCdraw.app"
+               BlueprintName = "QCdraw"
+               ReferencedContainer = "container:QCdraw.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,28 +28,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F54F8D0B1B5038D2001665CF"
-               BuildableName = "QChelperTests.xctest"
-               BlueprintName = "QChelperTests"
-               ReferencedContainer = "container:QChelper.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F54F8CF91B5038D2001665CF"
-            BuildableName = "QChelper.app"
-            BlueprintName = "QChelper"
-            ReferencedContainer = "container:QChelper.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -66,13 +45,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F54F8CF91B5038D2001665CF"
-            BuildableName = "QChelper.app"
-            BlueprintName = "QChelper"
-            ReferencedContainer = "container:QChelper.xcodeproj">
+            BuildableName = "QCdraw.app"
+            BlueprintName = "QCdraw"
+            ReferencedContainer = "container:QCdraw.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -85,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F54F8CF91B5038D2001665CF"
-            BuildableName = "QChelper.app"
-            BlueprintName = "QChelper"
-            ReferencedContainer = "container:QChelper.xcodeproj">
+            BuildableName = "QCdraw.app"
+            BlueprintName = "QCdraw"
+            ReferencedContainer = "container:QCdraw.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

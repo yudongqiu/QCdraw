@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
-        <plugIn identifier="com.apple.SceneKitIBPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.SceneKitIBPlugin" version="21225"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -383,16 +383,16 @@ CA
                             <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZqL-n9-QpZ">
                                 <rect key="frame" x="-1" y="39" width="434" height="233"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <clipView key="contentView" ambiguous="YES" drawsBackground="NO" copiesOnScroll="NO" id="1by-L2-zgE">
-                                    <rect key="frame" x="1" y="1" width="417" height="231"/>
+                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="1by-L2-zgE">
+                                    <rect key="frame" x="1" y="1" width="432" height="231"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView ambiguous="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" usesFontPanel="YES" findStyle="bar" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" textCompletion="NO" id="GrP-qd-WOP">
-                                            <rect key="frame" x="0.0" y="0.0" width="417" height="231"/>
+                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" fieldEditor="YES" usesFontPanel="YES" findStyle="bar" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" textCompletion="NO" id="GrP-qd-WOP">
+                                            <rect key="frame" x="0.0" y="0.0" width="432" height="231"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="417" height="231"/>
+                                            <size key="minSize" width="432" height="231"/>
                                             <size key="maxSize" width="479" height="10000000"/>
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
@@ -403,7 +403,7 @@ CA
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="yt8-en-5Hv">
-                                    <rect key="frame" x="418" y="1" width="15" height="231"/>
+                                    <rect key="frame" x="417" y="1" width="16" height="231"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -419,7 +419,7 @@ CA
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Blc-Tg-q35">
-                                <rect key="frame" x="242" y="2" width="82" height="32"/>
+                                <rect key="frame" x="249" y="2" width="76" height="33"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="svn-xy-BaR"/>
                                 </constraints>
@@ -435,7 +435,7 @@ Gw
                                 </connections>
                             </button>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SC6-4O-woS">
-                                <rect key="frame" x="18" y="6" width="97" height="25"/>
+                                <rect key="frame" x="17" y="5" width="98" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="hna-ER-2RX"/>
                                 </constraints>
@@ -451,7 +451,7 @@ Gw
                                 </popUpButtonCell>
                             </popUpButton>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iwj-0T-XgY">
-                                <rect key="frame" x="336" y="2" width="82" height="32"/>
+                                <rect key="frame" x="335" y="2" width="84" height="33"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="ofS-Qj-GYH"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="xNF-Z0-IAg"/>
@@ -503,48 +503,62 @@ DQ
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="EPQ-uy-JYQ"/>
                                 <toolbarItem implicitItemIdentifier="046FBBE4-A533-4131-8A2A-66A70C29C0BD" label="Open" paletteLabel="Open" tag="-1" image="open" id="yiZ-hX-kk6">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="open_fileWithSender:" target="Oky-zY-oP4" id="TYD-4Q-9Yk"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="49CCA4D9-A78D-47DC-BB74-A60FF950496F" label="Save" paletteLabel="Save" tag="-1" image="save" id="tLF-I3-A7g">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="save_snapshotWithSender:" target="Oky-zY-oP4" id="T4u-xv-iyI"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="43006C3E-23D1-4E10-BC2D-909B26CBE2B8" label="+Bond" paletteLabel="+Bond" tag="-1" image="add" id="35P-QO-eMj">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="add_bondWithSender:" target="Oky-zY-oP4" id="f09-KP-xeS"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="2876AA38-6011-4B9F-86F2-9A7731F6030F" label="Delete" paletteLabel="Delete" tag="-1" image="delete" id="UK5-lM-Dhi">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="remove_selected_nodeWithSender:" target="Oky-zY-oP4" id="abe-gI-Rux"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="8865A43B-E2B6-4F1B-9817-C28A404780BC" label="Rotate" paletteLabel="Rotate" tag="-1" image="rotate" id="Ijq-In-Lcp">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="rotate_moleculeWithSender:" target="Oky-zY-oP4" id="MQn-nG-PhD"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="FC69791E-0DEF-406D-AFB8-6858D02000AF" label="Undo" paletteLabel="Undo" tag="-1" image="undo" autovalidates="NO" id="EXF-Vs-fhl">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="undo:" target="Oky-zY-oP4" id="eMf-9O-VfS"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="04B744BE-2C08-4C17-83B9-69F4685BE4E9" label="Redo" paletteLabel="Redo" tag="-1" image="redo" autovalidates="NO" id="91J-R7-SHG">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="redo:" target="Oky-zY-oP4" id="EO8-AQ-Jz1"/>
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="8F08EAA0-9309-436B-99B0-38904B02F3EF" label="Save 3D" paletteLabel="Save 3D" tag="-1" image="save3d" id="k6E-Pl-JIR">
+                                    <size key="minSize" width="22" height="22"/>
+                                    <size key="maxSize" width="22" height="22"/>
                                     <connections>
                                         <action selector="export_daeWithSender:" target="Oky-zY-oP4" id="tJE-np-UUt"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="CAA151A5-D5F9-4297-AE36-DA3D9C955F0D" label="Shadow" paletteLabel="Shadow" tag="-1" image="atomShadowOff" id="Agt-v8-ab9">
-                                    <size key="minSize" width="819" height="819"/>
-                                    <size key="maxSize" width="819" height="819"/>
+                                <toolbarItem implicitItemIdentifier="CAA151A5-D5F9-4297-AE36-DA3D9C955F0D" label="Shadow" paletteLabel="Shadow" tag="-1" image="atomShadowOff" sizingBehavior="auto" id="Agt-v8-ab9">
                                     <connections>
                                         <action selector="cast_shadowsWithSender:" target="Oky-zY-oP4" id="LWW-Wl-650"/>
                                     </connections>
@@ -561,8 +575,8 @@ DQ
                                 <toolbarItem reference="35P-QO-eMj"/>
                                 <toolbarItem reference="UK5-lM-Dhi"/>
                                 <toolbarItem reference="EPQ-uy-JYQ"/>
-                                <toolbarItem reference="Agt-v8-ab9"/>
                                 <toolbarItem reference="Ijq-In-Lcp"/>
+                                <toolbarItem reference="Agt-v8-ab9"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -592,7 +606,7 @@ DQ
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </sceneView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iXf-9x-KPI">
-                                <rect key="frame" x="3" y="0.0" width="809" height="17"/>
+                                <rect key="frame" x="3" y="0.0" width="809" height="16"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="info_bar" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" id="sE6-HG-OXM">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -602,11 +616,11 @@ DQ
                             <box hidden="YES" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="uht-eG-ai6">
                                 <rect key="frame" x="-3" y="500" width="821" height="46"/>
                                 <view key="contentView" id="HlJ-Yf-30J">
-                                    <rect key="frame" x="3" y="3" width="815" height="40"/>
+                                    <rect key="frame" x="4" y="5" width="813" height="38"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <slider canDrawConcurrently="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cWo-VS-fCn">
-                                            <rect key="frame" x="84" y="12" width="583" height="19"/>
+                                        <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cWo-VS-fCn">
+                                            <rect key="frame" x="84" y="6" width="581" height="23"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="15" id="2qQ-3E-xG8"/>
                                             </constraints>
@@ -616,7 +630,7 @@ DQ
                                             </connections>
                                         </slider>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Nz7-Qp-f81">
-                                            <rect key="frame" x="20" y="9" width="50" height="22"/>
+                                            <rect key="frame" x="20" y="7" width="50" height="22"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="50" id="3G1-89-oCG"/>
                                                 <constraint firstAttribute="height" constant="22" id="YEE-IR-mFS"/>
@@ -632,7 +646,7 @@ DQ
                                             </connections>
                                         </textField>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E1i-Y8-Le5">
-                                            <rect key="frame" x="738" y="12" width="73" height="19"/>
+                                            <rect key="frame" x="736" y="6" width="73" height="23"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="69" id="KXk-cG-kBy"/>
                                                 <constraint firstAttribute="height" constant="15" id="Kte-we-EW5"/>
@@ -643,7 +657,7 @@ DQ
                                             </connections>
                                         </slider>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yzz-cI-P55">
-                                            <rect key="frame" x="672" y="4" width="66" height="32"/>
+                                            <rect key="frame" x="669" y="2" width="68" height="33"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="54" id="QfW-Gm-gfc"/>
                                                 <constraint firstAttribute="height" constant="21" id="xkF-Ie-EFw"/>
@@ -677,7 +691,7 @@ DQ
                                 <rect key="frame" x="194" y="213" width="427" height="116"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" id="TM9-En-BTl">
-                                    <rect key="frame" x="3" y="3" width="421" height="91"/>
+                                    <rect key="frame" x="4" y="5" width="419" height="96"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <progressIndicator wantsLayer="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="1iS-qd-WLY">
@@ -687,7 +701,7 @@ DQ
                                             </constraints>
                                         </progressIndicator>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OP2-Al-56B">
-                                            <rect key="frame" x="312" y="37" width="91" height="17"/>
+                                            <rect key="frame" x="312" y="37" width="89" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="ProgressLabel" id="WmG-6s-8yg">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>

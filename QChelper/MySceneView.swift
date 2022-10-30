@@ -776,8 +776,8 @@ class MySceneView: SCNView {
             let a_end = (bond_a.value(forUndefinedKey: "atom_b") as! SCNNode).position
             let b_start = (bond_b.value(forUndefinedKey: "atom_a") as! SCNNode).position
             let b_end = (bond_b.value(forUndefinedKey: "atom_b") as! SCNNode).position
-            let a_vector : float3 = float3(a_start - a_end)
-            let b_vector : float3 = float3(b_start - b_end)
+            let a_vector : SIMD3<Float> = SIMD3<Float>(a_start - a_end)
+            let b_vector : SIMD3<Float> = SIMD3<Float>(b_start - b_end)
             let a_length = a_start.distance(a_end)
             let b_length = b_start.distance(b_end)
             let theta = acos(dot(a_vector,b_vector)/Float(a_length * b_length)) / .pi * 180.0
@@ -848,9 +848,9 @@ class MySceneView: SCNView {
                     }
                 }
                 // compute the dihedral angle between point 1 -- 4
-                let a_vector : float3 = float3(point1 - point2)
-                let b_vector : float3 = float3(point2 - point3)
-                let c_vector : float3 = float3(point3 - point4)
+                let a_vector : SIMD3<Float> = SIMD3<Float>(point1 - point2)
+                let b_vector : SIMD3<Float> = SIMD3<Float>(point2 - point3)
+                let c_vector : SIMD3<Float> = SIMD3<Float>(point3 - point4)
                 let Uab = cross(a_vector, b_vector)
                 let Ubc = cross(b_vector, c_vector)
                 //let gamma = acos(dot(Uab,Ubc)/(length(Uab)*length(Ubc))) / .pi * 180.0
